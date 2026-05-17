@@ -1,20 +1,49 @@
-import { ScrollView, View, Text, Pressable } from 'react-native';
+import { useEffect, useState } from 'react';
+import { ScrollView, Text, View, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { ArrowRight, Locate, Train, Bus, Briefcase, Home, Ticket } from 'lucide-react-native';
+import { ArrowDownUp, ArrowRight, Briefcase, Bus, Home, Locate, Search, Ticket, Train } from 'lucide-react-native';
+import type { Place } from '@wayra/types';
 import { useTheme } from '@/theme';
-import { SearchField } from '@/components/SearchField';
+import { PlacesAutocomplete } from '@/components/PlacesAutocomplete';
+import { DemoBadge } from '@/components/DemoBadge';
+import { api } from '@/lib/api';
+
+interface StatusItem {
+  city: string;
+  status: 'ok' | 'minor' | 'major';
+  note: string;
+}
 
 export default function HomeScreen() {
   const theme = useTheme();
   const { t } = useTranslation();
+  const [from, setFrom] = useState<Place | null>(null);
+  const [to, setTo] = useState<Place | null>(null);
+  const [status, setStatus] = useState<StatusItem[]>([]);
+
+  useEffect(() => {
+    api.networkStatus().then((r) => setStatus(r.items.slice(0, 3))).catch(() => undefined);
+  }, []);
+
+  function plan() {
+    const params = new URLSearchParams();
+    if (from) params.set('from', from.id);
+    if (to) params.set('to', to.id);
+    router.push(`/plan?${params.toString()}`);
+  }
+
+  function swap() {
+    setFrom(to);
+    setTo(from);
+  }
 
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: theme.bg }}>
-      <ScrollView contentContainerStyle={{ padding: 20, gap: 16 }}>
-        {/* Hero */}
+      <ScrollView contentContainerStyle={{ padding: 20, gap: 16 }} keyboardShouldPersistTaps="handled">
         <View style={{ paddingTop: 8 }}>
-          <Text style={{ color: theme.textMuted, fontSize: 13, fontWeight: '600' }}>
+          <Text style={{ color: theme.textMuted, fontSize: 13, fontWeight: '700' }}>
             {t('brand.tagline')}
           </Text>
           <Text
@@ -30,7 +59,6 @@ export default function HomeScreen() {
           </Text>
         </View>
 
-        {/* Search card */}
         <View
           style={{
             backgroundColor: theme.surface,
@@ -38,54 +66,87 @@ export default function HomeScreen() {
             borderWidth: 1,
             borderRadius: 22,
             padding: 12,
-            gap: 8,
+            gap: 10,
+            zIndex: 10,
           }}
         >
-          <SearchField icon="from" placeholder={t('home.hero.fromPlaceholder')} />
-          <SearchField icon="to" placeholder={t('home.hero.toPlaceholder')} />
+          <View style={{ zIndex: 30 }}>
+            <PlacesAutocomplete
+              value={from}
+              onChange={setFrom}
+              placeholder={t('home.hero.fromPlaceholder')}
+              testID="home-from"
+            />
+          </View>
+          <View style={{ alignItems: 'center' }}>
+            <Pressable
+              onPress={swap}
+              hitSlop={10}
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: 999,
+                backgroundColor: theme.surfaceMuted,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <ArrowDownUp color={theme.text} size={14} />
+            </Pressable>
+          </View>
+          <View style={{ zIndex: 20 }}>
+            <PlacesAutocomplete
+              value={to}
+              onChange={setTo}
+              placeholder={t('home.hero.toPlaceholder')}
+              testID="home-to"
+            />
+          </View>
           <Pressable
+            onPress={plan}
+            disabled={!from || !to}
             style={{
               backgroundColor: theme.brand,
               borderRadius: 999,
-              paddingVertical: 12,
+              paddingVertical: 14,
               flexDirection: 'row',
-              justifyContent: 'center',
               alignItems: 'center',
+              justifyContent: 'center',
               gap: 8,
-              marginTop: 4,
+              opacity: !from || !to ? 0.5 : 1,
             }}
           >
-            <Text style={{ color: 'white', fontWeight: '700' }}>{t('home.hero.plan')}</Text>
-            <ArrowRight color="white" size={16} />
+            <Text style={{ color: '#fff', fontWeight: '800' }}>{t('home.hero.plan')}</Text>
+            <ArrowRight color="#fff" size={16} />
           </Pressable>
           <Pressable
+            onPress={() => router.push('/search')}
             style={{
               flexDirection: 'row',
-              alignItems: 'center',
               gap: 6,
-              alignSelf: 'flex-start',
-              paddingHorizontal: 4,
+              alignItems: 'center',
               paddingVertical: 6,
+              alignSelf: 'flex-start',
             }}
           >
-            <Locate color={theme.brand} size={14} />
-            <Text style={{ color: theme.brand, fontWeight: '600', fontSize: 12 }}>
-              {t('home.hero.useCurrentLocation')}
+            <Search color={theme.brand} size={14} />
+            <Text style={{ color: theme.brand, fontSize: 12, fontWeight: '700' }}>
+              Open full search
             </Text>
           </Pressable>
         </View>
 
-        {/* Quick actions */}
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
           {[
-            { label: t('home.quickActions.home'), Icon: Home },
-            { label: t('home.quickActions.work'), Icon: Briefcase },
-            { label: t('home.quickActions.findStation'), Icon: Train },
-            { label: t('home.quickActions.findStop'), Icon: Bus },
-            { label: t('home.quickActions.compareFares'), Icon: Ticket },
-          ].map(({ label, Icon }) => (
-            <View
+            { label: t('home.quickActions.home'), Icon: Home, action: () => router.push('/me') },
+            { label: t('home.quickActions.work'), Icon: Briefcase, action: () => router.push('/me') },
+            { label: t('home.quickActions.findStation'), Icon: Train, action: () => router.push('/search') },
+            { label: t('home.quickActions.findStop'), Icon: Bus, action: () => router.push('/search') },
+            { label: t('home.quickActions.compareFares'), Icon: Ticket, action: () => router.push('/plan') },
+          ].map(({ label, Icon, action }) => (
+            <Pressable
               key={label}
+              onPress={action}
               style={{
                 flexBasis: '47%',
                 flexGrow: 1,
@@ -107,23 +168,35 @@ export default function HomeScreen() {
                   justifyContent: 'center',
                 }}
               >
-                <Icon color="white" size={18} />
+                <Icon color="#fff" size={18} />
               </View>
               <Text style={{ color: theme.text, fontWeight: '700', fontSize: 13 }}>{label}</Text>
-            </View>
+            </Pressable>
           ))}
         </View>
 
-        {/* Live status section */}
-        <Text style={{ color: theme.text, fontSize: 16, fontWeight: '700', marginTop: 8 }}>
-          {t('home.sections.liveStatus')}
-        </Text>
-        <View style={{ gap: 8 }}>
-          {[
-            { city: 'Berlin', note: 'S-Bahn pünktlich', tone: theme.status.onTime },
-            { city: 'Paris', note: 'Ligne 4 — micro-perturbation', tone: theme.status.delay },
-            { city: 'Tunis', note: 'Métro 1 — léger retard', tone: theme.status.delay },
-          ].map((it) => (
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8 }}>
+          <Text style={{ color: theme.text, fontSize: 16, fontWeight: '800', flex: 1 }}>
+            {t('home.sections.liveStatus')}
+          </Text>
+          <DemoBadge />
+        </View>
+        {status.length === 0 ? (
+          <View
+            style={{
+              padding: 16,
+              borderRadius: 14,
+              backgroundColor: theme.surface,
+              borderColor: theme.border,
+              borderWidth: 1,
+            }}
+          >
+            <Text style={{ color: theme.textMuted, fontSize: 13 }}>
+              Status unavailable — backend not reachable.
+            </Text>
+          </View>
+        ) : (
+          status.map((it) => (
             <View
               key={it.city}
               style={{
@@ -142,16 +215,21 @@ export default function HomeScreen() {
                   width: 10,
                   height: 10,
                   borderRadius: 999,
-                  backgroundColor: it.tone,
+                  backgroundColor:
+                    it.status === 'ok'
+                      ? theme.status.onTime
+                      : it.status === 'minor'
+                        ? theme.status.delay
+                        : theme.status.severe,
                 }}
               />
               <View style={{ flex: 1 }}>
-                <Text style={{ color: theme.text, fontWeight: '700' }}>{it.city}</Text>
+                <Text style={{ color: theme.text, fontWeight: '800' }}>{it.city}</Text>
                 <Text style={{ color: theme.textMuted, fontSize: 12 }}>{it.note}</Text>
               </View>
             </View>
-          ))}
-        </View>
+          ))
+        )}
       </ScrollView>
     </SafeAreaView>
   );
