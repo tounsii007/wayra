@@ -1,8 +1,12 @@
 import { fuzzyScore, normalize, levenshtein } from '../src/fuzzy';
 
 describe('fuzzy.normalize', () => {
-  it('lowercases and strips diacritics', () => {
-    expect(normalize('Café — Châtelet')).toBe('cafe - chatelet');
+  it('lowercases and strips diacritics, preserving unicode punctuation', () => {
+    // Em-dash (U+2014) is not a combining diacritic — it is preserved.
+    expect(normalize('Café — Châtelet')).toBe('cafe — chatelet');
+  });
+  it('strips diacritics on regular letters', () => {
+    expect(normalize('München Hauptbahnhof')).toBe('munchen hauptbahnhof');
   });
   it('handles ß → ss', () => {
     expect(normalize('Straße')).toBe('strasse');
