@@ -1,4 +1,4 @@
-import { Suspense } from 'react';
+import * as React from 'react';
 import { SiteHeader } from '@/components/site-header';
 import { PlanClient } from './plan-client';
 
@@ -9,9 +9,9 @@ export default function PlanPage() {
     <>
       <SiteHeader />
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-        <Suspense fallback={<PlanSkeleton />}>
+        <React.Suspense fallback={<PlanSkeleton />}>
           <PlanClient />
-        </Suspense>
+        </React.Suspense>
       </main>
     </>
   );
