@@ -28,7 +28,7 @@ jobs:
         run: pnpm turbo run type-check
 
   test:
-    name: Tests (@wayra/shared)
+    name: Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -39,6 +39,8 @@ jobs:
       - run: pnpm install --no-frozen-lockfile
       - name: Run shared package tests
         run: pnpm --filter @wayra/shared test
+      - name: Run backend tests
+        run: pnpm --filter @wayra/backend test
 
   build-web:
     name: Build web
