@@ -30,16 +30,15 @@ interface Props {
   center: Coordinates;
   zoom?: number;
   markers?: MarkerInput[];
+  onMarkerPress?: (id: string) => void;
 }
 
 /**
- * Lightweight wrapper around the MapLibre Native React Native bindings.
- *
- * The v10 package (@maplibre/maplibre-react-native) accepts a JSON-string
- * style and no longer exposes setTelemetryEnabled — telemetry was a
- * Mapbox-only concept and was dropped when the fork forked.
+ * Lightweight wrapper around MapLibre Native React Native bindings (v10).
+ * Note: OSM raster tiles are convenient for dev but the public tile server
+ * has tight rate limits — switch to MapTiler/Stadia for production.
  */
-export function MapLibreView({ center, zoom = 12, markers = [] }: Props) {
+export function MapLibreView({ center, zoom = 12, markers = [], onMarkerPress }: Props) {
   const fc = useMemo(
     () => ({
       type: 'FeatureCollection' as const,
@@ -56,18 +55,16 @@ export function MapLibreView({ center, zoom = 12, markers = [] }: Props) {
   );
 
   return (
-    <MapView
-      style={{ flex: 1 }}
-      mapStyle={OSM_STYLE}
-      logoEnabled={false}
-      attributionEnabled
-    >
-      <Camera
-        centerCoordinate={[center.lng, center.lat]}
-        zoomLevel={zoom}
-        animationMode="flyTo"
-      />
-      <ShapeSource id="wayra-markers" shape={fc}>
+    <MapView style={{ flex: 1 }} mapStyle={OSM_STYLE} logoEnabled={false} attributionEnabled>
+      <Camera centerCoordinate={[center.lng, center.lat]} zoomLevel={zoom} animationMode="flyTo" />
+      <ShapeSource
+        id="wayra-markers"
+        shape={fc}
+        onPress={(e) => {
+          const id = e?.features?.[0]?.properties?.id as string | undefined;
+          if (id && onMarkerPress) onMarkerPress(id);
+        }}
+      >
         <CircleLayer
           id="wayra-markers-circle"
           style={{
