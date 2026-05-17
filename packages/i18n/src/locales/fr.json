@@ -1,0 +1,124 @@
+{
+  "brand": {
+    "name": "Wayra",
+    "tagline": "Voyager. Simple. Connecté."
+  },
+  "nav": {
+    "plan": "Planifier",
+    "map": "Carte",
+    "live": "Direct",
+    "assistant": "Assistant",
+    "settings": "Réglages",
+    "offline": "Hors ligne"
+  },
+  "home": {
+    "hero": {
+      "title": "Où veux-tu aller ?",
+      "subtitle": "Trains, bus et métros en Europe et en Afrique du Nord — dans une seule appli.",
+      "fromPlaceholder": "De …",
+      "toPlaceholder": "Destination",
+      "useCurrentLocation": "Utiliser ma position",
+      "plan": "Planifier",
+      "now": "Maintenant",
+      "departAt": "Départ",
+      "arriveBy": "Arrivée"
+    },
+    "quickActions": {
+      "home": "Domicile",
+      "work": "Travail",
+      "findStation": "Trouver une gare",
+      "findStop": "Trouver un arrêt",
+      "compareFares": "Comparer les prix"
+    },
+    "sections": {
+      "popularRoutes": "Itinéraires populaires",
+      "recentSearches": "Recherches récentes",
+      "liveStatus": "Trafic en direct",
+      "exploreCountries": "Explorer les pays"
+    },
+    "features": {
+      "title": "Tout ce qu'il faut pour ton voyage",
+      "items": [
+        { "title": "Itinéraires multimodaux", "body": "Train, bus, métro, tram et marche — intelligemment combinés." },
+        { "title": "Retards en direct", "body": "Ponctualité, changements de quai et perturbations en temps réel." },
+        { "title": "Horaires hors ligne", "body": "Télécharge des villes et utilise Wayra sans Internet." },
+        { "title": "Assistant IA", "body": "Pose tes questions en langage naturel — réponses instantanées." }
+      ]
+    }
+  },
+  "search": {
+    "placeholder": "Ville, gare ou adresse",
+    "noResults": "Aucun résultat.",
+    "useLocation": "Utiliser ma position",
+    "types": {
+      "city": "Ville",
+      "station": "Gare",
+      "stop": "Arrêt",
+      "metro_station": "Métro",
+      "tram_stop": "Tram",
+      "bus_stop": "Bus",
+      "airport": "Aéroport",
+      "street": "Rue",
+      "address": "Adresse",
+      "poi": "Lieu",
+      "landmark": "Monument",
+      "neighborhood": "Quartier"
+    }
+  },
+  "route": {
+    "departure": "Départ",
+    "arrival": "Arrivée",
+    "duration": "Durée",
+    "transfers": "Correspondances",
+    "platform": "Voie",
+    "noTransfer": "direct",
+    "transfersCount": "{count, plural, one {# correspondance} other {# correspondances}}",
+    "co2Saved": "{value} CO₂ économisé",
+    "preferences": {
+      "fastest": "Le plus rapide",
+      "cheapest": "Le moins cher",
+      "fewest_transfers": "Moins de correspondances",
+      "accessible": "Accessible",
+      "least_walking": "Moins de marche",
+      "night": "Nuit",
+      "most_comfortable": "Confortable"
+    }
+  },
+  "status": {
+    "onTime": "à l'heure",
+    "delayed": "en retard",
+    "cancelled": "supprimé",
+    "platformChanged": "changement de voie",
+    "detour": "déviation",
+    "strike": "grève",
+    "replacement": "service de remplacement",
+    "unknown": "inconnu"
+  },
+  "errors": {
+    "noRoute": "Aucun itinéraire direct trouvé. Voir les alternatives ?",
+    "noLive": "Données temps réel indisponibles. Horaires théoriques affichés.",
+    "noFare": "Impossible de charger le prix.",
+    "network": "Pas de connexion. Nouvelle tentative …",
+    "generic": "Une erreur est survenue. Veuillez réessayer."
+  },
+  "fare": {
+    "estimated": "Prix estimé",
+    "unavailable": "Prix non disponible",
+    "deutschlandticket": "Deutschlandticket valable"
+  },
+  "theme": {
+    "light": "Clair",
+    "dark": "Sombre",
+    "system": "Système"
+  },
+  "assistant": {
+    "greeting": "Bonjour ! Je peux t'aider à planifier ton voyage. Pose-moi tes questions.",
+    "placeholder": "Pose une question … par ex. « Comment aller à Paris demain matin ? »",
+    "examples": [
+      "Comment aller de Francfort à Paris demain matin ?",
+      "Trouve la connexion la moins chère de Tunis à Sousse.",
+      "Y a-t-il des perturbations à Berlin aujourd'hui ?",
+      "Quelle route est meilleure avec une poussette ?"
+    ]
+  }
+}

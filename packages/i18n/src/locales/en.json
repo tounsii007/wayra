@@ -1,0 +1,124 @@
+{
+  "brand": {
+    "name": "Wayra",
+    "tagline": "Travel. Simple. Connected."
+  },
+  "nav": {
+    "plan": "Plan trip",
+    "map": "Map",
+    "live": "Live",
+    "assistant": "Assistant",
+    "settings": "Settings",
+    "offline": "Offline"
+  },
+  "home": {
+    "hero": {
+      "title": "Where do you want to go?",
+      "subtitle": "Trains, buses and metros across Europe and North Africa — in one app.",
+      "fromPlaceholder": "From …",
+      "toPlaceholder": "Enter destination",
+      "useCurrentLocation": "Use current location",
+      "plan": "Plan route",
+      "now": "Now",
+      "departAt": "Depart at",
+      "arriveBy": "Arrive by"
+    },
+    "quickActions": {
+      "home": "Home",
+      "work": "Work",
+      "findStation": "Find station",
+      "findStop": "Find stop",
+      "compareFares": "Compare fares"
+    },
+    "sections": {
+      "popularRoutes": "Popular routes",
+      "recentSearches": "Recent searches",
+      "liveStatus": "Live traffic status",
+      "exploreCountries": "Explore countries"
+    },
+    "features": {
+      "title": "Everything you need for your trip",
+      "items": [
+        { "title": "Multimodal routes", "body": "Train, bus, metro, tram and walking — smartly combined." },
+        { "title": "Live delays", "body": "On-time status, platform changes and disruptions in real time." },
+        { "title": "Offline timetables", "body": "Download cities and use Wayra without internet." },
+        { "title": "AI travel assistant", "body": "Ask questions in plain language — get instant answers." }
+      ]
+    }
+  },
+  "search": {
+    "placeholder": "City, station or address",
+    "noResults": "No results.",
+    "useLocation": "Use my location",
+    "types": {
+      "city": "City",
+      "station": "Station",
+      "stop": "Stop",
+      "metro_station": "Metro",
+      "tram_stop": "Tram",
+      "bus_stop": "Bus",
+      "airport": "Airport",
+      "street": "Street",
+      "address": "Address",
+      "poi": "Place",
+      "landmark": "Landmark",
+      "neighborhood": "Neighborhood"
+    }
+  },
+  "route": {
+    "departure": "Departure",
+    "arrival": "Arrival",
+    "duration": "Duration",
+    "transfers": "Transfers",
+    "platform": "Platform",
+    "noTransfer": "direct",
+    "transfersCount": "{count, plural, one {# transfer} other {# transfers}}",
+    "co2Saved": "{value} CO₂ saved",
+    "preferences": {
+      "fastest": "Fastest",
+      "cheapest": "Cheapest",
+      "fewest_transfers": "Fewest transfers",
+      "accessible": "Accessible",
+      "least_walking": "Less walking",
+      "night": "Night",
+      "most_comfortable": "Most comfortable"
+    }
+  },
+  "status": {
+    "onTime": "on time",
+    "delayed": "delayed",
+    "cancelled": "cancelled",
+    "platformChanged": "platform changed",
+    "detour": "detour",
+    "strike": "strike",
+    "replacement": "replacement service",
+    "unknown": "unknown"
+  },
+  "errors": {
+    "noRoute": "No direct route found. Show alternatives?",
+    "noLive": "Live data unavailable. Showing scheduled times.",
+    "noFare": "Price could not be loaded.",
+    "network": "No connection. Retrying …",
+    "generic": "Something went wrong. Please try again."
+  },
+  "fare": {
+    "estimated": "Estimated price",
+    "unavailable": "Price not available",
+    "deutschlandticket": "Deutschlandticket valid"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "assistant": {
+    "greeting": "Hi! I can help plan your trip. Ask me anything.",
+    "placeholder": "Ask anything … e.g. \"How do I get to Paris tomorrow morning?\"",
+    "examples": [
+      "How do I get from Frankfurt to Paris tomorrow morning?",
+      "Find the cheapest connection from Tunis to Sousse.",
+      "Are there disruptions in Berlin today?",
+      "Which route is better with a stroller?"
+    ]
+  }
+}

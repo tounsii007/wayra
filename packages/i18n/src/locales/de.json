@@ -1,0 +1,124 @@
+{
+  "brand": {
+    "name": "Wayra",
+    "tagline": "Reisen. Einfach. Vernetzt."
+  },
+  "nav": {
+    "plan": "Reise planen",
+    "map": "Karte",
+    "live": "Live",
+    "assistant": "Assistent",
+    "settings": "Einstellungen",
+    "offline": "Offline"
+  },
+  "home": {
+    "hero": {
+      "title": "Wohin möchtest du fahren?",
+      "subtitle": "Züge, Busse und Metros in Europa und Nordafrika — in einer App.",
+      "fromPlaceholder": "Von …",
+      "toPlaceholder": "Ziel eingeben",
+      "useCurrentLocation": "Aktuelle Position verwenden",
+      "plan": "Route planen",
+      "now": "Jetzt",
+      "departAt": "Abfahrt",
+      "arriveBy": "Ankunft"
+    },
+    "quickActions": {
+      "home": "Nach Hause",
+      "work": "Zur Arbeit",
+      "findStation": "Bahnhof suchen",
+      "findStop": "Haltestelle suchen",
+      "compareFares": "Preise vergleichen"
+    },
+    "sections": {
+      "popularRoutes": "Beliebte Routen",
+      "recentSearches": "Letzte Suchen",
+      "liveStatus": "Live-Verkehrsstatus",
+      "exploreCountries": "Länder entdecken"
+    },
+    "features": {
+      "title": "Alles, was du für deine Reise brauchst",
+      "items": [
+        { "title": "Multimodale Routen", "body": "Zug, Bus, Metro, Tram und Fußweg — clever kombiniert." },
+        { "title": "Live-Verspätungen", "body": "Pünktlichkeit, Gleisänderungen und Störungen in Echtzeit." },
+        { "title": "Offline-Fahrpläne", "body": "Lade Städte herunter und nutze Wayra ohne Internet." },
+        { "title": "KI-Reiseassistent", "body": "Stelle Fragen in natürlicher Sprache — erhalte sofort Antworten." }
+      ]
+    }
+  },
+  "search": {
+    "placeholder": "Stadt, Bahnhof oder Adresse",
+    "noResults": "Keine Treffer.",
+    "useLocation": "Position verwenden",
+    "types": {
+      "city": "Stadt",
+      "station": "Bahnhof",
+      "stop": "Haltestelle",
+      "metro_station": "Metro",
+      "tram_stop": "Tram",
+      "bus_stop": "Bus",
+      "airport": "Flughafen",
+      "street": "Straße",
+      "address": "Adresse",
+      "poi": "Ort",
+      "landmark": "Sehenswürdigkeit",
+      "neighborhood": "Viertel"
+    }
+  },
+  "route": {
+    "departure": "Abfahrt",
+    "arrival": "Ankunft",
+    "duration": "Dauer",
+    "transfers": "Umstiege",
+    "platform": "Gleis",
+    "noTransfer": "ohne Umstieg",
+    "transfersCount": "{count, plural, one {# Umstieg} other {# Umstiege}}",
+    "co2Saved": "{value} CO₂ gespart",
+    "preferences": {
+      "fastest": "Schnellste",
+      "cheapest": "Günstigste",
+      "fewest_transfers": "Wenig Umstiege",
+      "accessible": "Barrierearm",
+      "least_walking": "Wenig Laufen",
+      "night": "Nacht",
+      "most_comfortable": "Bequemste"
+    }
+  },
+  "status": {
+    "onTime": "pünktlich",
+    "delayed": "verspätet",
+    "cancelled": "fällt aus",
+    "platformChanged": "Gleisänderung",
+    "detour": "Umleitung",
+    "strike": "Streik",
+    "replacement": "Ersatzverkehr",
+    "unknown": "unbekannt"
+  },
+  "errors": {
+    "noRoute": "Keine direkte Route gefunden. Alternative anzeigen?",
+    "noLive": "Live-Daten aktuell nicht verfügbar. Fahrplanzeiten werden angezeigt.",
+    "noFare": "Preis konnte nicht geladen werden.",
+    "network": "Keine Verbindung. Wir versuchen es weiter.",
+    "generic": "Etwas ist schiefgelaufen. Bitte erneut versuchen."
+  },
+  "fare": {
+    "estimated": "Preis geschätzt",
+    "unavailable": "Preis nicht verfügbar",
+    "deutschlandticket": "Deutschlandticket gilt"
+  },
+  "theme": {
+    "light": "Hell",
+    "dark": "Dunkel",
+    "system": "System"
+  },
+  "assistant": {
+    "greeting": "Hallo! Ich helfe dir bei deiner Reise. Frag mich alles.",
+    "placeholder": "Frage stellen … z. B. „Wie komme ich morgen früh nach Paris?“",
+    "examples": [
+      "Wie komme ich morgen früh von Frankfurt nach Paris?",
+      "Finde mir die günstigste Verbindung von Tunis nach Sousse.",
+      "Gibt es heute Störungen in Berlin?",
+      "Welche Route ist besser mit Kinderwagen?"
+    ]
+  }
+}
