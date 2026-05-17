@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "incremental": true,
+    "baseUrl": ".",
+    "paths": {
+      "@wayra/types": ["packages/types/src/index.ts"],
+      "@wayra/types/*": ["packages/types/src/*"],
+      "@wayra/shared": ["packages/shared/src/index.ts"],
+      "@wayra/shared/*": ["packages/shared/src/*"],
+      "@wayra/i18n": ["packages/i18n/src/index.ts"],
+      "@wayra/i18n/*": ["packages/i18n/src/*"],
+      "@wayra/ui": ["packages/ui/src/index.ts"],
+      "@wayra/ui/*": ["packages/ui/src/*"]
+    }
+  },
+  "exclude": ["node_modules", "dist", "build", ".next", ".expo"]
+}

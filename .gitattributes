@@ -1,0 +1,16 @@
+* text=auto eol=lf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.mbtiles binary
+*.pbf binary
+
+# Generated / lock files — keep as-is
+pnpm-lock.yaml -text -diff
+package-lock.json -text -diff
