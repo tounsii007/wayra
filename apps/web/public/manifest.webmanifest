@@ -1,0 +1,16 @@
+{
+  "name": "Wayra — Travel. Simple. Connected.",
+  "short_name": "Wayra",
+  "description": "Trains, buses and metros across Europe and North Africa — in one app.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0a0e1a",
+  "theme_color": "#2563eb",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "categories": ["travel", "navigation", "utilities"]
+}

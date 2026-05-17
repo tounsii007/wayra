@@ -1,0 +1,42 @@
+{
+  "name": "@wayra/web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf .next .turbo"
+  },
+  "dependencies": {
+    "@wayra/i18n": "workspace:*",
+    "@wayra/shared": "workspace:*",
+    "@wayra/types": "workspace:*",
+    "@wayra/ui": "workspace:*",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.460.0",
+    "maplibre-gl": "^4.7.1",
+    "next": "^15.0.4",
+    "next-intl": "^3.26.0",
+    "next-themes": "^0.4.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-map-gl": "^7.1.7",
+    "tailwind-merge": "^2.5.5",
+    "zustand": "^5.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9.16.0",
+    "eslint-config-next": "^15.0.4",
+    "postcss": "^8.4.49",
+    "prettier-plugin-tailwindcss": "^0.6.9",
+    "tailwindcss": "^3.4.16",
+    "typescript": "^5.7.0"
+  }
+}
