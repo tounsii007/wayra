@@ -1,5 +1,6 @@
 import { colors, radii, spacing, typography } from '@wayra/ui';
 import { useColorScheme } from 'react-native';
+import { usePrefsStore } from './lib/prefs-store';
 
 export interface Theme {
   bg: string;
@@ -15,16 +16,10 @@ export interface Theme {
   radii: typeof radii;
   spacing: typeof spacing;
   typography: typeof typography;
+  isDark: boolean;
 }
 
-const light: Theme = {
-  bg: colors.light.bg,
-  surface: colors.light.surface,
-  surfaceMuted: colors.light.surfaceMuted,
-  border: colors.light.border,
-  text: colors.light.text,
-  textMuted: colors.light.textMuted,
-  textSubtle: colors.light.textSubtle,
+const base = {
   brand: colors.brand[500],
   accent: colors.accent,
   status: colors.status,
@@ -33,8 +28,20 @@ const light: Theme = {
   typography,
 };
 
+const light: Theme = {
+  ...base,
+  bg: colors.light.bg,
+  surface: colors.light.surface,
+  surfaceMuted: colors.light.surfaceMuted,
+  border: colors.light.border,
+  text: colors.light.text,
+  textMuted: colors.light.textMuted,
+  textSubtle: colors.light.textSubtle,
+  isDark: false,
+};
+
 const dark: Theme = {
-  ...light,
+  ...base,
   bg: colors.dark.bg,
   surface: colors.dark.surface,
   surfaceMuted: colors.dark.surfaceMuted,
@@ -42,9 +49,12 @@ const dark: Theme = {
   text: colors.dark.text,
   textMuted: colors.dark.textMuted,
   textSubtle: colors.dark.textSubtle,
+  isDark: true,
 };
 
 export function useTheme(): Theme {
-  const scheme = useColorScheme();
-  return scheme === 'dark' ? dark : light;
+  const system = useColorScheme();
+  const override = usePrefsStore((s) => s.themeOverride);
+  const effective = override === 'system' ? system : override;
+  return effective === 'dark' ? dark : light;
 }
