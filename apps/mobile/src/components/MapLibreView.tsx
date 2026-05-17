@@ -3,7 +3,7 @@ import MapLibreGL, {
   Camera,
   ShapeSource,
   CircleLayer,
-} from 'react-native-maplibre-gl';
+} from '@maplibre/maplibre-react-native';
 import { useEffect, useMemo } from 'react';
 import type { Coordinates } from '@wayra/types';
 
