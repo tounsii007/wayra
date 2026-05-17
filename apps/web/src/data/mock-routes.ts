@@ -1,5 +1,6 @@
 import type { Route } from '@wayra/types';
 import { sampleSuggestions } from './sample-suggestions';
+import { distanceMeters } from '@wayra/shared';
 
 const now = new Date();
 const inMin = (m: number) => new Date(now.getTime() + m * 60_000).toISOString();
@@ -7,6 +8,20 @@ const inMin = (m: number) => new Date(now.getTime() + m * 60_000).toISOString();
 const fra = sampleSuggestions.find((p) => p.id === 'de:frankfurt:hbf')!;
 const ber = sampleSuggestions.find((p) => p.id === 'de:berlin:hbf')!;
 const paris = sampleSuggestions.find((p) => p.id === 'fr:paris:gare-de-lyon')!;
+
+const CAR_SOLO_G_PER_KM = 170;
+const ICE_G_PER_KM = 14;
+const IC_G_PER_KM = 32;
+const HSR_G_PER_KM = 6;
+
+function co2(km: number, perKm: number): { co2Grams: number; co2SavedGrams: number } {
+  const co2Grams = Math.round(km * perKm);
+  const co2SavedGrams = Math.max(0, Math.round(km * CAR_SOLO_G_PER_KM) - co2Grams);
+  return { co2Grams, co2SavedGrams };
+}
+
+const fraToBerKm = distanceMeters(fra.coordinates, ber.coordinates) / 1000;
+const fraToParisKm = distanceMeters(fra.coordinates, paris.coordinates) / 1000;
 
 export const mockRouteResults: Route[] = [
   {
@@ -16,8 +31,7 @@ export const mockRouteResults: Route[] = [
     durationSeconds: 240 * 60,
     transfers: 0,
     walkingMeters: 320,
-    co2Grams: 8400,
-    co2SavedGrams: 42_000,
+    ...co2(fraToBerKm, ICE_G_PER_KM),
     tags: ['fastest', 'recommended', 'eco'],
     fare: { amount: 59.9, currency: 'EUR', source: 'estimated' },
     legs: [
@@ -40,7 +54,7 @@ export const mockRouteResults: Route[] = [
         to: ber,
         departureTime: inMin(15),
         arrivalTime: inMin(250),
-        distanceMeters: 552_000,
+        distanceMeters: Math.round(fraToBerKm * 1000),
         delaySeconds: 0,
       },
       {
@@ -60,8 +74,7 @@ export const mockRouteResults: Route[] = [
     durationSeconds: 342 * 60,
     transfers: 1,
     walkingMeters: 540,
-    co2Grams: 12_300,
-    co2SavedGrams: 38_000,
+    ...co2(fraToBerKm * 1.08, IC_G_PER_KM),
     tags: ['cheapest'],
     fare: { amount: 27.9, currency: 'EUR', source: 'estimated', note: 'Sparpreis' },
     legs: [
@@ -84,7 +97,7 @@ export const mockRouteResults: Route[] = [
         to: ber,
         departureTime: inMin(42),
         arrivalTime: inMin(376),
-        distanceMeters: 600_000,
+        distanceMeters: Math.round(fraToBerKm * 1080),
         delaySeconds: 180,
       },
       {
@@ -104,8 +117,7 @@ export const mockRouteResults: Route[] = [
     durationSeconds: 235 * 60,
     transfers: 0,
     walkingMeters: 200,
-    co2Grams: 7900,
-    co2SavedGrams: 43_000,
+    ...co2(fraToParisKm, HSR_G_PER_KM),
     tags: ['fewest_transfers'],
     fare: { amount: 89.9, currency: 'EUR', source: 'estimated', note: 'Flex' },
     legs: [
@@ -128,7 +140,7 @@ export const mockRouteResults: Route[] = [
         to: paris,
         departureTime: inMin(62),
         arrivalTime: inMin(290),
-        distanceMeters: 1_200_000,
+        distanceMeters: Math.round(fraToParisKm * 1000),
       },
       {
         mode: { kind: 'walk' },

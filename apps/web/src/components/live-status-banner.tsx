@@ -1,50 +1,83 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Activity, AlertTriangle, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Activity, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { DemoBadge } from './demo-badge';
 
-interface Item {
+interface StatusItem {
   city: string;
+  country: 'DE' | 'FR' | 'TN';
   status: 'ok' | 'minor' | 'major';
   note: string;
+  locale: string;
 }
 
-const sample: Item[] = [
-  { city: 'Berlin', status: 'ok', note: 'S-Bahn pünktlich' },
-  { city: 'Paris', status: 'minor', note: 'Ligne 4 — micro-perturbation' },
-  { city: 'Frankfurt', status: 'ok', note: 'U-Bahn nach Plan' },
-  { city: 'Tunis', status: 'minor', note: 'Métro 1 — léger retard' },
-  { city: 'Hamburg', status: 'major', note: 'Streik bei der S-Bahn' },
-  { city: 'Lyon', status: 'ok', note: 'TCL — trafic normal' },
-];
-
-const tone: Record<Item['status'], { dot: string; ring: string; label: string }> = {
-  ok: { dot: 'bg-status-onTime', ring: 'ring-status-onTime/30', label: 'OK' },
-  minor: { dot: 'bg-status-delay', ring: 'ring-status-delay/30', label: '!' },
-  major: { dot: 'bg-status-severe', ring: 'ring-status-severe/30', label: '!!' },
+const tone: Record<StatusItem['status'], { dot: string; ring: string }> = {
+  ok: { dot: 'bg-status-onTime', ring: 'ring-status-onTime/30' },
+  minor: { dot: 'bg-status-delay', ring: 'ring-status-delay/30' },
+  major: { dot: 'bg-status-severe', ring: 'ring-status-severe/30' },
 };
+
+const FALLBACK: StatusItem[] = [
+  { city: 'Berlin', country: 'DE', status: 'ok', note: 'S-Bahn pünktlich', locale: 'de' },
+  { city: 'Paris', country: 'FR', status: 'minor', note: 'Ligne 4 — perturbations', locale: 'fr' },
+  { city: 'Tunis', country: 'TN', status: 'minor', note: 'Métro 1 ralentie', locale: 'fr' },
+];
 
 export function LiveStatusBanner() {
   const t = useTranslations('home.sections');
+  const [items, setItems] = useState<StatusItem[]>([]);
+  const [usedFallback, setUsedFallback] = useState(false);
+  const [generatedAt, setGeneratedAt] = useState<string | null>(null);
+
+  useEffect(() => {
+    const base = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000';
+    const ctrl = new AbortController();
+    (async () => {
+      try {
+        const res = await fetch(`${base}/api/realtime/network-status`, { signal: ctrl.signal });
+        const json = (await res.json()) as {
+          data?: { items: StatusItem[]; generatedAt: string };
+          error?: { message: string };
+        };
+        if (json.error) throw new Error(json.error.message);
+        setItems(json.data?.items ?? []);
+        setGeneratedAt(json.data?.generatedAt ?? null);
+        setUsedFallback(false);
+      } catch {
+        setItems(FALLBACK);
+        setUsedFallback(true);
+      }
+    })();
+    return () => ctrl.abort();
+  }, []);
+
+  const display = items.length > 0 ? items.slice(0, 6) : FALLBACK;
+
   return (
     <section aria-labelledby="live-status-title">
-      <div className="mb-4 flex items-end justify-between">
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
         <h2 id="live-status-title" className="inline-flex items-center gap-2 text-lg font-semibold">
           <Activity className="h-5 w-5 text-status-onTime" />
           {t('liveStatus')}
         </h2>
-        <span className="text-xs text-subtle inline-flex items-center gap-1">
-          <Sparkles className="h-3 w-3" />
-          live
-        </span>
+        <div className="flex items-center gap-2">
+          <DemoBadge />
+          {generatedAt && (
+            <span className="text-xs text-subtle">
+              · updated {new Date(generatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </span>
+          )}
+          {usedFallback && <span className="text-xs text-status-delay">offline preview</span>}
+        </div>
       </div>
       <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-        {sample.map((it) => {
-          const Icon =
-            it.status === 'major' ? AlertTriangle : it.status === 'minor' ? AlertTriangle : CheckCircle2;
+        {display.map((it) => {
+          const Icon = it.status === 'ok' ? CheckCircle2 : AlertTriangle;
           return (
             <li
-              key={it.city}
+              key={`${it.country}-${it.city}`}
               className="flex items-center gap-3 rounded-xl surface px-4 py-3"
             >
               <span
@@ -54,11 +87,20 @@ export function LiveStatusBanner() {
                   <span className="absolute inset-0 animate-ping rounded-full bg-status-onTime/40" />
                 )}
               </span>
-              <Icon className={`h-4 w-4 shrink-0 ${
-                it.status === 'major' ? 'text-status-severe' : it.status === 'minor' ? 'text-status-delay' : 'text-status-onTime'
-              }`} />
+              <Icon
+                className={`h-4 w-4 shrink-0 ${
+                  it.status === 'major'
+                    ? 'text-status-severe'
+                    : it.status === 'minor'
+                      ? 'text-status-delay'
+                      : 'text-status-onTime'
+                }`}
+              />
               <div className="min-w-0 flex-1">
-                <div className="truncate text-sm font-semibold">{it.city}</div>
+                <div className="flex items-baseline gap-2">
+                  <span className="truncate text-sm font-semibold">{it.city}</span>
+                  <span className="text-[10px] font-bold uppercase text-subtle">{it.country}</span>
+                </div>
                 <div className="truncate text-xs text-muted">{it.note}</div>
               </div>
             </li>

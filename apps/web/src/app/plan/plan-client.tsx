@@ -3,6 +3,7 @@
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
+import Link from 'next/link';
 import {
   ArrowRight,
   Clock,
@@ -11,14 +12,16 @@ import {
   Leaf,
   AlertTriangle,
   Sparkles,
+  Loader2,
 } from 'lucide-react';
 import { formatDuration, formatTime, formatFare, formatCO2 } from '@wayra/shared';
-import type { Locale, Route } from '@wayra/types';
+import type { Locale, Route, PlanRouteRequest, PlanRouteResponse } from '@wayra/types';
 import { mockRouteResults } from '@/data/mock-routes';
 import { sampleSuggestions } from '@/data/sample-suggestions';
+import { DemoBadge } from '@/components/demo-badge';
 import { cn } from '@/lib/utils';
 
-type Preference = 'fastest' | 'cheapest' | 'fewest_transfers' | 'accessible' | 'least_walking';
+type Preference = 'fastest' | 'cheapest' | 'fewest_transfers' | 'least_walking' | 'accessible';
 
 export function PlanClient() {
   const sp = useSearchParams();
@@ -29,32 +32,72 @@ export function PlanClient() {
 
   const fromId = sp.get('from');
   const toId = sp.get('to');
+  const departAt = sp.get('departAt') ?? undefined;
+  const arriveBy = sp.get('arriveBy') ?? undefined;
+
   const from = sampleSuggestions.find((p) => p.id === fromId);
   const to = sampleSuggestions.find((p) => p.id === toId);
 
   const [pref, setPref] = useState<Preference>('fastest');
   const [routes, setRoutes] = useState<Route[]>([]);
   const [loading, setLoading] = useState(true);
+  const [usedFallback, setUsedFallback] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => {
-    setLoading(true);
-    const t = setTimeout(() => {
-      setRoutes(mockRouteResults);
+    if (!fromId || !toId) {
       setLoading(false);
-    }, 350);
-    return () => clearTimeout(t);
-  }, [fromId, toId, pref]);
+      return;
+    }
+    const base = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000';
+    const ctrl = new AbortController();
+    setLoading(true);
+    setNotice(null);
 
-  const sorted = [...routes].sort((a, b) => {
-    if (pref === 'cheapest') return (a.fare?.amount ?? 9e9) - (b.fare?.amount ?? 9e9);
-    if (pref === 'fewest_transfers') return a.transfers - b.transfers;
-    if (pref === 'least_walking') return a.walkingMeters - b.walkingMeters;
-    return a.durationSeconds - b.durationSeconds;
-  });
+    (async () => {
+      const body: PlanRouteRequest = {
+        from: { placeId: fromId },
+        to: { placeId: toId },
+        ...(departAt ? { departAt } : {}),
+        ...(arriveBy ? { arriveBy } : {}),
+        preferences: [pref === 'accessible' ? 'accessible' : pref],
+        ...(pref === 'accessible' ? { wheelchair: true } : {}),
+      };
+      try {
+        const res = await fetch(`${base}/api/routes/plan`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+          signal: ctrl.signal,
+        });
+        const payload = (await res.json()) as {
+          data?: PlanRouteResponse;
+          error?: { message: string };
+        };
+        if (payload.error) throw new Error(payload.error.message);
+        const result = payload.data ?? { routes: [] };
+        setRoutes(result.routes);
+        setNotice(result.notice ?? null);
+        setUsedFallback(false);
+      } catch {
+        setRoutes(mockRouteResults);
+        setUsedFallback(true);
+      } finally {
+        setLoading(false);
+      }
+    })();
+
+    return () => ctrl.abort();
+  }, [fromId, toId, departAt, arriveBy, pref]);
+
+  const sorted = [...routes];
+  if (pref === 'cheapest') sorted.sort((a, b) => (a.fare?.amount ?? 9e9) - (b.fare?.amount ?? 9e9));
+  else if (pref === 'fewest_transfers') sorted.sort((a, b) => a.transfers - b.transfers);
+  else if (pref === 'least_walking') sorted.sort((a, b) => a.walkingMeters - b.walkingMeters);
+  else sorted.sort((a, b) => a.durationSeconds - b.durationSeconds);
 
   return (
     <div className="grid gap-6 lg:grid-cols-[360px_1fr]">
-      {/* Summary card */}
       <aside className="surface sticky top-20 h-fit rounded-2xl p-5">
         <div className="text-sm text-muted">{tHero('title')}</div>
         <div className="mt-2 flex items-start gap-2">
@@ -76,29 +119,40 @@ export function PlanClient() {
         </div>
 
         <div className="mt-5 border-t border-[rgb(var(--border))] pt-4">
-          <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-subtle">
-            {tRoute('duration')} · sort
-          </div>
+          <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-subtle">Sort by</div>
           <div className="flex flex-wrap gap-1.5">
-            {(['fastest', 'cheapest', 'fewest_transfers', 'least_walking', 'accessible'] as const).map((p) => (
-              <button
-                key={p}
-                onClick={() => setPref(p)}
-                className={cn(
-                  'rounded-full px-3 py-1.5 text-xs font-semibold transition-colors focus-ring',
-                  pref === p
-                    ? 'bg-brand-500 text-white'
-                    : 'border border-[rgb(var(--border))] text-muted hover:text-[rgb(var(--text))]',
-                )}
-              >
-                {tRoute(`preferences.${p}`)}
-              </button>
-            ))}
+            {(['fastest', 'cheapest', 'fewest_transfers', 'least_walking', 'accessible'] as const).map(
+              (p) => (
+                <button
+                  key={p}
+                  onClick={() => setPref(p)}
+                  className={cn(
+                    'rounded-full px-3 py-1.5 text-xs font-semibold transition-colors focus-ring',
+                    pref === p
+                      ? 'bg-brand-500 text-white'
+                      : 'border border-[rgb(var(--border))] text-muted hover:text-[rgb(var(--text))]',
+                  )}
+                >
+                  {tRoute(`preferences.${p}`)}
+                </button>
+              ),
+            )}
           </div>
         </div>
       </aside>
 
       <section>
+        {usedFallback && (
+          <div className="mb-3 surface-muted rounded-xl px-3 py-2 text-xs text-muted inline-flex items-center gap-2">
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            Backend unreachable — showing offline preview.
+          </div>
+        )}
+        {notice && (
+          <div className="mb-3 rounded-xl bg-status-delay/10 px-3 py-2 text-xs text-status-delay">
+            {notice}
+          </div>
+        )}
         {!from || !to ? (
           <EmptyState message={tErr('noRoute')} />
         ) : loading ? (
@@ -106,15 +160,26 @@ export function PlanClient() {
         ) : sorted.length === 0 ? (
           <EmptyState message={tErr('noRoute')} />
         ) : (
-          <ul className="space-y-3">
-            {sorted.map((r) => (
-              <li key={r.id}>
-                <a href={`/trips/${encodeURIComponent(r.id)}`} className="block focus-ring rounded-2xl">
-                  <RouteCard route={r} locale={locale} />
-                </a>
-              </li>
-            ))}
-          </ul>
+          <>
+            <div className="mb-2 flex items-center gap-2">
+              <DemoBadge label="Estimated" />
+              <span className="text-xs text-subtle">
+                Synthesised from distance + per-km energy mix; production uses OpenTripPlanner over GTFS.
+              </span>
+            </div>
+            <ul className="space-y-3">
+              {sorted.map((r) => (
+                <li key={r.id}>
+                  <Link
+                    href={`/trips/${encodeURIComponent(r.id)}`}
+                    className="block focus-ring rounded-2xl"
+                  >
+                    <RouteCard route={r} locale={locale} />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </>
         )}
       </section>
     </div>
@@ -193,7 +258,7 @@ function RouteCard({ route, locale }: { route: Route; locale: Locale }) {
           <Footprints className="h-3.5 w-3.5" />
           {Math.round(route.walkingMeters)} m
         </span>
-        {route.co2SavedGrams !== undefined && (
+        {route.co2SavedGrams !== undefined && route.co2SavedGrams > 0 && (
           <>
             <span>·</span>
             <span className="inline-flex items-center gap-1 text-status-onTime">
