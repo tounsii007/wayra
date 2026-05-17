@@ -24,6 +24,11 @@ export class RealtimeController {
     return this.rt.disruptions(country);
   }
 
+  @Get('network-status')
+  networkStatus(@Query('country') country?: string) {
+    return this.rt.networkStatus(country);
+  }
+
   @Get('trip/:tripId')
   trip(@Param('tripId') tripId: string) {
     return this.rt.trip(tripId);
