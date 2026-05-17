@@ -1,15 +1,13 @@
-import MapLibreGL, {
+import {
   MapView,
   Camera,
   ShapeSource,
   CircleLayer,
 } from '@maplibre/maplibre-react-native';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import type { Coordinates } from '@wayra/types';
 
-MapLibreGL.setAccessToken(null);
-
-const OSM_STYLE = {
+const OSM_STYLE = JSON.stringify({
   version: 8,
   sources: {
     osm: {
@@ -20,7 +18,7 @@ const OSM_STYLE = {
     },
   },
   layers: [{ id: 'osm', type: 'raster', source: 'osm' }],
-};
+});
 
 export interface MarkerInput {
   id: string;
@@ -34,12 +32,14 @@ interface Props {
   markers?: MarkerInput[];
 }
 
+/**
+ * Lightweight wrapper around the MapLibre Native React Native bindings.
+ *
+ * The v10 package (@maplibre/maplibre-react-native) accepts a JSON-string
+ * style and no longer exposes setTelemetryEnabled — telemetry was a
+ * Mapbox-only concept and was dropped when the fork forked.
+ */
 export function MapLibreView({ center, zoom = 12, markers = [] }: Props) {
-  useEffect(() => {
-    // No telemetry from MapLibre on Android by default — explicit just in case.
-    MapLibreGL.setTelemetryEnabled(false);
-  }, []);
-
   const fc = useMemo(
     () => ({
       type: 'FeatureCollection' as const,
@@ -58,12 +58,15 @@ export function MapLibreView({ center, zoom = 12, markers = [] }: Props) {
   return (
     <MapView
       style={{ flex: 1 }}
-      // @ts-expect-error MapLibre style spec accepts raw object
       mapStyle={OSM_STYLE}
       logoEnabled={false}
       attributionEnabled
     >
-      <Camera centerCoordinate={[center.lng, center.lat]} zoomLevel={zoom} animationMode="flyTo" />
+      <Camera
+        centerCoordinate={[center.lng, center.lat]}
+        zoomLevel={zoom}
+        animationMode="flyTo"
+      />
       <ShapeSource id="wayra-markers" shape={fc}>
         <CircleLayer
           id="wayra-markers-circle"
