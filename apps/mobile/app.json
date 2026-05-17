@@ -1,0 +1,44 @@
+{
+  "expo": {
+    "name": "Wayra",
+    "slug": "wayra",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "wayra",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0a0e1a"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "app.wayra.client",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Wayra needs your location to find nearby stops and plan trips from where you are.",
+        "UIBackgroundModes": ["fetch", "remote-notification"]
+      }
+    },
+    "android": {
+      "package": "app.wayra.client",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0a0e1a"
+      },
+      "permissions": ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"]
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": ["expo-router", "expo-font", "expo-localization", "expo-location"],
+    "extra": {
+      "router": { "origin": false }
+    },
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
