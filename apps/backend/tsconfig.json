@@ -13,7 +13,6 @@
     "noUncheckedIndexedAccess": false,
     "noImplicitOverride": false,
     "esModuleInterop": true,
-    "declaration": false,
     "noEmit": false,
     "paths": {
       "@wayra/types": ["../../packages/types/src/index.ts"],

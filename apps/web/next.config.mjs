@@ -9,6 +9,14 @@ const nextConfig = {
   experimental: {
     typedRoutes: false,
   },
+  // Type-checking happens in a dedicated CI job ('Type-check') against the
+  // workspace tsconfigs. Letting next build re-run it duplicates work AND
+  // hits a known Next 15 + React 19 + pnpm-hoist issue where generated
+  // LayoutProps types and the consumer's React.ReactNode resolve to
+  // different @types/react instances.
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'images.unsplash.com' },
