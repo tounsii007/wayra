@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import type { ReactNode } from 'react';
+import * as React from 'react';
 import { ShieldCheck, AlertTriangle, Database, Activity, MessageSquare, BarChart3 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LocaleSwitcher } from '@/components/locale-switcher';
@@ -15,7 +15,7 @@ const nav = [
   { href: '/admin/feedback', label: 'Feedback', Icon: MessageSquare },
 ];
 
-export default function AdminLayout({ children }: { children: ReactNode }) {
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="grid min-h-screen grid-cols-[240px_1fr]">
       <aside className="surface flex flex-col gap-2 border-e border-[rgb(var(--border))] p-4">
