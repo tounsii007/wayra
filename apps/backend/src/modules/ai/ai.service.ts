@@ -119,7 +119,9 @@ export class AiService {
    *  - prefix the latest user turn with locale + country + now context
    */
   private mapHistory(req: AiAssistantRequest): Anthropic.MessageParam[] {
-    const history = (req.history ?? []).filter((m) => m.role !== 'system');
+    const history = (req.history ?? []).filter(
+      (m): m is { role: 'user' | 'assistant'; content: string } => m.role !== 'system',
+    );
     const tail = history.slice(-12);
     const merged: Anthropic.MessageParam[] = [];
     for (const m of tail) {
