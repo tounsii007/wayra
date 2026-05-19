@@ -68,7 +68,7 @@ export function usePushSubscription() {
       existing ??
       (await reg.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(vapid),
+        applicationServerKey: urlBase64ToUint8Array(vapid).buffer as ArrayBuffer,
       }));
     const payload = subscription.toJSON();
     if (token) {
