@@ -110,21 +110,71 @@ export class AiService {
 
   // --- internals ---
 
+  /**
+   * Convert the client's chat transcript into Anthropic Messages. We:
+   *  - drop any client-side `system` messages (system goes via the
+   *    top-level system prompt only)
+   *  - merge consecutive same-role turns so the API doesn't reject us
+   *  - cap history at the most recent 12 turns to control token cost
+   *  - prefix the latest user turn with locale + country + now context
+   */
   private mapHistory(req: AiAssistantRequest): Anthropic.MessageParam[] {
-    const out: Anthropic.MessageParam[] = [];
-    for (const m of req.history ?? []) {
-      if (m.role === 'system') continue;
-      out.push({ role: m.role, content: m.content });
+    const history = (req.history ?? []).filter((m) => m.role !== 'system');
+    const tail = history.slice(-12);
+    const merged: Anthropic.MessageParam[] = [];
+    for (const m of tail) {
+      const last = merged[merged.length - 1];
+      if (last && last.role === m.role && typeof last.content === 'string') {
+        last.content = `${last.content}\n\n${m.content}`;
+      } else {
+        merged.push({ role: m.role, content: m.content });
+      }
     }
-    out.push({
-      role: 'user',
-      content:
-        `User locale: ${req.locale}` +
-        (req.context?.countryCode ? `, country: ${req.context.countryCode}` : '') +
-        (req.context?.nowISO ? `, now: ${req.context.nowISO}` : '') +
-        `\n\n${req.message}`,
-    });
-    return out;
+    const ctx =
+      `User locale: ${req.locale}` +
+      (req.context?.countryCode ? `, country: ${req.context.countryCode}` : '') +
+      (req.context?.nowISO ? `, now: ${req.context.nowISO}` : '');
+    const final: Anthropic.MessageParam = { role: 'user', content: `${ctx}\n\n${req.message}` };
+    // If the previous turn is already a user turn, merge to keep alternation.
+    const last = merged[merged.length - 1];
+    if (last && last.role === 'user' && typeof last.content === 'string') {
+      last.content = `${last.content}\n\n${final.content as string}`;
+    } else {
+      merged.push(final);
+    }
+    return merged;
+  }
+
+  /**
+   * Server-Sent Events streaming variant. Iterator yields plain-text
+   * deltas so controllers can pipe directly to the response.
+   */
+  async *streamRespond(req: AiAssistantRequest): AsyncGenerator<string, void, void> {
+    if (!this.client) {
+      yield this.stubResponse(req).reply;
+      return;
+    }
+    const messages = this.mapHistory(req);
+    try {
+      const stream = await this.client.messages.stream({
+        model: this.model,
+        max_tokens: 1024,
+        system: SYSTEM_PROMPT,
+        messages,
+      });
+      for await (const event of stream) {
+        if (
+          event.type === 'content_block_delta' &&
+          event.delta.type === 'text_delta' &&
+          event.delta.text
+        ) {
+          yield event.delta.text;
+        }
+      }
+    } catch (e) {
+      this.logger.error(`Streaming failed: ${(e as Error).message}`);
+      yield `⚠️ Assistant error: ${(e as Error).message}`;
+    }
   }
 
   private async runTool(name: string, input: Record<string, unknown>): Promise<unknown> {

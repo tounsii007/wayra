@@ -8,7 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import type { Request } from 'express';
 
 export interface AuthedRequest extends Request {
-  user: { sub: string; email?: string };
+  user: { sub: string; email?: string; role?: string };
 }
 
 @Injectable()
@@ -26,7 +26,7 @@ export class JwtAuthGuard implements CanActivate {
       });
     }
     try {
-      const payload = await this.jwt.verifyAsync<{ sub: string; email?: string }>(token);
+      const payload = await this.jwt.verifyAsync<{ sub: string; email?: string; role?: string }>(token);
       req.user = payload;
       return true;
     } catch {

@@ -11,6 +11,10 @@ import { UserEntity } from './user.entity';
 import { FavoritePlaceEntity } from './favorite-place.entity';
 import { SavedRouteEntity } from './saved-route.entity';
 import { OfflineRegionEntity } from './offline-region.entity';
+import { RefreshTokenEntity } from './refresh-token.entity';
+import { AuthActionTokenEntity } from './auth-action-token.entity';
+import { OauthIdentityEntity } from './oauth-identity.entity';
+import { PushSubscriptionEntity } from './push-subscription.entity';
 
 export const entities = [
   CountryEntity,
@@ -26,6 +30,10 @@ export const entities = [
   FavoritePlaceEntity,
   SavedRouteEntity,
   OfflineRegionEntity,
+  RefreshTokenEntity,
+  AuthActionTokenEntity,
+  OauthIdentityEntity,
+  PushSubscriptionEntity,
 ];
 
 export {
@@ -42,4 +50,8 @@ export {
   FavoritePlaceEntity,
   SavedRouteEntity,
   OfflineRegionEntity,
+  RefreshTokenEntity,
+  AuthActionTokenEntity,
+  OauthIdentityEntity,
+  PushSubscriptionEntity,
 };

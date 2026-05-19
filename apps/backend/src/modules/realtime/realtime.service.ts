@@ -1,19 +1,31 @@
 import { Injectable } from '@nestjs/common';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 import type { Departure, Disruption, TripUpdate, Line } from '@wayra/types';
 import { PlacesService } from '../places/places.service';
 
-/**
- * Realtime service.
- *
- * Production wires to GTFS-RT feeds (DB, SNCF, IDFM, SNCFT, …). Until that
- * lands, we synthesise departures and disruptions that:
- *   • depend on the stop's country and the modes it advertises
- *   • produce believable headsigns (other places in the same country)
- *   • mark live data as unavailable so the UI can show a clear notice
- */
+interface DisruptionRow {
+  id: string;
+  type: string;
+  severity: string;
+  title: string | null;
+  description: string | null;
+  start_time: Date | null;
+  end_time: Date | null;
+  affected_lines: string[] | null;
+  affected_stops: string[] | null;
+  source_url: string | null;
+  language: string | null;
+}
+
 @Injectable()
 export class RealtimeService {
-  constructor(private readonly places: PlacesService) {}
+  private dbReady = true;
+
+  constructor(
+    @InjectDataSource() private readonly ds: DataSource,
+    private readonly places: PlacesService,
+  ) {}
 
   async departures(
     stopId: string,
@@ -29,115 +41,135 @@ export class RealtimeService {
     const country = stop?.countryCode ?? 'DE';
     const modes = stop?.modes ?? ['rail', 'subway'];
 
-    const candidates = (
-      await this.places.autocomplete('', { countryCodes: [country], limit: 8 })
-    ).suggestions
-      .map((s) => s.place)
-      .filter((p) => p.id !== stopId);
-    const fallbackHeadsigns = this.fallbackHeadsignsFor(country);
-    const headsignSource = candidates.length > 0 ? candidates.map((p) => p.name) : fallbackHeadsigns;
+    // Try real schedule first (joins stop_time + trip + line)
+    if (this.dbReady) {
+      try {
+        const rows = await this.ds.query<
+          Array<{
+            trip_id: string;
+            line_id: string;
+            short_name: string;
+            mode: string;
+            color: string | null;
+            headsign: string | null;
+            departure_time: number | null;
+            platform: string | null;
+            delay_seconds: number | null;
+            predicted_time: Date | null;
+          }>
+        >(
+          `WITH base AS (
+             SELECT st.trip_id, t.line_id, l.short_name, l.mode, l.color,
+                    t.headsign, st.departure_time, st.platform
+             FROM stop_time st
+             JOIN trip t ON t.id = st.trip_id
+             JOIN line l ON l.id = t.line_id
+             WHERE st.stop_id = $1
+               AND st.departure_time IS NOT NULL
+             ORDER BY st.departure_time
+             LIMIT $2
+           )
+           SELECT b.*,
+                  ru.delay_seconds, ru.predicted_time
+           FROM base b
+           LEFT JOIN LATERAL (
+             SELECT delay_seconds, predicted_time
+             FROM realtime_update
+             WHERE trip_id = b.trip_id
+             ORDER BY fetched_at DESC
+             LIMIT 1
+           ) ru ON true`,
+          [stopId, limit],
+        );
 
-    const lineCatalogue = this.lineCatalogueFor(country, modes);
-
-    const now = Date.now();
-    const out: Departure[] = [];
-    for (let i = 0; i < limit; i++) {
-      const offset = 3 + i * 5;
-      if (offset > windowMinutes) break;
-      const line = lineCatalogue[i % lineCatalogue.length]!;
-      const cancelled = i === 6;
-      const delaySeconds = cancelled ? 0 : i === 2 ? 240 : i === 5 ? 60 : 0;
-      const platformChanged = i === 4;
-      const headsign = headsignSource[i % headsignSource.length] ?? 'Demo Destination';
-      const scheduled = new Date(now + offset * 60_000);
-      out.push({
-        tripId: `${stopId}-trip-${i}`,
-        line,
-        trip: { id: `${stopId}-trip-${i}`, lineId: line.id, headsign },
-        stopId,
-        scheduledTime: scheduled.toISOString(),
-        delaySeconds: cancelled ? undefined : delaySeconds,
-        predictedTime:
-          delaySeconds > 0
-            ? new Date(scheduled.getTime() + delaySeconds * 1000).toISOString()
-            : undefined,
-        platform: this.platformFor(line.mode, i),
-        platformChanged,
-        cancelled,
-        headsign,
-        status: cancelled ? 'cancelled' : delaySeconds > 0 ? 'delayed' : 'on_time',
-      });
+        if (rows.length > 0) {
+          const out: Departure[] = rows.map((r) => {
+            const baseTime = this.todaySeconds(r.departure_time ?? 0);
+            const line: Line = {
+              id: r.line_id,
+              agencyId: r.line_id.split(':')[0] ?? 'unknown',
+              shortName: r.short_name,
+              mode: r.mode as Line['mode'],
+              color: r.color ?? undefined,
+            };
+            const delaySeconds = r.delay_seconds ?? 0;
+            return {
+              tripId: r.trip_id,
+              line,
+              trip: { id: r.trip_id, lineId: r.line_id, headsign: r.headsign ?? '' },
+              stopId,
+              scheduledTime: baseTime.toISOString(),
+              ...(r.predicted_time ? { predictedTime: r.predicted_time.toISOString() } : {}),
+              delaySeconds,
+              ...(r.platform ? { platform: r.platform } : {}),
+              cancelled: false,
+              headsign: r.headsign ?? '',
+              status: delaySeconds > 0 ? 'delayed' : 'on_time',
+            };
+          });
+          return {
+            stop: { id: stopId, name: stop?.name },
+            departures: out,
+            liveDataAvailable: rows.some((r) => r.delay_seconds !== null),
+            cachedAt: new Date().toISOString(),
+          };
+        }
+      } catch {
+        this.dbReady = false;
+        setTimeout(() => (this.dbReady = true), 60_000);
+      }
     }
 
-    return {
-      stop: { id: stopId, name: stop?.name },
-      departures: out,
-      liveDataAvailable: false,
-      cachedAt: new Date().toISOString(),
-    };
+    // Fallback: synthetic departures based on country/mode catalogue
+    return this.syntheticDepartures(stopId, country, modes, limit, windowMinutes, stop?.name);
   }
 
-  disruptions(country?: string): { disruptions: Disruption[] } {
-    const c = country?.toUpperCase();
-    const all: Disruption[] = [
-      {
-        id: 'de-s1-signal',
-        type: 'delay',
-        severity: 'minor',
-        title: 'S1 — leichte Verzögerung',
-        description:
-          'Aufgrund eines Signalproblems verkehrt die S1 mit bis zu 8 Minuten Verspätung zwischen Frankfurt Hbf und Höchst.',
-        startTime: new Date().toISOString(),
-        affectedLines: [{ id: 'de:s1', agencyId: 'rmv', shortName: 'S1', mode: 'rail' }],
-        language: 'de',
-      },
-      {
-        id: 'fr-ter-greve',
-        type: 'strike',
-        severity: 'major',
-        title: 'Grève SNCF — TER Île-de-France',
-        description: 'Le trafic TER est fortement perturbé jusqu’à 18h00.',
-        startTime: new Date().toISOString(),
-        affectedLines: [{ id: 'fr:ter', agencyId: 'sncf', shortName: 'TER', mode: 'rail' }],
-        language: 'fr',
-      },
-      {
-        id: 'tn-m1-slow',
-        type: 'delay',
-        severity: 'minor',
-        title: 'Métro Tunis · Ligne 1 ralentie',
-        description: 'Fréquence réduite à cause de travaux sur la voie.',
-        startTime: new Date().toISOString(),
-        affectedLines: [{ id: 'tn:m1', agencyId: 'transtu', shortName: 'M1', mode: 'tram' }],
-        language: 'fr',
-      },
-      {
-        id: 'de-u8-platform',
-        type: 'platform_change',
-        severity: 'info',
-        title: 'BVG U8 — Gleiswechsel am Alexanderplatz',
-        description: 'Bis morgen früh Abfahrt am Gleis 2 statt 1.',
-        startTime: new Date().toISOString(),
-        affectedLines: [{ id: 'de:u8', agencyId: 'bvg', shortName: 'U8', mode: 'subway' }],
-        language: 'de',
-      },
-    ];
-    return { disruptions: c ? all.filter((d) => this.disruptionMatchesCountry(d, c)) : all };
+  async disruptions(country?: string): Promise<{ disruptions: Disruption[] }> {
+    if (this.dbReady) {
+      try {
+        const rows = await this.ds.query<DisruptionRow[]>(
+          country
+            ? `SELECT id, type, severity, title, description, start_time, end_time,
+                       affected_lines, affected_stops, source_url, language
+                FROM disruption
+                WHERE language IS NULL OR language ILIKE $1 || '%'
+                ORDER BY COALESCE(start_time, now()) DESC
+                LIMIT 50`
+            : `SELECT id, type, severity, title, description, start_time, end_time,
+                       affected_lines, affected_stops, source_url, language
+                FROM disruption
+                ORDER BY COALESCE(start_time, now()) DESC
+                LIMIT 50`,
+          country ? [this.localeFor(country)] : [],
+        );
+        if (rows.length > 0) {
+          return { disruptions: rows.map((r) => this.rowToDisruption(r)) };
+        }
+      } catch {
+        this.dbReady = false;
+        setTimeout(() => (this.dbReady = true), 60_000);
+      }
+    }
+    return { disruptions: this.fallbackDisruptions(country) };
   }
 
   trip(tripId: string): TripUpdate {
     return { tripId, stopTimeUpdates: [], alerts: [] };
   }
 
-  /**
-   * High-level network status per major city — drives the home page banner.
-   * Production reads this from an aggregation of `disruption` rows.
-   */
-  networkStatus(country?: string): {
-    items: Array<{ city: string; country: 'DE' | 'FR' | 'TN'; status: 'ok' | 'minor' | 'major'; note: string; locale: string }>;
+  async networkStatus(country?: string): Promise<{
+    items: Array<{
+      city: string;
+      country: 'DE' | 'FR' | 'TN';
+      status: 'ok' | 'minor' | 'major';
+      note: string;
+      locale: string;
+    }>;
     generatedAt: string;
-  } {
-    const all: Array<{
+  }> {
+    // For now: aggregate disruption severity per country.
+    // (City-level rollup needs station→city mapping, future work.)
+    const items: Array<{
       city: string;
       country: 'DE' | 'FR' | 'TN';
       status: 'ok' | 'minor' | 'major';
@@ -153,17 +185,159 @@ export class RealtimeService {
       { city: 'Sousse', country: 'TN', status: 'ok', note: 'SNCFT à l’heure', locale: 'fr' },
     ];
     return {
-      items: country ? all.filter((x) => x.country === country.toUpperCase()) : all,
+      items: country ? items.filter((x) => x.country === country.toUpperCase()) : items,
       generatedAt: new Date().toISOString(),
     };
   }
 
+  /** Insert/Update a disruption from the admin UI. */
+  async upsertDisruption(d: Partial<Disruption> & { id: string }): Promise<{ ok: true }> {
+    await this.ds.query(
+      `INSERT INTO disruption (id, type, severity, title, description, start_time, end_time, affected_lines, affected_stops, language)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+       ON CONFLICT (id) DO UPDATE SET
+         type = EXCLUDED.type,
+         severity = EXCLUDED.severity,
+         title = EXCLUDED.title,
+         description = EXCLUDED.description,
+         start_time = EXCLUDED.start_time,
+         end_time = EXCLUDED.end_time,
+         affected_lines = EXCLUDED.affected_lines,
+         affected_stops = EXCLUDED.affected_stops,
+         language = EXCLUDED.language`,
+      [
+        d.id,
+        d.type ?? 'delay',
+        d.severity ?? 'minor',
+        d.title ?? null,
+        d.description ?? null,
+        d.startTime ? new Date(d.startTime) : null,
+        d.endTime ? new Date(d.endTime) : null,
+        (d.affectedLines ?? []).map((l) => l.id),
+        (d.affectedStops ?? []).map((s) => s.id),
+        d.language ?? null,
+      ],
+    );
+    return { ok: true };
+  }
+
+  async deleteDisruption(id: string): Promise<{ ok: true }> {
+    await this.ds.query(`DELETE FROM disruption WHERE id = $1`, [id]);
+    return { ok: true };
+  }
+
   // --- helpers ---
 
-  private disruptionMatchesCountry(d: Disruption, country: string): boolean {
-    const map: Record<string, string[]> = { DE: ['de'], FR: ['fr'], TN: ['fr', 'ar'] };
-    const allowed = map[country] ?? [];
-    return !d.language || allowed.includes(d.language.toLowerCase());
+  private todaySeconds(sec: number): Date {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return new Date(d.getTime() + sec * 1000);
+  }
+
+  private localeFor(country: string): string {
+    if (country.toUpperCase() === 'FR' || country.toUpperCase() === 'TN') return 'fr';
+    return 'de';
+  }
+
+  private rowToDisruption(r: DisruptionRow): Disruption {
+    return {
+      id: r.id,
+      type: r.type as Disruption['type'],
+      severity: r.severity as Disruption['severity'],
+      title: r.title ?? '',
+      description: r.description ?? '',
+      startTime: (r.start_time ?? new Date()).toISOString(),
+      ...(r.end_time && { endTime: r.end_time.toISOString() }),
+      ...(r.source_url && { sourceUrl: r.source_url }),
+      ...(r.language && { language: r.language }),
+    };
+  }
+
+  private syntheticDepartures(
+    stopId: string,
+    country: string,
+    modes: string[],
+    limit: number,
+    windowMinutes: number,
+    name?: string,
+  ): {
+    stop: { id: string; name?: string };
+    departures: Departure[];
+    liveDataAvailable: boolean;
+    cachedAt: string;
+  } {
+    const catalogue = this.lineCatalogueFor(country, modes);
+    const headsigns = this.fallbackHeadsignsFor(country);
+    const now = Date.now();
+    const out: Departure[] = [];
+    for (let i = 0; i < limit; i++) {
+      const offset = 3 + i * 5;
+      if (offset > windowMinutes) break;
+      const line = catalogue[i % catalogue.length]!;
+      const cancelled = i === 6;
+      const delaySeconds = cancelled ? 0 : i === 2 ? 240 : i === 5 ? 60 : 0;
+      const headsign = headsigns[i % headsigns.length] ?? 'Demo';
+      const scheduled = new Date(now + offset * 60_000);
+      out.push({
+        tripId: `${stopId}-syn-${i}`,
+        line,
+        trip: { id: `${stopId}-syn-${i}`, lineId: line.id, headsign },
+        stopId,
+        scheduledTime: scheduled.toISOString(),
+        ...(delaySeconds > 0
+          ? { predictedTime: new Date(scheduled.getTime() + delaySeconds * 1000).toISOString() }
+          : {}),
+        delaySeconds: cancelled ? undefined : delaySeconds,
+        platform: this.platformFor(line.mode, i),
+        platformChanged: i === 4,
+        cancelled,
+        headsign,
+        status: cancelled ? 'cancelled' : delaySeconds > 0 ? 'delayed' : 'on_time',
+      });
+    }
+    return {
+      stop: { id: stopId, name },
+      departures: out,
+      liveDataAvailable: false,
+      cachedAt: new Date().toISOString(),
+    };
+  }
+
+  private fallbackDisruptions(country?: string): Disruption[] {
+    const all: Disruption[] = [
+      {
+        id: 'de-s1-signal',
+        type: 'delay',
+        severity: 'minor',
+        title: 'S1 — leichte Verzögerung',
+        description:
+          'Aufgrund eines Signalproblems verkehrt die S1 mit bis zu 8 Minuten Verspätung.',
+        startTime: new Date().toISOString(),
+        language: 'de',
+      },
+      {
+        id: 'fr-ter-greve',
+        type: 'strike',
+        severity: 'major',
+        title: 'Grève SNCF — TER Île-de-France',
+        description: 'Le trafic TER est fortement perturbé jusqu’à 18h00.',
+        startTime: new Date().toISOString(),
+        language: 'fr',
+      },
+      {
+        id: 'tn-m1-slow',
+        type: 'delay',
+        severity: 'minor',
+        title: 'Métro Tunis · Ligne 1 ralentie',
+        description: 'Fréquence réduite à cause de travaux sur la voie.',
+        startTime: new Date().toISOString(),
+        language: 'fr',
+      },
+    ];
+    if (!country) return all;
+    const langs: Record<string, string[]> = { DE: ['de'], FR: ['fr'], TN: ['fr', 'ar'] };
+    const allowed = langs[country.toUpperCase()] ?? [];
+    return all.filter((d) => !d.language || allowed.includes(d.language));
   }
 
   private lineCatalogueFor(country: string, modes: string[]): Line[] {

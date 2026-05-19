@@ -4,9 +4,10 @@ import { RealtimeService } from './realtime.service';
 import { RealtimeGateway } from './realtime.gateway';
 import { GtfsRtWorker } from './gtfs-rt.worker';
 import { PlacesModule } from '../places/places.module';
+import { DatabaseModule } from '../../database/database.module';
 
 @Module({
-  imports: [PlacesModule],
+  imports: [PlacesModule, DatabaseModule],
   controllers: [RealtimeController],
   providers: [RealtimeService, RealtimeGateway, GtfsRtWorker],
   exports: [RealtimeService, RealtimeGateway, GtfsRtWorker],

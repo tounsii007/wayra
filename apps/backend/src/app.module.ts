@@ -14,6 +14,8 @@ import { AiModule } from './modules/ai/ai.module';
 import { OfflineModule } from './modules/offline/offline.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { AccountModule } from './modules/account/account.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
+import { AdminModule } from './modules/admin/admin.module';
 
 import { ResponseEnvelopeInterceptor } from './common/response-envelope.interceptor';
 import { HttpExceptionFilter } from './common/http-exception.filter';
@@ -34,6 +36,8 @@ import { HttpExceptionFilter } from './common/http-exception.filter';
     OfflineModule,
     AuthModule,
     AccountModule,
+    NotificationsModule,
+    AdminModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

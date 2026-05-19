@@ -156,6 +156,11 @@ export class RoutesService {
     return { routes: [...this.cache.values()].flat().filter((x) => x.id !== id) };
   }
 
+  /** Index a route from any provider for later /routes/:id lookups. */
+  cacheRoute(r: Route): void {
+    this.cache.set(r.id, [r]);
+  }
+
   // --- internals ---
 
   private async resolve(input: Coordinates | { placeId: string }): Promise<Place | undefined> {

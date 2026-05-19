@@ -1,32 +1,38 @@
-import { Body, Controller, Post, Get, Param, BadRequestException } from '@nestjs/common';
-import { ApiTags, ApiBody } from '@nestjs/swagger';
+import { BadRequestException, Body, Controller, Get, Inject, Param, Post } from '@nestjs/common';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
 import type { PlanRouteRequest } from '@wayra/types';
 import { RoutesService } from './routes.service';
+import { ROUTING_PROVIDER, type RoutingProvider } from './routing-provider';
 
 @ApiTags('routes')
 @Controller('routes')
 export class RoutesController {
-  constructor(private readonly routes: RoutesService) {}
+  constructor(
+    @Inject(ROUTING_PROVIDER) private readonly provider: RoutingProvider,
+    private readonly cache: RoutesService,
+  ) {}
 
   @Post('plan')
   @ApiBody({ description: 'Multimodal trip plan request', required: true })
-  plan(@Body() body: PlanRouteRequest) {
+  async plan(@Body() body: PlanRouteRequest) {
     if (!body?.from || !body?.to) {
       throw new BadRequestException({
         code: 'missing_origin_or_destination',
         message: 'Both from and to are required.',
       });
     }
-    return this.routes.plan(body);
+    const result = await this.provider.plan(body);
+    for (const r of result.routes) this.cache.cacheRoute(r);
+    return result;
   }
 
   @Get(':id')
   byId(@Param('id') id: string) {
-    return this.routes.byId(id);
+    return this.cache.byId(id);
   }
 
   @Get(':id/alternatives')
   alternatives(@Param('id') id: string) {
-    return this.routes.alternativesFor(id);
+    return this.cache.alternativesFor(id);
   }
 }
