@@ -133,8 +133,10 @@ export function MapLibreView({
         {...((cluster
           ? { cluster: true, clusterRadius: 48, clusterMaxZoom: 14 }
           : {}) as unknown as Record<string, never>)}
-        onPress={(e: { features?: Array<{ properties?: Record<string, unknown> }> }) => {
-          const f = e?.features?.[0];
+        onPress={(e) => {
+          const features = (e as { features?: Array<{ properties?: Record<string, unknown> }> })
+            ?.features;
+          const f = features?.[0];
           if (!f) return;
           if ((f.properties as { cluster?: boolean } | undefined)?.cluster) return;
           const id = (f.properties as { id?: string } | undefined)?.id;
