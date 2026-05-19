@@ -15,6 +15,12 @@ import { RefreshTokenEntity } from './refresh-token.entity';
 import { AuthActionTokenEntity } from './auth-action-token.entity';
 import { OauthIdentityEntity } from './oauth-identity.entity';
 import { PushSubscriptionEntity } from './push-subscription.entity';
+import { AuditLogEntity } from './audit-log.entity';
+import { TotpSecretEntity } from './totp-secret.entity';
+import { LoginAttemptEntity } from './login-attempt.entity';
+import { NotificationOutboxEntity } from './notification-outbox.entity';
+import { VehiclePositionEntity } from './vehicle-position.entity';
+import { TransferEntity } from './transfer.entity';
 
 export const entities = [
   CountryEntity,
@@ -34,6 +40,12 @@ export const entities = [
   AuthActionTokenEntity,
   OauthIdentityEntity,
   PushSubscriptionEntity,
+  AuditLogEntity,
+  TotpSecretEntity,
+  LoginAttemptEntity,
+  NotificationOutboxEntity,
+  VehiclePositionEntity,
+  TransferEntity,
 ];
 
 export {
@@ -54,4 +66,10 @@ export {
   AuthActionTokenEntity,
   OauthIdentityEntity,
   PushSubscriptionEntity,
+  AuditLogEntity,
+  TotpSecretEntity,
+  LoginAttemptEntity,
+  NotificationOutboxEntity,
+  VehiclePositionEntity,
+  TransferEntity,
 };

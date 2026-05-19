@@ -7,11 +7,18 @@ import { AuthService } from './auth.service';
 import { MailerService } from './mailer.service';
 import { JwtAuthGuard } from './jwt.guard';
 import { RolesGuard } from './roles.guard';
+import { OAuthVerifierService } from './oauth-verifier.service';
+import { AuditService } from './audit.service';
+import { LoginRateLimitService } from './login-rate-limit.service';
+import { TotpService } from './totp.service';
 import {
   UserEntity,
   RefreshTokenEntity,
   AuthActionTokenEntity,
   OauthIdentityEntity,
+  AuditLogEntity,
+  TotpSecretEntity,
+  LoginAttemptEntity,
 } from '../../database/entities';
 
 @Module({
@@ -21,6 +28,9 @@ import {
       RefreshTokenEntity,
       AuthActionTokenEntity,
       OauthIdentityEntity,
+      AuditLogEntity,
+      TotpSecretEntity,
+      LoginAttemptEntity,
     ]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -38,7 +48,16 @@ import {
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, MailerService, JwtAuthGuard, RolesGuard],
-  exports: [AuthService, JwtAuthGuard, RolesGuard, JwtModule],
+  providers: [
+    AuthService,
+    MailerService,
+    JwtAuthGuard,
+    RolesGuard,
+    OAuthVerifierService,
+    AuditService,
+    LoginRateLimitService,
+    TotpService,
+  ],
+  exports: [AuthService, JwtAuthGuard, RolesGuard, JwtModule, AuditService],
 })
 export class AuthModule {}

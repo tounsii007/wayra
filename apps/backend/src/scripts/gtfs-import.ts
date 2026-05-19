@@ -120,6 +120,12 @@ function guessStopType(r: Record<string, string>): string {
   return 'stop';
 }
 
+/** GTFS YYYYMMDD → ISO date string */
+function gtfsDate(s?: string): string | null {
+  if (!s || !/^\d{8}$/.test(s)) return null;
+  return `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)}`;
+}
+
 /** GTFS HH:MM:SS → seconds since service start (handles 25:00:00 etc.) */
 function timeToSeconds(t?: string): number | null {
   if (!t) return null;
@@ -220,9 +226,13 @@ async function main() {
       let count = 0;
       for await (const r of readCsvRows(join(dir, 'trips.txt'))) {
         await client.query(
-          `INSERT INTO trip (id, line_id, headsign, direction, wheelchair_accessible, bikes_allowed)
-           VALUES ($1,$2,$3,$4,$5,$6)
-           ON CONFLICT (id) DO UPDATE SET headsign = EXCLUDED.headsign`,
+          `INSERT INTO trip
+             (id, line_id, headsign, direction, wheelchair_accessible, bikes_allowed, service_id, shape_id)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+           ON CONFLICT (id) DO UPDATE SET
+             headsign = EXCLUDED.headsign,
+             service_id = EXCLUDED.service_id,
+             shape_id = EXCLUDED.shape_id`,
           [
             `${feed}:${r.trip_id}`,
             `${feed}:${r.route_id}`,
@@ -230,6 +240,8 @@ async function main() {
             r.direction_id ? Number(r.direction_id) : null,
             r.wheelchair_accessible === '1' ? true : r.wheelchair_accessible === '2' ? false : null,
             r.bikes_allowed === '1' ? true : r.bikes_allowed === '2' ? false : null,
+            r.service_id ? `${feed}:${r.service_id}` : null,
+            r.shape_id ? `${feed}:${r.shape_id}` : null,
           ],
         );
         count++;
@@ -272,14 +284,89 @@ async function main() {
 
     if (existsSync(join(dir, 'calendar.txt'))) {
       let count = 0;
-      for await (const _ of readCsvRows(join(dir, 'calendar.txt'))) count++;
-      console.log(`  ~ calendar rows (schema not yet present): ${count}`);
+      for await (const r of readCsvRows(join(dir, 'calendar.txt'))) {
+        await client.query(
+          `INSERT INTO service_day
+             (id, monday, tuesday, wednesday, thursday, friday, saturday, sunday, start_date, end_date)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+           ON CONFLICT (id) DO UPDATE SET
+             monday=EXCLUDED.monday, tuesday=EXCLUDED.tuesday, wednesday=EXCLUDED.wednesday,
+             thursday=EXCLUDED.thursday, friday=EXCLUDED.friday,
+             saturday=EXCLUDED.saturday, sunday=EXCLUDED.sunday,
+             start_date=EXCLUDED.start_date, end_date=EXCLUDED.end_date`,
+          [
+            `${feed}:${r.service_id}`,
+            r.monday === '1',
+            r.tuesday === '1',
+            r.wednesday === '1',
+            r.thursday === '1',
+            r.friday === '1',
+            r.saturday === '1',
+            r.sunday === '1',
+            r.start_date ? gtfsDate(r.start_date) : null,
+            r.end_date ? gtfsDate(r.end_date) : null,
+          ],
+        );
+        count++;
+      }
+      console.log(`  ✓ service_day: ${count}`);
+    }
+
+    if (existsSync(join(dir, 'calendar_dates.txt'))) {
+      let count = 0;
+      for await (const r of readCsvRows(join(dir, 'calendar_dates.txt'))) {
+        await client.query(
+          `INSERT INTO service_date (service_id, date, exception_type)
+           VALUES ($1, $2, $3)
+           ON CONFLICT (service_id, date) DO UPDATE SET exception_type=EXCLUDED.exception_type`,
+          [`${feed}:${r.service_id}`, gtfsDate(r.date), Number(r.exception_type ?? '1')],
+        );
+        count++;
+      }
+      console.log(`  ✓ service_date exceptions: ${count}`);
     }
 
     if (existsSync(join(dir, 'shapes.txt'))) {
       let count = 0;
-      for await (const _ of readCsvRows(join(dir, 'shapes.txt'))) count++;
-      console.log(`  ~ shape points (schema not yet present): ${count}`);
+      for await (const r of readCsvRows(join(dir, 'shapes.txt'))) {
+        if (!r.shape_pt_lat || !r.shape_pt_lon) continue;
+        await client.query(
+          `INSERT INTO shape_point (shape_id, shape_pt_sequence, geom, shape_dist_traveled)
+           VALUES ($1, $2, ST_GeographyFromText($3), $4)
+           ON CONFLICT (shape_id, shape_pt_sequence) DO UPDATE SET
+             geom=EXCLUDED.geom, shape_dist_traveled=EXCLUDED.shape_dist_traveled`,
+          [
+            `${feed}:${r.shape_id}`,
+            Number(r.shape_pt_sequence ?? 0),
+            `SRID=4326;POINT(${Number(r.shape_pt_lon)} ${Number(r.shape_pt_lat)})`,
+            r.shape_dist_traveled ? Number(r.shape_dist_traveled) : null,
+          ],
+        );
+        count++;
+      }
+      console.log(`  ✓ shape_point: ${count}`);
+    }
+
+    if (existsSync(join(dir, 'transfers.txt'))) {
+      let count = 0;
+      for await (const r of readCsvRows(join(dir, 'transfers.txt'))) {
+        if (!r.from_stop_id || !r.to_stop_id) continue;
+        await client.query(
+          `INSERT INTO transfer (from_stop_id, to_stop_id, transfer_type, min_transfer_time)
+           VALUES ($1,$2,$3,$4)
+           ON CONFLICT (from_stop_id, to_stop_id) DO UPDATE SET
+             transfer_type=EXCLUDED.transfer_type,
+             min_transfer_time=EXCLUDED.min_transfer_time`,
+          [
+            `${feed}:${r.from_stop_id}`,
+            `${feed}:${r.to_stop_id}`,
+            Number(r.transfer_type ?? '0'),
+            r.min_transfer_time ? Number(r.min_transfer_time) : null,
+          ],
+        );
+        count++;
+      }
+      console.log(`  ✓ transfer rules: ${count}`);
     }
 
     await client.query('COMMIT');

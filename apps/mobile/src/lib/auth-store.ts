@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { asyncStorage } from './storage';
+import { secureStorage } from './secure-storage';
 
 export interface AuthUser {
   id: string;
@@ -36,7 +36,7 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'wayra:auth',
-      storage: asyncStorage(),
+      storage: secureStorage(),
       onRehydrateStorage: () => (s) => s?.setHydrated(true),
       partialize: (s) =>
         ({ token: s.token, refreshToken: s.refreshToken, user: s.user }) as Partial<AuthState>,

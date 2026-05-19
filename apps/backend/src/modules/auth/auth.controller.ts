@@ -1,8 +1,21 @@
-import { Body, Controller, Delete, Get, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Patch,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { IsEmail, IsIn, IsOptional, IsString, MinLength } from 'class-validator';
+import type { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard, type AuthedRequest } from './jwt.guard';
+import { TotpService } from './totp.service';
 
 class SignupDto {
   @IsEmail() email!: string;
@@ -13,9 +26,10 @@ class SignupDto {
 class LoginDto {
   @IsEmail() email!: string;
   @IsString() password!: string;
+  @IsOptional() @IsString() totp?: string;
 }
 class RefreshDto {
-  @IsString() refreshToken!: string;
+  @IsOptional() @IsString() refreshToken?: string;
 }
 class ForgotDto {
   @IsEmail() email!: string;
@@ -43,44 +57,75 @@ class DeleteAccountDto {
 class OauthDto {
   @IsIn(['google', 'apple']) provider!: 'google' | 'apple';
   @IsString() idToken!: string;
-  @IsOptional() @IsString() subject?: string;
-  @IsOptional() @IsString() email?: string | null;
-  @IsOptional() @IsString() displayName?: string | null;
 }
+class TotpCodeDto {
+  @IsString() code!: string;
+}
+
+function ctxFromReq(req: Request) {
+  return {
+    ip: (req.ip ?? (req.headers['x-forwarded-for'] as string | undefined) ?? null) as string | null,
+    userAgent: (req.headers['user-agent'] ?? null) as string | null,
+  };
+}
+
+const REFRESH_COOKIE = 'wayra_rt';
+const REFRESH_COOKIE_OPTS = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax' as const,
+  path: '/api/auth',
+  maxAge: 30 * 24 * 3600_000,
+};
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly auth: AuthService) {}
+  constructor(
+    private readonly auth: AuthService,
+    private readonly totp: TotpService,
+  ) {}
 
   @Post('signup')
-  signup(@Body() dto: SignupDto) {
-    return this.auth.signup(dto);
+  async signup(@Body() dto: SignupDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const result = await this.auth.signup(dto, ctxFromReq(req));
+    res.cookie(REFRESH_COOKIE, result.refreshToken, REFRESH_COOKIE_OPTS);
+    return result;
   }
 
   @Post('login')
-  login(@Body() dto: LoginDto) {
-    return this.auth.login(dto);
+  async login(@Body() dto: LoginDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const result = await this.auth.login(dto, ctxFromReq(req));
+    if ('totpRequired' in result) return result;
+    res.cookie(REFRESH_COOKIE, result.refreshToken, REFRESH_COOKIE_OPTS);
+    return result;
   }
 
   @Post('refresh')
-  refresh(@Body() dto: RefreshDto) {
-    return this.auth.refresh(dto.refreshToken);
+  async refresh(@Body() dto: RefreshDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const token = dto.refreshToken ?? (req.cookies?.[REFRESH_COOKIE] as string | undefined);
+    if (!token) throw new BadRequestException({ code: 'missing_refresh', message: 'No refresh token.' });
+    const result = await this.auth.refresh(token, ctxFromReq(req));
+    res.cookie(REFRESH_COOKIE, result.refreshToken, REFRESH_COOKIE_OPTS);
+    return result;
   }
 
   @Post('logout')
-  logout(@Body() dto: RefreshDto) {
-    return this.auth.logout(dto.refreshToken);
+  async logout(@Body() dto: RefreshDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const token = dto.refreshToken ?? (req.cookies?.[REFRESH_COOKIE] as string | undefined);
+    if (token) await this.auth.logout(token, ctxFromReq(req));
+    res.clearCookie(REFRESH_COOKIE, REFRESH_COOKIE_OPTS);
+    return { ok: true };
   }
 
   @Post('forgot-password')
-  forgot(@Body() dto: ForgotDto) {
-    return this.auth.requestPasswordReset(dto.email);
+  forgot(@Body() dto: ForgotDto, @Req() req: Request) {
+    return this.auth.requestPasswordReset(dto.email, ctxFromReq(req));
   }
 
   @Post('reset-password')
-  reset(@Body() dto: ResetDto) {
-    return this.auth.resetPassword(dto.token, dto.newPassword);
+  reset(@Body() dto: ResetDto, @Req() req: Request) {
+    return this.auth.resetPassword(dto.token, dto.newPassword, ctxFromReq(req));
   }
 
   @Post('verify-email')
@@ -89,8 +134,10 @@ export class AuthController {
   }
 
   @Post('oauth')
-  oauth(@Body() dto: OauthDto) {
-    return this.auth.oauthSignIn(dto);
+  async oauth(@Body() dto: OauthDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const result = await this.auth.oauthSignIn(dto, ctxFromReq(req));
+    res.cookie(REFRESH_COOKIE, result.refreshToken, REFRESH_COOKIE_OPTS);
+    return result;
   }
 
   @ApiBearerAuth()
@@ -110,8 +157,11 @@ export class AuthController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post('me/password')
-  changePassword(@Req() req: AuthedRequest, @Body() dto: ChangePasswordDto) {
-    return this.auth.changePassword(req.user.sub, dto);
+  changePassword(
+    @Req() req: AuthedRequest,
+    @Body() dto: ChangePasswordDto,
+  ) {
+    return this.auth.changePassword(req.user.sub, dto, ctxFromReq(req));
   }
 
   @ApiBearerAuth()
@@ -124,7 +174,36 @@ export class AuthController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Delete('me')
-  deleteAccount(@Req() req: AuthedRequest, @Body() dto: DeleteAccountDto) {
-    return this.auth.deleteAccount(req.user.sub, dto);
+  async deleteAccount(
+    @Req() req: AuthedRequest,
+    @Body() dto: DeleteAccountDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const result = await this.auth.deleteAccount(req.user.sub, dto, ctxFromReq(req));
+    res.clearCookie(REFRESH_COOKIE, REFRESH_COOKIE_OPTS);
+    return result;
+  }
+
+  // ---------- 2FA ----------
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Post('me/totp/setup')
+  totpSetup(@Req() req: AuthedRequest) {
+    return this.totp.setup(req.user.sub);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Post('me/totp/enable')
+  totpEnable(@Req() req: AuthedRequest, @Body() dto: TotpCodeDto) {
+    return this.totp.enable(req.user.sub, dto.code);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Post('me/totp/disable')
+  totpDisable(@Req() req: AuthedRequest, @Body() dto: TotpCodeDto) {
+    return this.totp.disable(req.user.sub, dto.code);
   }
 }

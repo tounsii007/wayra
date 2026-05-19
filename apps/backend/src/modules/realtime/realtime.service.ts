@@ -58,7 +58,35 @@ export class RealtimeService {
             predicted_time: Date | null;
           }>
         >(
-          `WITH base AS (
+          `WITH today AS (
+             SELECT CURRENT_DATE AS d,
+                    LOWER(TO_CHAR(CURRENT_DATE, 'fmDay')) AS dow
+           ),
+           active_services AS (
+             SELECT sd.id
+             FROM service_day sd, today
+             WHERE (today.d BETWEEN COALESCE(sd.start_date, today.d) AND COALESCE(sd.end_date, today.d))
+               AND (
+                 (today.dow = 'monday'    AND sd.monday)
+                 OR (today.dow = 'tuesday'   AND sd.tuesday)
+                 OR (today.dow = 'wednesday' AND sd.wednesday)
+                 OR (today.dow = 'thursday'  AND sd.thursday)
+                 OR (today.dow = 'friday'    AND sd.friday)
+                 OR (today.dow = 'saturday'  AND sd.saturday)
+                 OR (today.dow = 'sunday'    AND sd.sunday)
+               )
+               AND NOT EXISTS (
+                 SELECT 1 FROM service_date sx
+                 WHERE sx.service_id = sd.id AND sx.date = today.d AND sx.exception_type = 2
+               )
+             UNION
+             SELECT sd.service_id
+             FROM service_date sx
+             JOIN service_day sd ON sd.id = sx.service_id
+             , today
+             WHERE sx.date = today.d AND sx.exception_type = 1
+           ),
+           base AS (
              SELECT st.trip_id, t.line_id, l.short_name, l.mode, l.color,
                     t.headsign, st.departure_time, st.platform
              FROM stop_time st
@@ -66,6 +94,7 @@ export class RealtimeService {
              JOIN line l ON l.id = t.line_id
              WHERE st.stop_id = $1
                AND st.departure_time IS NOT NULL
+               AND (t.service_id IS NULL OR t.service_id IN (SELECT id FROM active_services))
              ORDER BY st.departure_time
              LIMIT $2
            )

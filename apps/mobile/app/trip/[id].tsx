@@ -10,6 +10,8 @@ import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { useAuthStore } from '@/lib/auth-store';
 import { MapLibreView } from '@/components/MapLibreView';
+import { tap } from '@/lib/haptics';
+import { newMutationId, useOfflineQueue } from '@/lib/offline-queue';
 
 export default function TripScreen() {
   const theme = useTheme();
@@ -36,11 +38,25 @@ export default function TripScreen() {
       router.push('/login');
       return;
     }
-    await api.saveRoute({
+    const body = {
       label: `${route.legs[0]!.from.name} → ${route.legs.at(-1)!.to.name}`,
       data: { route },
       notify: true,
-    });
+    };
+    try {
+      await api.saveRoute(body);
+      tap('success');
+    } catch {
+      // Offline — queue the mutation so it replays when network returns.
+      useOfflineQueue.getState().enqueue({
+        id: newMutationId(),
+        path: '/api/me/routes',
+        method: 'POST',
+        body,
+        auth: true,
+      });
+      tap('warning');
+    }
     setSaved(true);
   }
 
