@@ -9,6 +9,7 @@ import { useTheme } from '@/theme';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { useAuthStore } from '@/lib/auth-store';
+import { MapLibreView } from '@/components/MapLibreView';
 
 export default function TripScreen() {
   const theme = useTheme();
@@ -59,7 +60,37 @@ export default function TripScreen() {
       ) : !route ? (
         <Text style={{ padding: 16, color: theme.textMuted }}>Trip not found.</Text>
       ) : (
-        <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
+        <ScrollView contentContainerStyle={{ padding: 0, gap: 0 }}>
+          <View style={{ height: 220 }}>
+            <MapLibreView
+              center={route.legs[0]!.from.coordinates}
+              zoom={9}
+              markers={[
+                {
+                  id: 'start',
+                  coordinates: route.legs[0]!.from.coordinates,
+                  color: '#2563eb',
+                },
+                {
+                  id: 'end',
+                  coordinates: route.legs.at(-1)!.to.coordinates,
+                  color: '#7c3aed',
+                },
+              ]}
+              polylines={[
+                {
+                  id: route.id,
+                  coordinates: route.legs.flatMap((l) => [
+                    [l.from.coordinates.lng, l.from.coordinates.lat] as [number, number],
+                    [l.to.coordinates.lng, l.to.coordinates.lat] as [number, number],
+                  ]),
+                  color: '#2563eb',
+                  width: 5,
+                },
+              ]}
+            />
+          </View>
+          <View style={{ padding: 16, gap: 12 }}>
           <View
             style={{
               backgroundColor: theme.surface,
@@ -165,6 +196,7 @@ export default function TripScreen() {
               </Text>
             </View>
           )}
+          </View>
         </ScrollView>
       )}
     </SafeAreaView>

@@ -4,14 +4,16 @@ import de from './locales/de.json';
 import en from './locales/en.json';
 import fr from './locales/fr.json';
 import ar from './locales/ar.json';
+import it from './locales/it.json';
+import es from './locales/es.json';
 
 export const messages: Record<Locale, Record<string, unknown>> = {
   de,
   en,
   fr,
   ar,
-  it: en, // fallback to English until translated
-  es: en,
+  it,
+  es,
 };
 
 export type MessageKey = keyof typeof en;

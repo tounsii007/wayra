@@ -9,12 +9,18 @@ interface AuthUser {
   displayName: string | null;
   locale: string;
   theme: string;
+  role?: string;
+  emailVerified?: boolean;
 }
 
 interface AuthState {
+  /** Short-lived access token (~15 min) */
   token: string | null;
+  /** Long-lived refresh token (~30 days) */
+  refreshToken: string | null;
   user: AuthUser | null;
-  setSession: (token: string, user: AuthUser) => void;
+  setSession: (token: string, user: AuthUser, refreshToken?: string) => void;
+  setAccessToken: (token: string) => void;
   clear: () => void;
 }
 
@@ -22,9 +28,12 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       token: null,
+      refreshToken: null,
       user: null,
-      setSession: (token, user) => set({ token, user }),
-      clear: () => set({ token: null, user: null }),
+      setSession: (token, user, refreshToken) =>
+        set({ token, user, ...(refreshToken !== undefined && { refreshToken }) }),
+      setAccessToken: (token) => set({ token }),
+      clear: () => set({ token: null, refreshToken: null, user: null }),
     }),
     {
       name: 'wayra-auth',
@@ -33,7 +42,6 @@ export const useAuthStore = create<AuthState>()(
   ),
 );
 
-/** Helper to read the current token outside of React. */
 export function getToken(): string | null {
   try {
     return useAuthStore.getState().token;

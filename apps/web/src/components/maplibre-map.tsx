@@ -22,15 +22,26 @@ export interface MapRouteLine {
   width?: number;
 }
 
+export interface ClusteredLayer {
+  /** Stable id used for the GeoJSON source + layers */
+  id: string;
+  points: MapMarker[];
+  clusterRadius?: number;
+  clusterMaxZoom?: number;
+}
+
 interface Props {
   center: Coordinates;
   zoom?: number;
   markers?: MapMarker[];
   routes?: MapRouteLine[];
+  /** Clustered point layers — preferred over `markers` for >100 points. */
+  clusters?: ClusteredLayer[];
   /** Auto-fit to markers/routes on first render */
   fitToContent?: boolean;
   className?: string;
   onMarkerClick?: (m: MapMarker) => void;
+  onClusterPointClick?: (layerId: string, pointId: string) => void;
   interactive?: boolean;
 }
 
@@ -60,9 +71,11 @@ export function MapLibreMap({
   zoom = 11,
   markers = [],
   routes = [],
+  clusters = [],
   fitToContent = false,
   className,
   onMarkerClick,
+  onClusterPointClick,
   interactive = true,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -200,6 +213,97 @@ export function MapLibreMap({
     if (map.isStyleLoaded()) apply();
     else map.once('load', apply);
   }, [routes]);
+
+  // Clustered layers
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    const apply = () => {
+      for (const c of clusters) {
+        const fc: GeoJSON.FeatureCollection = {
+          type: 'FeatureCollection',
+          features: c.points.map((p) => ({
+            type: 'Feature',
+            properties: { id: p.id, color: p.color ?? '#2563eb', label: p.label ?? '' },
+            geometry: { type: 'Point', coordinates: [p.coordinates.lng, p.coordinates.lat] },
+          })),
+        };
+        const src = map.getSource(c.id) as maplibregl.GeoJSONSource | undefined;
+        if (src) {
+          src.setData(fc);
+        } else {
+          map.addSource(c.id, {
+            type: 'geojson',
+            data: fc,
+            cluster: true,
+            clusterRadius: c.clusterRadius ?? 48,
+            clusterMaxZoom: c.clusterMaxZoom ?? 14,
+          });
+          map.addLayer({
+            id: `${c.id}-clusters`,
+            type: 'circle',
+            source: c.id,
+            filter: ['has', 'point_count'],
+            paint: {
+              'circle-color': '#2563eb',
+              'circle-radius': ['step', ['get', 'point_count'], 14, 10, 20, 50, 26, 200, 34],
+              'circle-stroke-color': '#ffffff',
+              'circle-stroke-width': 3,
+              'circle-opacity': 0.92,
+            },
+          });
+          map.addLayer({
+            id: `${c.id}-cluster-count`,
+            type: 'symbol',
+            source: c.id,
+            filter: ['has', 'point_count'],
+            layout: {
+              'text-field': '{point_count_abbreviated}',
+              'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+              'text-size': 12,
+            },
+            paint: { 'text-color': '#ffffff' },
+          });
+          map.addLayer({
+            id: `${c.id}-points`,
+            type: 'circle',
+            source: c.id,
+            filter: ['!', ['has', 'point_count']],
+            paint: {
+              'circle-color': ['get', 'color'],
+              'circle-radius': 8,
+              'circle-stroke-color': '#ffffff',
+              'circle-stroke-width': 3,
+            },
+          });
+
+          map.on('click', `${c.id}-clusters`, (e) => {
+            const features = map.queryRenderedFeatures(e.point, { layers: [`${c.id}-clusters`] });
+            const clusterId = features[0]?.properties?.cluster_id;
+            if (clusterId === undefined) return;
+            const src2 = map.getSource(c.id) as maplibregl.GeoJSONSource;
+            src2.getClusterExpansionZoom(clusterId).then((zoom) => {
+              if (typeof zoom === 'number') {
+                map.easeTo({ center: (features[0]!.geometry as GeoJSON.Point).coordinates as [number, number], zoom });
+              }
+            });
+          });
+          map.on('click', `${c.id}-points`, (e) => {
+            const f = e.features?.[0];
+            if (!f) return;
+            const id = String(f.properties?.id ?? '');
+            onClusterPointClick?.(c.id, id);
+          });
+          map.on('mouseenter', `${c.id}-clusters`, () => (map.getCanvas().style.cursor = 'pointer'));
+          map.on('mouseleave', `${c.id}-clusters`, () => (map.getCanvas().style.cursor = ''));
+          map.on('mouseenter', `${c.id}-points`, () => (map.getCanvas().style.cursor = 'pointer'));
+          map.on('mouseleave', `${c.id}-points`, () => (map.getCanvas().style.cursor = ''));
+        }
+      }
+    };
+    if (map.isStyleLoaded()) apply();
+    else map.once('load', apply);
+  }, [clusters, onClusterPointClick]);
 
   // Fit to content
   useEffect(() => {

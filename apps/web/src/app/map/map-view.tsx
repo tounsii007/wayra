@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { Filter, Search } from 'lucide-react';
 import { sampleSuggestions } from '@/data/sample-suggestions';
 import { COUNTRY_DEFAULT_CENTER, MVP_COUNTRIES } from '@wayra/shared';
-import type { CountryCode, TransitMode } from '@wayra/types';
+import type { CountryCode, Place } from '@wayra/types';
 import { cn } from '@/lib/utils';
 
 const MapLibreMap = dynamic(
@@ -41,21 +41,42 @@ export function MapView() {
     bus_stop: true,
     airport: true,
   });
+  const [places, setPlaces] = useState<Place[]>([]);
 
   const center = COUNTRY_DEFAULT_CENTER[country];
-  const markers = sampleSuggestions
-    .filter((p) => p.countryCode === country)
-    .filter((p) => enabled[p.type as keyof typeof enabled] ?? true)
-    .map((p) => ({
-      id: p.id,
-      coordinates: p.coordinates,
-      color: MODE_COLORS[p.type] ?? '#2563eb',
-      label: p.name,
-    }));
+
+  useEffect(() => {
+    const base = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000';
+    const ctrl = new AbortController();
+    (async () => {
+      try {
+        const res = await fetch(
+          `${base}/api/stops/nearby?lat=${center.lat}&lng=${center.lng}&radiusMeters=1500000&limit=200`,
+          { signal: ctrl.signal },
+        );
+        const json = (await res.json()) as {
+          data?: { stops: Place[] };
+          error?: { message: string };
+        };
+        if (json.error || !json.data) throw new Error(json.error?.message ?? 'no data');
+        setPlaces(json.data.stops);
+      } catch {
+        setPlaces(sampleSuggestions.filter((p) => p.countryCode === country));
+      }
+    })();
+    return () => ctrl.abort();
+  }, [country, center.lat, center.lng]);
+
+  const visible = places.filter((p) => enabled[p.type] ?? true);
+  const points = visible.map((p) => ({
+    id: p.id,
+    coordinates: p.coordinates,
+    color: MODE_COLORS[p.type] ?? '#2563eb',
+    label: p.name,
+  }));
 
   return (
     <div className="relative h-full rounded-3xl overflow-hidden surface">
-      {/* Filter rail */}
       <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex flex-wrap items-start justify-between gap-2 p-3">
         <div className="pointer-events-auto inline-flex gap-1 rounded-full glass-strong p-1 shadow-card">
           {MVP_COUNTRIES.map((c) => (
@@ -85,9 +106,7 @@ export function MapView() {
                 onClick={() => setEnabled((s) => ({ ...s, [key]: !s[key] }))}
                 className={cn(
                   'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-xs font-semibold transition-colors',
-                  on
-                    ? 'bg-[rgb(var(--surface))] text-[rgb(var(--text))] shadow-sm'
-                    : 'text-subtle',
+                  on ? 'bg-[rgb(var(--surface))] text-[rgb(var(--text))] shadow-sm' : 'text-subtle',
                 )}
               >
                 <span
@@ -105,9 +124,9 @@ export function MapView() {
       <MapLibreMap
         center={{ lat: center.lat, lng: center.lng }}
         zoom={center.zoom}
-        markers={markers}
+        clusters={[{ id: 'stops', points }]}
         fitToContent
-        onMarkerClick={(m) => router.push(`/stops/${encodeURIComponent(m.id)}`)}
+        onClusterPointClick={(_, id) => router.push(`/stops/${encodeURIComponent(id)}`)}
         className="h-full w-full"
       />
 

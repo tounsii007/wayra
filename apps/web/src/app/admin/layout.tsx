@@ -4,6 +4,7 @@ import { ShieldCheck, AlertTriangle, Database, Activity, MessageSquare, BarChart
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LocaleSwitcher } from '@/components/locale-switcher';
 import { WayraLogo } from '@/components/wayra-logo';
+import { AdminGuard } from './admin-guard';
 
 export const metadata = { title: 'Admin' };
 
@@ -16,6 +17,14 @@ const nav = [
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <AdminGuard>
+      <AdminShell>{children}</AdminShell>
+    </AdminGuard>
+  );
+}
+
+function AdminShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="grid min-h-screen grid-cols-[240px_1fr]">
       <aside className="surface flex flex-col gap-2 border-e border-[rgb(var(--border))] p-4">

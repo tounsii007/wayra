@@ -16,6 +16,8 @@ import { useAuthStore } from '@/lib/auth-store';
 import { useRecentStore } from '@/lib/recent-store';
 import { usePrefsStore, type NotificationChannels } from '@/lib/prefs-store';
 import { Toggle } from '@/components/Toggle';
+import { registerForPush } from '@/lib/push';
+import { api } from '@/lib/api';
 import { localeMetadata } from '@wayra/i18n';
 import { SUPPORTED_LOCALES } from '@wayra/shared';
 import type { Locale, Theme } from '@wayra/types';
@@ -162,9 +164,32 @@ export default function ProfileScreen() {
             label="Push"
             hint="Notifications for delays and disruptions."
             value={prefs.pushEnabled}
-            onChange={prefs.setPushEnabled}
+            onChange={async (v) => {
+              prefs.setPushEnabled(v);
+              if (v) await registerForPush();
+              if (auth.token) {
+                try {
+                  await api.setNotificationPrefs({ pushEnabled: v });
+                } catch {
+                  /* offline: local prefs still toggled */
+                }
+              }
+            }}
           />
-          <Toggle label="Email" value={prefs.emailEnabled} onChange={prefs.setEmailEnabled} />
+          <Toggle
+            label="Email"
+            value={prefs.emailEnabled}
+            onChange={async (v) => {
+              prefs.setEmailEnabled(v);
+              if (auth.token) {
+                try {
+                  await api.setNotificationPrefs({ emailEnabled: v });
+                } catch {
+                  /* ignore */
+                }
+              }
+            }}
+          />
           <Text
             style={{
               color: theme.textSubtle,

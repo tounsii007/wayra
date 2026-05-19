@@ -27,7 +27,7 @@ export default function LoginScreen() {
         mode === 'signup'
           ? await api.signup({ email, password, displayName: name || undefined })
           : await api.login({ email, password });
-      setSession(result.token, result.user);
+      setSession(result.accessToken, result.user, result.refreshToken);
       router.replace('/(tabs)/profile');
     } catch (e) {
       setError((e as Error).message);

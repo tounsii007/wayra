@@ -1,0 +1,117 @@
+{
+  "brand": { "name": "Wayra", "tagline": "Viajar. Sencillo. Conectado." },
+  "nav": {
+    "plan": "Planificar",
+    "map": "Mapa",
+    "live": "En vivo",
+    "assistant": "Asistente",
+    "settings": "Ajustes",
+    "offline": "Sin conexión"
+  },
+  "home": {
+    "hero": {
+      "title": "¿A dónde quieres ir?",
+      "subtitle": "Trenes, autobuses y metro por Europa y el norte de África — en una sola app.",
+      "fromPlaceholder": "Desde …",
+      "toPlaceholder": "Destino",
+      "useCurrentLocation": "Usar mi ubicación",
+      "plan": "Planificar",
+      "now": "Ahora",
+      "departAt": "Salida",
+      "arriveBy": "Llegada"
+    },
+    "quickActions": {
+      "home": "Casa",
+      "work": "Trabajo",
+      "findStation": "Buscar estación",
+      "findStop": "Buscar parada",
+      "compareFares": "Comparar precios"
+    },
+    "sections": {
+      "popularRoutes": "Rutas populares",
+      "recentSearches": "Búsquedas recientes",
+      "liveStatus": "Estado del tráfico",
+      "exploreCountries": "Explorar países"
+    },
+    "features": {
+      "title": "Todo lo que necesitas para tu viaje",
+      "items": [
+        { "title": "Rutas multimodales", "body": "Tren, autobús, metro, tranvía y a pie — combinados con inteligencia." },
+        { "title": "Retrasos en directo", "body": "Puntualidad, cambios de andén e incidencias en tiempo real." },
+        { "title": "Horarios offline", "body": "Descarga ciudades y usa Wayra sin Internet." },
+        { "title": "Asistente IA", "body": "Pregunta en lenguaje natural — respuestas instantáneas." }
+      ]
+    }
+  },
+  "search": {
+    "placeholder": "Ciudad, estación o dirección",
+    "noResults": "Sin resultados.",
+    "useLocation": "Usar mi ubicación",
+    "types": {
+      "city": "Ciudad",
+      "station": "Estación",
+      "stop": "Parada",
+      "metro_station": "Metro",
+      "tram_stop": "Tranvía",
+      "bus_stop": "Autobús",
+      "airport": "Aeropuerto",
+      "street": "Calle",
+      "address": "Dirección",
+      "poi": "Lugar",
+      "landmark": "Monumento",
+      "neighborhood": "Barrio"
+    }
+  },
+  "route": {
+    "departure": "Salida",
+    "arrival": "Llegada",
+    "duration": "Duración",
+    "transfers": "Transbordos",
+    "platform": "Andén",
+    "noTransfer": "directo",
+    "transfersCount": "{count, plural, one {# transbordo} other {# transbordos}}",
+    "co2Saved": "{value} CO₂ ahorrado",
+    "preferences": {
+      "fastest": "Más rápido",
+      "cheapest": "Más barato",
+      "fewest_transfers": "Menos transbordos",
+      "accessible": "Accesible",
+      "least_walking": "Menos caminata",
+      "night": "Nocturno",
+      "most_comfortable": "Más cómodo"
+    }
+  },
+  "status": {
+    "onTime": "a tiempo",
+    "delayed": "retrasado",
+    "cancelled": "cancelado",
+    "platformChanged": "cambio de andén",
+    "detour": "desvío",
+    "strike": "huelga",
+    "replacement": "servicio sustitutivo",
+    "unknown": "desconocido"
+  },
+  "errors": {
+    "noRoute": "No hay ruta directa. ¿Mostrar alternativas?",
+    "noLive": "Datos en directo no disponibles. Mostrando horarios programados.",
+    "noFare": "No se ha podido cargar el precio.",
+    "network": "Sin conexión. Reintentando …",
+    "generic": "Algo salió mal. Vuelve a intentarlo."
+  },
+  "fare": {
+    "estimated": "Precio estimado",
+    "unavailable": "Precio no disponible",
+    "deutschlandticket": "Deutschlandticket válido"
+  },
+  "theme": { "light": "Claro", "dark": "Oscuro", "system": "Sistema" },
+  "assistant": {
+    "greeting": "¡Hola! Puedo ayudarte a planificar tu viaje. Pregúntame.",
+    "placeholder": "Haz una pregunta … p. ej. «¿Cómo llego a París mañana por la mañana?»",
+    "examples": [
+      "¿Cómo voy de Fráncfort a París mañana por la mañana?",
+      "Busca la conexión más barata de Túnez a Susa.",
+      "¿Hay incidencias hoy en Berlín?",
+      "¿Qué ruta es mejor con carrito?"
+    ]
+  }
+}

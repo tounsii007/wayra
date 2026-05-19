@@ -32,13 +32,19 @@ export function AuthForm() {
         ),
       });
       const json = (await res.json()) as {
-        data?: { token: string; user: never };
+        data?: {
+          accessToken?: string;
+          token?: string;
+          refreshToken?: string;
+          user: never;
+        };
         error?: { message: string };
       };
       if (!res.ok || !json.data) {
         throw new Error(json.error?.message ?? 'Request failed');
       }
-      setSession(json.data.token, json.data.user);
+      const access = json.data.accessToken ?? json.data.token ?? '';
+      setSession(access, json.data.user, json.data.refreshToken);
       router.replace('/me');
     } catch (e) {
       setError((e as Error).message);

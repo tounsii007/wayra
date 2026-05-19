@@ -138,6 +138,8 @@ export default function MapScreen() {
           center={{ lat: center.lat, lng: center.lng }}
           zoom={center.zoom}
           markers={markers}
+          cluster
+          showUserLocation
           onMarkerPress={(id) => router.push(`/stop/${encodeURIComponent(id)}`)}
         />
       </View>

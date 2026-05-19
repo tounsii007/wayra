@@ -74,11 +74,21 @@ function SiteFooter() {
     <footer className="border-t border-[rgb(var(--border))]">
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-8 text-sm text-subtle sm:flex-row sm:px-6">
         <p>
-          © {new Date().getFullYear()} {t('name')} · MVP build
+          © {new Date().getFullYear()} {t('name')} · v0.5
         </p>
-        <p className="inline-flex items-center gap-2">
-          <span>Data: OSM, GTFS, GTFS-RT, DB, SNCF, SNCFT</span>
-        </p>
+        <nav className="flex items-center gap-4">
+          <a className="hover:text-[rgb(var(--text))]" href="/about">About</a>
+          <a className="hover:text-[rgb(var(--text))]" href="/privacy">Privacy</a>
+          <a className="hover:text-[rgb(var(--text))]" href="/terms">Terms</a>
+          <a
+            className="hover:text-[rgb(var(--text))]"
+            href="https://github.com/tounsii007/wayra"
+            target="_blank"
+            rel="noreferrer"
+          >
+            GitHub
+          </a>
+        </nav>
       </div>
     </footer>
   );

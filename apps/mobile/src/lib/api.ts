@@ -45,6 +45,20 @@ export class ApiError extends Error {
   }
 }
 
+export interface AuthSessionResponse {
+  accessToken: string;
+  refreshToken: string;
+  user: {
+    id: string;
+    email: string | null;
+    displayName: string | null;
+    locale: string;
+    theme: string;
+    role?: string;
+    emailVerified?: boolean;
+  };
+}
+
 export const api = {
   baseUrl: BASE,
 
@@ -111,20 +125,66 @@ export const api = {
   },
 
   // --- auth ---
-  signup(body: { email: string; password: string; displayName?: string }) {
-    return request<{ token: string; user: { id: string; email: string | null; displayName: string | null; locale: string; theme: string } }>(
-      '/api/auth/signup',
-      { method: 'POST', body: JSON.stringify(body) },
-    );
+  signup(body: { email: string; password: string; displayName?: string; locale?: string }) {
+    return request<AuthSessionResponse>('/api/auth/signup', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
   },
   login(body: { email: string; password: string }) {
-    return request<{ token: string; user: { id: string; email: string | null; displayName: string | null; locale: string; theme: string } }>(
-      '/api/auth/login',
-      { method: 'POST', body: JSON.stringify(body) },
-    );
+    return request<AuthSessionResponse>('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+  },
+  refresh(refreshToken: string) {
+    return request<AuthSessionResponse>('/api/auth/refresh', {
+      method: 'POST',
+      body: JSON.stringify({ refreshToken }),
+    });
+  },
+  logout(refreshToken: string) {
+    return request<{ ok: true }>('/api/auth/logout', {
+      method: 'POST',
+      body: JSON.stringify({ refreshToken }),
+    });
+  },
+  forgotPassword(email: string) {
+    return request<{ ok: true }>('/api/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
   },
   me() {
-    return request<{ id: string; email: string | null; displayName: string | null; locale: string; theme: string }>('/api/auth/me', { auth: true });
+    return request<{
+      id: string;
+      email: string | null;
+      displayName: string | null;
+      locale: string;
+      theme: string;
+      role?: string;
+      emailVerified?: boolean;
+    }>('/api/auth/me', { auth: true });
+  },
+  updateProfile(body: { displayName?: string; locale?: string; theme?: string; homeCountry?: string }) {
+    return request<{ id: string; email: string | null; displayName: string | null; locale: string; theme: string }>(
+      '/api/auth/me',
+      { method: 'PATCH', body: JSON.stringify(body), auth: true },
+    );
+  },
+  changePassword(body: { currentPassword: string; newPassword: string }) {
+    return request<{ ok: true }>('/api/auth/me/password', {
+      method: 'POST',
+      body: JSON.stringify(body),
+      auth: true,
+    });
+  },
+  deleteAccount(body: { password: string }) {
+    return request<{ ok: true }>('/api/auth/me', {
+      method: 'DELETE',
+      body: JSON.stringify(body),
+      auth: true,
+    });
   },
 
   // --- account ---
@@ -159,6 +219,45 @@ export const api = {
       body: JSON.stringify(body),
       auth: true,
     });
+  },
+
+  // --- notifications ---
+  addExpoSubscription(body: { token: string; platform: 'ios' | 'android' }) {
+    return request<{ id: string }>('/api/me/notifications/subscriptions/expo', {
+      method: 'POST',
+      body: JSON.stringify(body),
+      auth: true,
+    });
+  },
+  addWebPushSubscription(body: { endpoint: string; p256dh?: string; auth?: string }) {
+    return request<{ id: string }>('/api/me/notifications/subscriptions/web', {
+      method: 'POST',
+      body: JSON.stringify(body),
+      auth: true,
+    });
+  },
+  removePushSubscription(endpoint: string) {
+    return request<{ ok: true }>('/api/me/notifications/subscriptions', {
+      method: 'DELETE',
+      body: JSON.stringify({ endpoint }),
+      auth: true,
+    });
+  },
+  getNotificationPrefs() {
+    return request<{ pushEnabled: boolean; emailEnabled: boolean; channels: Record<string, boolean> }>(
+      '/api/me/notifications/preferences',
+      { auth: true },
+    );
+  },
+  setNotificationPrefs(body: {
+    pushEnabled?: boolean;
+    emailEnabled?: boolean;
+    channels?: Record<string, boolean>;
+  }) {
+    return request<{ pushEnabled: boolean; emailEnabled: boolean; channels: Record<string, boolean> }>(
+      '/api/me/notifications/preferences',
+      { method: 'PATCH', body: JSON.stringify(body), auth: true },
+    );
   },
 
   // --- offline ---

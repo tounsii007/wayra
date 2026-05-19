@@ -1,6 +1,6 @@
-import { ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams, Stack } from 'expo-router';
+import { router, useLocalSearchParams, Stack } from 'expo-router';
 import { useTheme } from '@/theme';
 import { MapLibreView } from '@/components/MapLibreView';
 import { useEffect, useState } from 'react';
@@ -61,6 +61,42 @@ export default function StopDetailsScreen() {
         <Text style={{ color: theme.text, fontSize: 22, fontWeight: '800' }}>
           {name ?? id}
         </Text>
+
+        <View style={{ flexDirection: 'row', gap: 8, marginVertical: 8 }}>
+          <Pressable
+            onPress={() => router.push(`/plan?to=${encodeURIComponent(id ?? '')}`)}
+            style={{
+              flex: 1,
+              flexDirection: 'row',
+              gap: 6,
+              alignItems: 'center',
+              justifyContent: 'center',
+              paddingVertical: 12,
+              borderRadius: 999,
+              backgroundColor: theme.brand,
+            }}
+          >
+            <Text style={{ color: '#fff', fontWeight: '800' }}>Plan to here</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => router.push(`/plan?from=${encodeURIComponent(id ?? '')}`)}
+            style={{
+              flex: 1,
+              flexDirection: 'row',
+              gap: 6,
+              alignItems: 'center',
+              justifyContent: 'center',
+              paddingVertical: 12,
+              borderRadius: 999,
+              backgroundColor: theme.surface,
+              borderColor: theme.border,
+              borderWidth: 1,
+            }}
+          >
+            <Text style={{ color: theme.text, fontWeight: '800' }}>From here</Text>
+          </Pressable>
+        </View>
+
         <Text style={{ color: theme.textMuted, marginBottom: 6 }}>Live departures</Text>
         {departures.length === 0 && (
           <Text style={{ color: theme.textSubtle, fontSize: 13 }}>

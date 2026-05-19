@@ -15,6 +15,7 @@ import { useTheme } from '@/theme';
 import { useTranslation } from 'react-i18next';
 import type { Locale } from '@wayra/types';
 import { api } from '@/lib/api';
+import { SimpleMarkdown } from '@/components/SimpleMarkdown';
 
 type Msg = { role: 'user' | 'assistant'; content: string };
 
@@ -106,9 +107,11 @@ export default function AssistantScreen() {
                   maxWidth: '80%',
                 }}
               >
-                <Text style={{ color: m.role === 'user' ? '#fff' : theme.text, fontSize: 14 }}>
-                  {m.content}
-                </Text>
+                {m.role === 'user' ? (
+                  <Text style={{ color: '#fff', fontSize: 14 }}>{m.content}</Text>
+                ) : (
+                  <SimpleMarkdown text={m.content} color={theme.text} />
+                )}
               </View>
               {m.role === 'user' && (
                 <View

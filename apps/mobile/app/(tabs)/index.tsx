@@ -3,12 +3,24 @@ import { ScrollView, Text, View, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { ArrowDownUp, ArrowRight, Briefcase, Bus, Home, Locate, Search, Ticket, Train } from 'lucide-react-native';
+import {
+  ArrowDownUp,
+  ArrowRight,
+  Briefcase,
+  Bus,
+  Home,
+  Loader2,
+  Locate,
+  Search,
+  Ticket,
+  Train,
+} from 'lucide-react-native';
 import type { Place } from '@wayra/types';
 import { useTheme } from '@/theme';
 import { PlacesAutocomplete } from '@/components/PlacesAutocomplete';
 import { DemoBadge } from '@/components/DemoBadge';
 import { api } from '@/lib/api';
+import { useGeolocation } from '@/hooks/useGeolocation';
 
 interface StatusItem {
   city: string;
@@ -119,21 +131,18 @@ export default function HomeScreen() {
             <Text style={{ color: '#fff', fontWeight: '800' }}>{t('home.hero.plan')}</Text>
             <ArrowRight color="#fff" size={16} />
           </Pressable>
-          <Pressable
-            onPress={() => router.push('/search')}
-            style={{
-              flexDirection: 'row',
-              gap: 6,
-              alignItems: 'center',
-              paddingVertical: 6,
-              alignSelf: 'flex-start',
-            }}
-          >
-            <Search color={theme.brand} size={14} />
-            <Text style={{ color: theme.brand, fontSize: 12, fontWeight: '700' }}>
-              Open full search
-            </Text>
-          </Pressable>
+          <View style={{ flexDirection: 'row', gap: 14 }}>
+            <Pressable
+              onPress={() => router.push('/search')}
+              style={{ flexDirection: 'row', gap: 6, alignItems: 'center', paddingVertical: 6 }}
+            >
+              <Search color={theme.brand} size={14} />
+              <Text style={{ color: theme.brand, fontSize: 12, fontWeight: '700' }}>
+                Open full search
+              </Text>
+            </Pressable>
+            <UseLocationButton onCoords={(c) => router.push(`/search?lat=${c.lat}&lng=${c.lng}`)} />
+          </View>
         </View>
 
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
@@ -232,5 +241,30 @@ export default function HomeScreen() {
         )}
       </ScrollView>
     </SafeAreaView>
+  );
+}
+
+function UseLocationButton({ onCoords }: { onCoords: (c: { lat: number; lng: number }) => void }) {
+  const theme = useTheme();
+  const { t } = useTranslation();
+  const { state, request } = useGeolocation();
+  const busy = state.status === 'requesting';
+  return (
+    <Pressable
+      onPress={async () => {
+        const coords = await request();
+        if (coords) onCoords(coords);
+      }}
+      style={{ flexDirection: 'row', gap: 6, alignItems: 'center', paddingVertical: 6 }}
+    >
+      {busy ? (
+        <Loader2 color={theme.brand} size={14} />
+      ) : (
+        <Locate color={theme.brand} size={14} />
+      )}
+      <Text style={{ color: theme.brand, fontSize: 12, fontWeight: '700' }}>
+        {t('home.hero.useCurrentLocation')}
+      </Text>
+    </Pressable>
   );
 }
