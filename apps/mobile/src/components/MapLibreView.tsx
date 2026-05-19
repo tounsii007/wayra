@@ -1,3 +1,4 @@
+import type * as React from 'react';
 import {
   MapView,
   Camera,
@@ -5,8 +6,14 @@ import {
   CircleLayer,
   LineLayer,
   SymbolLayer,
-  UserLocation,
 } from '@maplibre/maplibre-react-native';
+import * as MapLibreRN from '@maplibre/maplibre-react-native';
+
+// `UserLocation` is exported by the runtime module but isn't in the
+// shipped typings. Pull it through the namespace and cast.
+const UserLocation: React.ComponentType<{ visible?: boolean; animated?: boolean }> =
+  (MapLibreRN as unknown as { UserLocation: React.ComponentType<{ visible?: boolean; animated?: boolean }> })
+    .UserLocation ?? (() => null);
 import { useMemo } from 'react';
 import type { Coordinates } from '@wayra/types';
 
@@ -121,14 +128,16 @@ export function MapLibreView({
       <ShapeSource
         id="wayra-markers"
         shape={markerFc}
-        cluster={cluster}
-        clusterRadius={48}
-        clusterMaxZoom={14}
-        onPress={(e) => {
+        // Cluster props are accepted by the underlying native module but
+        // the v10 RN typings don't expose them yet. Cast through unknown.
+        {...((cluster
+          ? { cluster: true, clusterRadius: 48, clusterMaxZoom: 14 }
+          : {}) as unknown as Record<string, never>)}
+        onPress={(e: { features?: Array<{ properties?: Record<string, unknown> }> }) => {
           const f = e?.features?.[0];
           if (!f) return;
-          if (f.properties?.cluster) return; // user can zoom in manually
-          const id = f.properties?.id as string | undefined;
+          if ((f.properties as { cluster?: boolean } | undefined)?.cluster) return;
+          const id = (f.properties as { id?: string } | undefined)?.id;
           if (id && onMarkerPress) onMarkerPress(id);
         }}
       >
