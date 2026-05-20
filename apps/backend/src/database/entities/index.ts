@@ -21,6 +21,10 @@ import { LoginAttemptEntity } from './login-attempt.entity';
 import { NotificationOutboxEntity } from './notification-outbox.entity';
 import { VehiclePositionEntity } from './vehicle-position.entity';
 import { TransferEntity } from './transfer.entity';
+import { WebAuthnCredentialEntity } from './webauthn-credential.entity';
+import { WebAuthnChallengeEntity } from './webauthn-challenge.entity';
+import { AiConversationEntity } from './ai-conversation.entity';
+import { AiMessageEntity } from './ai-message.entity';
 
 export const entities = [
   CountryEntity,
@@ -46,6 +50,10 @@ export const entities = [
   NotificationOutboxEntity,
   VehiclePositionEntity,
   TransferEntity,
+  WebAuthnCredentialEntity,
+  WebAuthnChallengeEntity,
+  AiConversationEntity,
+  AiMessageEntity,
 ];
 
 export {
@@ -72,4 +80,8 @@ export {
   NotificationOutboxEntity,
   VehiclePositionEntity,
   TransferEntity,
+  WebAuthnCredentialEntity,
+  WebAuthnChallengeEntity,
+  AiConversationEntity,
+  AiMessageEntity,
 };

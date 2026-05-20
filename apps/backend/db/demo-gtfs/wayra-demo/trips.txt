@@ -1,0 +1,12 @@
+route_id,service_id,trip_id,trip_headsign,direction_id
+ice,daily,ice-fra-ber-1,Berlin Hbf,0
+ice,daily,ice-ber-fra-1,Frankfurt Hbf,1
+ice,daily,ice-fra-muc-1,München Hbf,0
+ic,daily,ic-koe-ham-1,Hamburg Hbf,0
+re,daily,re-fra-koe-1,Köln Hbf,0
+tgv,daily,tgv-par-lyon-1,Paris Gare de Lyon,0
+ter,daily,ter-par-lyon-1,Lyon Part-Dieu,0
+ter,daily,ter-lyon-mrs-1,Marseille St-Charles,0
+sncft-r,daily,sncft-tun-sou-1,Sousse,0
+sncft-r,daily,sncft-sou-tun-1,Tunis Barcelone,1
+sncft-r,daily,sncft-sou-sfa-1,Sfax,0

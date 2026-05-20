@@ -11,6 +11,7 @@ import { OAuthVerifierService } from './oauth-verifier.service';
 import { AuditService } from './audit.service';
 import { LoginRateLimitService } from './login-rate-limit.service';
 import { TotpService } from './totp.service';
+import { WebAuthnService } from './webauthn.service';
 import {
   UserEntity,
   RefreshTokenEntity,
@@ -19,6 +20,8 @@ import {
   AuditLogEntity,
   TotpSecretEntity,
   LoginAttemptEntity,
+  WebAuthnCredentialEntity,
+  WebAuthnChallengeEntity,
 } from '../../database/entities';
 
 @Module({
@@ -31,6 +34,8 @@ import {
       AuditLogEntity,
       TotpSecretEntity,
       LoginAttemptEntity,
+      WebAuthnCredentialEntity,
+      WebAuthnChallengeEntity,
     ]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -57,6 +62,7 @@ import {
     AuditService,
     LoginRateLimitService,
     TotpService,
+    WebAuthnService,
   ],
   exports: [AuthService, JwtAuthGuard, RolesGuard, JwtModule, AuditService],
 })

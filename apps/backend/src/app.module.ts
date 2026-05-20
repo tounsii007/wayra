@@ -18,6 +18,8 @@ import { AuthModule } from './modules/auth/auth.module';
 import { AccountModule } from './modules/account/account.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { AdminModule } from './modules/admin/admin.module';
+import { ProvidersModule } from './modules/providers/providers.module';
+import { MetricsModule } from './modules/metrics/metrics.module';
 
 import { ResponseEnvelopeInterceptor } from './common/response-envelope.interceptor';
 import { HttpExceptionFilter } from './common/http-exception.filter';
@@ -63,6 +65,7 @@ const isProd = process.env.NODE_ENV === 'production';
 
     DatabaseModule,
     AppCacheModule,
+    ProvidersModule,
     HealthModule,
     PlacesModule,
     RoutesModule,
@@ -74,6 +77,7 @@ const isProd = process.env.NODE_ENV === 'production';
     AccountModule,
     NotificationsModule,
     AdminModule,
+    MetricsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

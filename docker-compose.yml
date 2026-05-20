@@ -37,8 +37,8 @@ services:
 
   backend:
     build:
-      context: ./apps/backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: apps/backend/Dockerfile
     container_name: wayra-backend
     restart: unless-stopped
     depends_on:
@@ -50,14 +50,17 @@ services:
       NODE_ENV: ${NODE_ENV:-development}
       DATABASE_URL: postgresql://${POSTGRES_USER:-wayra}:${POSTGRES_PASSWORD:-wayra}@postgres:5432/${POSTGRES_DB:-wayra}
       REDIS_URL: redis://redis:6379
-      JWT_SECRET: ${JWT_SECRET}
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      JWT_SECRET: ${JWT_SECRET:-dev-only-secret-replace-me}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      # Demo data auto-import on first boot (set to false to skip)
+      WAYRA_AUTO_IMPORT_DEMO: ${WAYRA_AUTO_IMPORT_DEMO:-true}
+      WAYRA_DEMO_FEED: ${WAYRA_DEMO_FEED:-wayra-demo}
+      WAYRA_DEMO_DIR: /app/db/demo-gtfs/wayra-demo
+      WAYRA_DEMO_COUNTRY: ${WAYRA_DEMO_COUNTRY:-DE}
     ports:
       - "4000:4000"
-    volumes:
-      - ./apps/backend/src:/app/src:ro
 
-  # Optional: Adminer for DB inspection (dev only)
+  # Adminer for DB inspection (dev profile only)
   adminer:
     image: adminer:latest
     container_name: wayra-adminer
@@ -67,6 +70,30 @@ services:
     depends_on:
       - postgres
     profiles: ["dev"]
+
+  # OpenTripPlanner 2 — multimodal routing engine.
+  # Enable with `--profile otp`. First boot builds the graph from any
+  # GTFS feeds + OSM extracts placed in apps/backend/otp/graphs/.
+  otp:
+    image: docker.io/opentripplanner/opentripplanner:2.6.0
+    container_name: wayra-otp
+    restart: unless-stopped
+    profiles: ["otp"]
+    ports:
+      - "8088:8080"
+    volumes:
+      - ./apps/backend/otp/graphs:/var/opentripplanner
+    command:
+      - "--build"
+      - "--save"
+      - "--serve"
+      - "/var/opentripplanner"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/otp/v1/serverinfo"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
 
 volumes:
   postgres-data:

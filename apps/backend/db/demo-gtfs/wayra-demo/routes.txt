@@ -1,0 +1,7 @@
+route_id,agency_id,route_short_name,route_long_name,route_type,route_color,route_text_color
+ice,db,ICE,Intercity-Express,2,EC0016,FFFFFF
+ic,db,IC,Intercity,2,0A4EA2,FFFFFF
+re,db,RE,Regional-Express,2,7C3AED,FFFFFF
+tgv,sncf,TGV,TGV INOUI,2,1D4FD1,FFFFFF
+ter,sncf,TER,TER,2,16A34A,FFFFFF
+sncft-r,sncft,SNCFT,SNCFT Régional,2,DC2626,FFFFFF

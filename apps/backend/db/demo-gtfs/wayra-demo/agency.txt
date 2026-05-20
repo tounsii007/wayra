@@ -1,0 +1,4 @@
+agency_id,agency_name,agency_url,agency_timezone,agency_lang
+db,Deutsche Bahn (demo),https://bahn.de,Europe/Berlin,de
+sncf,SNCF (demo),https://sncf.com,Europe/Paris,fr
+sncft,SNCFT (demo),https://sncft.com.tn,Africa/Tunis,fr

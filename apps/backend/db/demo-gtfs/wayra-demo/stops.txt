@@ -1,0 +1,13 @@
+stop_id,stop_name,stop_lat,stop_lon,location_type,parent_station
+fra-hbf,Frankfurt (Main) Hbf,50.1073,8.6638,1,
+ber-hbf,Berlin Hauptbahnhof,52.5251,13.3694,1,
+muc-hbf,München Hbf,48.1402,11.5586,1,
+ham-hbf,Hamburg Hauptbahnhof,53.5528,10.0067,1,
+koe-hbf,Köln Hbf,50.9429,6.9588,1,
+par-nord,Paris Gare du Nord,48.8809,2.3553,1,
+par-lyon,Paris Gare de Lyon,48.8443,2.3743,1,
+lyon-pd,Lyon Part-Dieu,45.7606,4.8597,1,
+mrs-sc,Marseille Saint-Charles,43.3025,5.3806,1,
+tun-barcelone,Tunis Barcelone,36.7937,10.1729,1,
+sousse,Sousse,35.8245,10.6396,1,
+sfax,Sfax,34.7398,10.7603,1,

@@ -3,13 +3,20 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { NotificationsController } from './notifications.controller';
 import { NotificationsService } from './notifications.service';
 import { PushSender } from './push-sender.service';
-import { PushSubscriptionEntity } from '../../database/entities';
+import { OutboxWorker } from './outbox.worker';
+import {
+  NotificationOutboxEntity,
+  PushSubscriptionEntity,
+} from '../../database/entities';
 import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([PushSubscriptionEntity]), AuthModule],
+  imports: [
+    TypeOrmModule.forFeature([PushSubscriptionEntity, NotificationOutboxEntity]),
+    AuthModule,
+  ],
   controllers: [NotificationsController],
-  providers: [NotificationsService, PushSender],
+  providers: [NotificationsService, PushSender, OutboxWorker],
   exports: [NotificationsService, PushSender],
 })
 export class NotificationsModule {}

@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
   Patch,
   Post,
   Req,
@@ -16,6 +17,7 @@ import type { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard, type AuthedRequest } from './jwt.guard';
 import { TotpService } from './totp.service';
+import { WebAuthnService } from './webauthn.service';
 
 class SignupDto {
   @IsEmail() email!: string;
@@ -84,6 +86,7 @@ export class AuthController {
   constructor(
     private readonly auth: AuthService,
     private readonly totp: TotpService,
+    private readonly webauthn: WebAuthnService,
   ) {}
 
   @Post('signup')
@@ -205,5 +208,55 @@ export class AuthController {
   @Post('me/totp/disable')
   totpDisable(@Req() req: AuthedRequest, @Body() dto: TotpCodeDto) {
     return this.totp.disable(req.user.sub, dto.code);
+  }
+
+  // ---------- Passkeys (WebAuthn) ----------
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Get('me/passkeys')
+  passkeysList(@Req() req: AuthedRequest) {
+    return this.webauthn.listCredentials(req.user.sub);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Post('me/passkeys/register/options')
+  passkeysRegisterOptions(@Req() req: AuthedRequest) {
+    return this.webauthn.generateRegistrationOptions(req.user.sub);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Post('me/passkeys/register/verify')
+  passkeysRegisterVerify(
+    @Req() req: AuthedRequest,
+    @Body() body: { response: never; deviceName?: string },
+  ) {
+    return this.webauthn.verifyRegistration(req.user.sub, body);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Post('me/passkeys/auth/options')
+  passkeysAuthOptions(@Req() req: AuthedRequest) {
+    return this.webauthn.generateAuthenticationOptions(req.user.sub);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Post('me/passkeys/auth/verify')
+  passkeysAuthVerify(
+    @Req() req: AuthedRequest,
+    @Body() body: { response: never },
+  ) {
+    return this.webauthn.verifyAuthentication(req.user.sub, body);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Delete('me/passkeys/:id')
+  passkeysRemove(@Req() req: AuthedRequest, @Param('id') id: string) {
+    return this.webauthn.removeCredential(req.user.sub, id);
   }
 }
