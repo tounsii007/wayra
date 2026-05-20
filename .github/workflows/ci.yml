@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: "20"
+  NODE_VERSION: '20'
 
 jobs:
   format:
@@ -57,6 +57,8 @@ jobs:
         run: pnpm --filter @wayra/backend test
       - name: Run web component tests (Vitest)
         run: pnpm --filter @wayra/web test
+      - name: Run mobile tests (Jest)
+        run: pnpm --filter @wayra/mobile test
 
   # ------------------------------------------------------------------ #
   # E2E (Playwright) — runs against the production Next.js build.       #
@@ -69,7 +71,7 @@ jobs:
     # to keep the feedback loop fast (Vitest + unit tests cover PRs).
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     env:
-      NEXT_TELEMETRY_DISABLED: "1"
+      NEXT_TELEMETRY_DISABLED: '1'
       NEXT_PUBLIC_API_URL: http://localhost:4000
     steps:
       - uses: actions/checkout@v4
@@ -85,7 +87,7 @@ jobs:
       - name: Run E2E tests
         env:
           PLAYWRIGHT_BASE_URL: http://localhost:3000
-          CI: "true"
+          CI: 'true'
         run: |
           pnpm --filter @wayra/web exec next start -p 3000 &
           npx wait-on http://localhost:3000 --timeout 60000
@@ -102,7 +104,7 @@ jobs:
     name: Build web
     runs-on: ubuntu-latest
     env:
-      NEXT_TELEMETRY_DISABLED: "1"
+      NEXT_TELEMETRY_DISABLED: '1'
       NEXT_PUBLIC_API_URL: http://localhost:4000
     steps:
       - uses: actions/checkout@v4
