@@ -55,7 +55,7 @@ export function CountryPicker() {
           </span>
           <h2
             id="countries-title"
-            className="mt-3 font-display text-display-sm font-bold tracking-tightest display-tight"
+            className="font-display text-display-sm tracking-tightest display-tight mt-3 font-bold"
           >
             {t('exploreCountries')}
           </h2>
@@ -78,8 +78,8 @@ export function CountryPicker() {
                     className={cn(
                       'focus-ring inline-flex items-center gap-2 rounded-full border px-3.5 py-2 text-sm font-semibold transition-all',
                       active
-                        ? 'border-brand-500 bg-brand-500 text-white shadow-glow scale-105'
-                        : 'border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text))] hover:-translate-y-0.5 hover:border-brand-500/40 hover:bg-[rgb(var(--surface-muted))]',
+                        ? 'border-brand-500 bg-brand-500 shadow-glow scale-105 text-white'
+                        : 'hover:border-brand-500/40 border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text))] hover:-translate-y-0.5 hover:bg-[rgb(var(--surface-muted))]',
                     )}
                   >
                     <span aria-hidden className="text-base leading-none">
@@ -93,7 +93,7 @@ export function CountryPicker() {
           </ul>
 
           {/* World coverage hint */}
-          <p className="mt-4 text-xs text-subtle">
+          <p className="text-subtle mt-4 text-xs">
             <Globe2 className="mr-1 inline h-3 w-3" />
             11 countries covered · more coming soon
           </p>
@@ -101,7 +101,7 @@ export function CountryPicker() {
 
         {/* Detail card for selected country */}
         <div className="ticket relative overflow-hidden p-6 sm:p-8" role="tabpanel">
-          <div className="absolute -right-12 -top-12 h-48 w-48 rounded-full bg-gradient-to-br from-brand-500/30 to-accent-500/0 blur-2xl" />
+          <div className="from-brand-500/30 to-accent-500/0 absolute -right-12 -top-12 h-48 w-48 rounded-full bg-gradient-to-br blur-2xl" />
           <div className="flex items-start justify-between gap-4">
             <div>
               <div className="flex items-center gap-3">
@@ -110,7 +110,7 @@ export function CountryPicker() {
                 </span>
                 <div>
                   <h3 className="font-display text-2xl font-bold tracking-tight">{name}</h3>
-                  <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-subtle">
+                  <p className="text-subtle font-mono text-[10px] font-bold uppercase tracking-[0.18em]">
                     {selected} · {fact.modes}
                   </p>
                 </div>
@@ -134,12 +134,7 @@ export function CountryPicker() {
           </dl>
 
           {/* Decorative route map */}
-          <svg
-            viewBox="0 0 280 50"
-            aria-hidden
-            className="mt-6 w-full"
-            preserveAspectRatio="none"
-          >
+          <svg viewBox="0 0 280 50" aria-hidden className="mt-6 w-full" preserveAspectRatio="none">
             <path
               d="M 6 25 Q 60 5 110 25 T 220 25 T 274 25"
               fill="none"
@@ -162,10 +157,8 @@ export function CountryPicker() {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <dt className="text-[10px] font-semibold uppercase tracking-[0.18em] text-subtle">
-        {label}
-      </dt>
-      <dd className="mt-1 font-display text-2xl font-bold tracking-tight">
+      <dt className="text-subtle text-[10px] font-semibold uppercase tracking-[0.18em]">{label}</dt>
+      <dd className="font-display mt-1 text-2xl font-bold tracking-tight">
         <span className="board-num">{value}</span>
       </dd>
     </div>

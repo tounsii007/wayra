@@ -75,7 +75,7 @@ export function QuickActions() {
         <Link
           key={href}
           href={href}
-          className="surface-elevated group relative isolate overflow-hidden rounded-2xl p-4 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-card focus-ring"
+          className="surface-elevated hover:shadow-card focus-ring group relative isolate overflow-hidden rounded-2xl p-4 transition-all duration-300 hover:-translate-y-0.5"
         >
           {/* Background halo */}
           <div
@@ -87,7 +87,7 @@ export function QuickActions() {
           {/* Icon tile */}
           <div
             className={cn(
-              'inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br shadow-md transition-transform duration-300 group-hover:scale-105 group-hover:rotate-3',
+              'inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br shadow-md transition-transform duration-300 group-hover:rotate-3 group-hover:scale-105',
               TONE_CLASSES[tone],
             )}
           >
@@ -97,9 +97,9 @@ export function QuickActions() {
           <div className="mt-3 flex items-start justify-between gap-2">
             <div>
               <div className="font-display text-sm font-bold tracking-tight">{label}</div>
-              <div className="mt-0.5 text-[11px] text-subtle">{sub}</div>
+              <div className="text-subtle mt-0.5 text-[11px]">{sub}</div>
             </div>
-            <ArrowUpRight className="h-4 w-4 text-subtle transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[rgb(var(--text))]" />
+            <ArrowUpRight className="text-subtle h-4 w-4 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[rgb(var(--text))]" />
           </div>
         </Link>
       ))}

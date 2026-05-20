@@ -7,7 +7,7 @@ export default function MapPage() {
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto h-[calc(100vh-64px)] max-w-7xl px-4 py-4 sm:px-6">
+      <main id="main" className="h-[calc(100vh-56px)] px-3 py-3 sm:h-[calc(100vh-64px)] sm:px-5">
         <MapView />
       </main>
     </>

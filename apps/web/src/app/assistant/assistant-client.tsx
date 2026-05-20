@@ -1,11 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { Sparkles, Send, Bot, User as UserIcon } from 'lucide-react';
+import { Sparkles, Send, Bot, User as UserIcon, RotateCcw } from 'lucide-react';
 import type { AiChatMessage, Locale } from '@wayra/types';
 import { cn } from '@/lib/utils';
 
+/**
+ * AI Travel Assistant — a polished chat interface with the Wayra brand
+ * palette: gradient avatar, paper-warm bubbles, mono timestamp, animated
+ * thinking indicator, suggested-prompt chips that fade out once the user
+ * starts a conversation.
+ */
 export function AssistantClient() {
   const t = useTranslations('assistant');
   const locale = useLocale() as Locale;
@@ -14,6 +20,12 @@ export function AssistantClient() {
   const [messages, setMessages] = useState<AiChatMessage[]>([
     { role: 'assistant', content: t('greeting') },
   ]);
+  const scrollerRef = useRef<HTMLOListElement>(null);
+
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [messages, busy]);
 
   async function send(text: string) {
     const message = text.trim();
@@ -23,8 +35,7 @@ export function AssistantClient() {
     setInput('');
     setBusy(true);
 
-    // For MVP we stub a thoughtful local response. Production wires this to
-    // POST /api/ai/travel-assistant which calls Claude with the GTFS schema as a tool.
+    // MVP: local stub. Production: POST /api/ai/travel-assistant (streaming).
     setTimeout(() => {
       setMessages([
         ...next,
@@ -34,26 +45,49 @@ export function AssistantClient() {
         },
       ]);
       setBusy(false);
-    }, 600);
+    }, 650);
+  }
+
+  function reset() {
+    setMessages([{ role: 'assistant', content: t('greeting') }]);
   }
 
   const examples = t.raw('examples') as string[];
+  const showExamples = messages.length <= 1 && !busy;
 
   return (
-    <section className="surface flex min-h-[70vh] flex-col rounded-3xl p-4 sm:p-6">
-      <header className="flex items-center gap-3">
-        <div className="from-brand-500 to-accent-violet inline-flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br text-white">
-          <Sparkles className="h-5 w-5" />
-        </div>
-        <div>
-          <div className="text-sm font-semibold">Wayra Assistant</div>
-          <div className="text-subtle text-xs">
-            Multilingual · context-aware · routes & disruptions
+    <section className="ticket flex min-h-[70vh] flex-col overflow-hidden">
+      {/* Top accent bar */}
+      <div className="from-brand-500 via-accent-500 to-brand-500 h-[3px] shrink-0 bg-gradient-to-r" />
+
+      {/* Header */}
+      <header className="flex items-center justify-between gap-3 border-b border-[rgb(var(--border))] p-4">
+        <div className="flex items-center gap-3">
+          <div className="from-brand-500 via-brand-700 to-accent-600 relative inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br text-white shadow-md">
+            <Sparkles className="h-5 w-5" />
+            <span className="bg-status-onTime absolute -bottom-0.5 -right-0.5 inline-flex h-3.5 w-3.5 items-center justify-center rounded-full ring-2 ring-[rgb(var(--bg-elevated))]" />
+          </div>
+          <div>
+            <div className="font-display text-base font-bold tracking-tight">Wayra Assistant</div>
+            <div className="text-subtle font-mono text-[10px] uppercase tracking-[0.18em]">
+              Multilingual · context-aware · GTFS
+            </div>
           </div>
         </div>
+        <button
+          type="button"
+          onClick={reset}
+          disabled={messages.length <= 1}
+          aria-label="Reset conversation"
+          className="focus-ring text-muted inline-flex h-9 items-center gap-1.5 rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-3 text-xs font-semibold transition-colors hover:text-[rgb(var(--text))] disabled:opacity-40"
+        >
+          <RotateCcw className="h-3.5 w-3.5" />
+          <span className="hidden sm:inline">Reset</span>
+        </button>
       </header>
 
-      <ol className="my-6 flex-1 space-y-3 overflow-y-auto">
+      {/* Messages */}
+      <ol ref={scrollerRef} className="flex-1 space-y-4 overflow-y-auto p-4" aria-live="polite">
         {messages.map((m, i) => (
           <li
             key={i}
@@ -61,10 +95,10 @@ export function AssistantClient() {
           >
             <div
               className={cn(
-                'flex h-8 w-8 shrink-0 items-center justify-center rounded-full',
+                'flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl shadow-sm',
                 m.role === 'assistant'
-                  ? 'from-brand-500 to-accent-violet bg-gradient-to-br text-white'
-                  : 'surface text-muted',
+                  ? 'from-brand-500 via-brand-700 to-accent-600 bg-gradient-to-br text-white'
+                  : 'text-muted border border-[rgb(var(--border))] bg-[rgb(var(--surface))]',
               )}
             >
               {m.role === 'assistant' ? (
@@ -75,80 +109,97 @@ export function AssistantClient() {
             </div>
             <div
               className={cn(
-                'max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed',
-                m.role === 'assistant' ? 'surface-muted' : 'bg-brand-500 text-white',
+                'max-w-[78%] rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm',
+                m.role === 'assistant'
+                  ? 'border border-[rgb(var(--border))] bg-[rgb(var(--surface-muted))]'
+                  : 'from-brand-500 to-brand-700 bg-gradient-to-br text-white',
               )}
             >
               {m.content}
             </div>
           </li>
         ))}
+
         {busy && (
-          <li className="flex gap-3">
-            <div className="from-brand-500 to-accent-violet flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br text-white">
+          <li className="animate-fade-in flex gap-3">
+            <div className="from-brand-500 via-brand-700 to-accent-600 flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br text-white shadow-sm">
               <Bot className="h-4 w-4" />
             </div>
-            <div className="surface-muted rounded-2xl px-4 py-3">
-              <span className="inline-flex gap-1">
-                <span className="bg-muted h-2 w-2 animate-bounce rounded-full [animation-delay:-0.3s]" />
-                <span className="bg-muted h-2 w-2 animate-bounce rounded-full [animation-delay:-0.15s]" />
-                <span className="bg-muted h-2 w-2 animate-bounce rounded-full" />
+            <div className="rounded-2xl border border-[rgb(var(--border))] bg-[rgb(var(--surface-muted))] px-4 py-3 shadow-sm">
+              <span className="inline-flex items-center gap-1">
+                <span className="bg-brand-500 h-2 w-2 animate-bounce rounded-full [animation-delay:-0.3s]" />
+                <span className="bg-brand-500 h-2 w-2 animate-bounce rounded-full [animation-delay:-0.15s]" />
+                <span className="bg-brand-500 h-2 w-2 animate-bounce rounded-full" />
+                <span className="text-subtle ml-2 font-mono text-[10px] uppercase tracking-[0.16em]">
+                  thinking
+                </span>
               </span>
             </div>
           </li>
         )}
       </ol>
 
-      {messages.length <= 1 && (
-        <div className="mb-4 flex flex-wrap gap-2">
-          {examples.map((ex) => (
-            <button
-              key={ex}
-              onClick={() => send(ex)}
-              className="surface-muted text-muted focus-ring rounded-full px-3 py-1.5 text-xs font-medium hover:text-[rgb(var(--text))]"
-            >
-              {ex}
-            </button>
-          ))}
+      {/* Suggested prompts */}
+      {showExamples && (
+        <div className="border-t border-[rgb(var(--border))] p-4">
+          <div className="text-subtle mb-2 font-mono text-[10px] uppercase tracking-[0.18em]">
+            Try
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {examples.map((ex) => (
+              <button
+                key={ex}
+                type="button"
+                onClick={() => send(ex)}
+                className="chip-surface transition-all hover:-translate-y-0.5 hover:text-[rgb(var(--text))]"
+              >
+                {ex}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
+      {/* Composer */}
       <form
         onSubmit={(e) => {
           e.preventDefault();
           send(input);
         }}
-        className="surface flex items-end gap-2 rounded-2xl p-2"
+        className="border-t border-[rgb(var(--border))] p-3 sm:p-4"
       >
-        <textarea
-          rows={1}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              send(input);
-            }
-          }}
-          placeholder={t('placeholder')}
-          dir="auto"
-          className="placeholder:text-subtle max-h-32 min-h-[40px] flex-1 resize-none bg-transparent px-3 py-2 text-sm outline-none"
-        />
-        <button
-          type="submit"
-          disabled={!input.trim() || busy}
-          className="bg-brand-500 focus-ring inline-flex h-10 w-10 items-center justify-center rounded-xl text-white transition-opacity disabled:opacity-40"
-        >
-          <Send className="h-4 w-4" />
-        </button>
+        <div className="focus-within:border-brand-500/60 flex items-end gap-2 rounded-2xl border border-[rgb(var(--border))] bg-[rgb(var(--bg-elevated))] p-1.5 focus-within:shadow-[0_0_0_4px_rgb(13_148_136_/_0.12)]">
+          <textarea
+            rows={1}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                send(input);
+              }
+            }}
+            placeholder={t('placeholder')}
+            dir="auto"
+            className="placeholder:text-subtle max-h-32 min-h-[40px] flex-1 resize-none bg-transparent px-3 py-2 text-sm outline-none"
+          />
+          <button
+            type="submit"
+            disabled={!input.trim() || busy}
+            aria-label="Send"
+            className="focus-ring from-brand-500 to-brand-700 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br text-white shadow-md transition-all hover:scale-105 disabled:opacity-40 disabled:hover:scale-100"
+          >
+            <Send className="h-4 w-4" />
+          </button>
+        </div>
+        <p className="text-subtle mt-2 px-1 font-mono text-[10px] uppercase tracking-[0.18em]">
+          ⏎ to send · shift+⏎ for newline · responses may be inaccurate
+        </p>
       </form>
     </section>
   );
 }
 
-/**
- * MVP stub. Replace with /api/ai/travel-assistant in production.
- */
 function localStub(message: string, locale: Locale): string {
   const lower = message.toLowerCase();
   if (lower.includes('paris') && lower.includes('frankfurt')) {

@@ -52,7 +52,7 @@ export function MapPreview() {
       {/* Top-right CTA */}
       <Link
         href="/map"
-        className="glass-strong group absolute right-5 top-5 inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-semibold shadow-sm transition-all hover:-translate-y-0.5 focus-ring"
+        className="glass-strong focus-ring group absolute right-5 top-5 inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-semibold shadow-sm transition-all hover:-translate-y-0.5"
       >
         <MapIcon className="h-3.5 w-3.5" />
         Open full map
@@ -61,16 +61,16 @@ export function MapPreview() {
 
       {/* Bottom-left caption */}
       <div className="absolute bottom-5 left-5 right-5 z-10 sm:right-auto sm:max-w-md">
-        <h3 className="font-display text-2xl font-bold tracking-tight text-balance">
+        <h3 className="font-display text-balance text-2xl font-bold tracking-tight">
           From Berlin to Tunis,{' '}
-          <span className="bg-gradient-to-r from-brand-600 to-accent-600 bg-clip-text text-transparent">
+          <span className="from-brand-600 to-accent-600 bg-gradient-to-r bg-clip-text text-transparent">
             one map
           </span>
         </h3>
-        <p className="mt-1 text-sm text-muted">
+        <p className="text-muted mt-1 text-sm">
           Real-time vehicle positions, disruptions, and routing across 11 countries.
         </p>
-        <div className="mt-3 flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-subtle">
+        <div className="text-subtle mt-3 flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em]">
           <Radio className="h-3 w-3" />
           <span>34 live feeds active</span>
           <span aria-hidden>·</span>

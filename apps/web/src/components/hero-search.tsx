@@ -54,8 +54,8 @@ export function HeroSearch() {
   return (
     <form onSubmit={submit} className="relative mx-auto max-w-4xl" aria-label="Plan a trip">
       {/* Decorative ticket-stub glow on the sides */}
-      <div className="pointer-events-none absolute -left-1.5 top-1/3 hidden h-32 w-3 -translate-y-1/2 rounded-r-full bg-accent-500/20 blur-md md:block" />
-      <div className="pointer-events-none absolute -right-1.5 top-1/3 hidden h-32 w-3 -translate-y-1/2 rounded-l-full bg-brand-500/20 blur-md md:block" />
+      <div className="bg-accent-500/20 pointer-events-none absolute -left-1.5 top-1/3 hidden h-32 w-3 -translate-y-1/2 rounded-r-full blur-md md:block" />
+      <div className="bg-brand-500/20 pointer-events-none absolute -right-1.5 top-1/3 hidden h-32 w-3 -translate-y-1/2 rounded-l-full blur-md md:block" />
 
       <div className="ticket relative overflow-hidden p-3 shadow-lg sm:p-5">
         {/* From / Swap / To */}
@@ -72,7 +72,7 @@ export function HeroSearch() {
             type="button"
             aria-label="Swap from and to"
             onClick={swap}
-            className="focus-ring group relative mx-auto inline-flex h-11 w-11 items-center justify-center rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--bg-elevated))] text-muted shadow-sm transition-all duration-300 hover:scale-105 hover:text-[rgb(var(--text))] hover:shadow-md active:scale-95"
+            className="focus-ring text-muted group relative mx-auto inline-flex h-11 w-11 items-center justify-center rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--bg-elevated))] shadow-sm transition-all duration-300 hover:scale-105 hover:text-[rgb(var(--text))] hover:shadow-md active:scale-95"
           >
             <ArrowDownUp className="h-4 w-4 transition-transform duration-300 group-hover:rotate-180 md:rotate-90 md:group-hover:rotate-[270deg]" />
           </button>
@@ -112,8 +112,8 @@ export function HeroSearch() {
             </div>
 
             {/* Datetime — disguised as a chip */}
-            <label className="inline-flex items-center gap-2 rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-3 py-1.5 text-sm focus-within:ring-2 focus-within:ring-brand-500/40">
-              <Calendar className="h-3.5 w-3.5 text-muted" />
+            <label className="focus-within:ring-brand-500/40 inline-flex items-center gap-2 rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-3 py-1.5 text-sm focus-within:ring-2">
+              <Calendar className="text-muted h-3.5 w-3.5" />
               <input
                 type="datetime-local"
                 aria-label={mode === 'depart' ? t('departAt') : t('arriveBy')}
@@ -125,7 +125,7 @@ export function HeroSearch() {
             <button
               type="button"
               onClick={() => setWhen('')}
-              className="focus-ring rounded-full px-3 py-1.5 text-xs font-medium text-muted hover:bg-[rgb(var(--surface-muted))] hover:text-[rgb(var(--text))]"
+              className="focus-ring text-muted rounded-full px-3 py-1.5 text-xs font-medium hover:bg-[rgb(var(--surface-muted))] hover:text-[rgb(var(--text))]"
             >
               {t('now')}
             </button>
@@ -150,7 +150,7 @@ export function HeroSearch() {
                 'focus-ring inline-flex h-9 items-center gap-1.5 rounded-full border px-3 text-xs font-semibold transition-colors',
                 wheelchair
                   ? 'border-brand-500/60 bg-brand-50 text-brand-700 dark:bg-brand-500/20 dark:text-brand-300'
-                  : 'border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-muted hover:text-[rgb(var(--text))]',
+                  : 'text-muted border-[rgb(var(--border))] bg-[rgb(var(--surface))] hover:text-[rgb(var(--text))]',
               )}
             >
               <Accessibility className="h-3.5 w-3.5" />
@@ -168,12 +168,12 @@ export function HeroSearch() {
         <div className="mt-3 flex items-center justify-between text-xs">
           <button
             type="button"
-            className="link-editorial focus-ring inline-flex items-center gap-1.5 font-semibold text-brand-700 dark:text-brand-300"
+            className="link-editorial focus-ring text-brand-700 dark:text-brand-300 inline-flex items-center gap-1.5 font-semibold"
           >
             <LocateFixed className="h-3.5 w-3.5" />
             {t('useCurrentLocation')}
           </button>
-          <span className="hidden font-mono text-[10px] uppercase tracking-[0.18em] text-subtle sm:inline">
+          <span className="text-subtle hidden font-mono text-[10px] uppercase tracking-[0.18em] sm:inline">
             ↵ to plan
           </span>
         </div>
@@ -234,13 +234,13 @@ function Stepper({
       className="inline-flex h-9 items-center gap-1.5 rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface))] pl-3 pr-1 text-sm"
       aria-label={ariaLabel}
     >
-      <Icon className="h-3.5 w-3.5 text-muted" />
+      <Icon className="text-muted h-3.5 w-3.5" />
       <button
         type="button"
         onClick={() => onChange(Math.max(min, value - 1))}
         disabled={value <= min}
         aria-label="Decrease"
-        className="focus-ring h-7 w-7 rounded-full text-base font-bold text-muted hover:bg-[rgb(var(--surface-muted))] disabled:opacity-30"
+        className="focus-ring text-muted h-7 w-7 rounded-full text-base font-bold hover:bg-[rgb(var(--surface-muted))] disabled:opacity-30"
       >
         −
       </button>
@@ -250,7 +250,7 @@ function Stepper({
         onClick={() => onChange(Math.min(max, value + 1))}
         disabled={value >= max}
         aria-label="Increase"
-        className="focus-ring h-7 w-7 rounded-full text-base font-bold text-muted hover:bg-[rgb(var(--surface-muted))] disabled:opacity-30"
+        className="focus-ring text-muted h-7 w-7 rounded-full text-base font-bold hover:bg-[rgb(var(--surface-muted))] disabled:opacity-30"
       >
         +
       </button>

@@ -37,7 +37,7 @@ export function FeatureGrid() {
         </span>
         <h2
           id="features-title"
-          className="mt-4 font-display text-display-md font-bold tracking-tightest display-tight"
+          className="font-display text-display-md tracking-tightest display-tight mt-4 font-bold"
         >
           {t('title')}
         </h2>
@@ -52,7 +52,7 @@ export function FeatureGrid() {
             <article
               key={item.title}
               className={cn(
-                'surface-elevated group relative isolate overflow-hidden rounded-3xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-card',
+                'surface-elevated hover:shadow-card group relative isolate overflow-hidden rounded-3xl p-6 transition-all duration-300 hover:-translate-y-1',
               )}
               style={{ animationDelay: `${i * 60}ms` }}
             >
@@ -82,17 +82,17 @@ export function FeatureGrid() {
               </div>
 
               {/* Index marker — top-right corner */}
-              <span className="absolute right-4 top-4 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-subtle">
+              <span className="text-subtle absolute right-4 top-4 font-mono text-[10px] font-bold uppercase tracking-[0.18em]">
                 0{i + 1}
               </span>
 
-              <h3 className="mt-5 font-display text-lg font-bold tracking-tight">{item.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted">{item.body}</p>
+              <h3 className="font-display mt-5 text-lg font-bold tracking-tight">{item.title}</h3>
+              <p className="text-muted mt-2 text-sm leading-relaxed">{item.body}</p>
 
               {/* Bottom divider with mini route line */}
               <div className="mt-5 flex items-center gap-2">
                 <span className="h-1.5 w-1.5 rounded-full bg-current opacity-70" />
-                <span className="h-px flex-1 bg-[linear-gradient(to_right,rgb(var(--border)) 50%,transparent 50%)] bg-[length:6px_1px]" />
+                <span className="bg-[linear-gradient(to_right,rgb(var(--border)) 50%,transparent 50%)] h-px flex-1 bg-[length:6px_1px]" />
                 <span className="h-1.5 w-1.5 rounded-full bg-current opacity-30" />
               </div>
             </article>

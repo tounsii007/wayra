@@ -26,14 +26,14 @@ export function PopularRoutes() {
           </span>
           <h2
             id="popular-routes-title"
-            className="mt-3 font-display text-display-sm font-bold tracking-tightest display-tight"
+            className="font-display text-display-sm tracking-tightest display-tight mt-3 font-bold"
           >
             {t('popularRoutes')}
           </h2>
         </div>
         <Link
           href="/search"
-          className="link-editorial hidden text-sm font-semibold text-muted hover:text-[rgb(var(--text))] sm:inline-flex"
+          className="link-editorial text-muted hidden text-sm font-semibold hover:text-[rgb(var(--text))] sm:inline-flex"
         >
           See all →
         </Link>
@@ -44,35 +44,35 @@ export function PopularRoutes() {
           <Link
             key={r.id}
             href={`/plan?from=${encodeURIComponent(r.from.id)}&to=${encodeURIComponent(r.to.id)}`}
-            className="ticket ticket--stub group relative isolate flex items-stretch overflow-hidden focus-ring"
+            className="ticket ticket--stub focus-ring group relative isolate flex items-stretch overflow-hidden"
             style={{ animationDelay: `${i * 60}ms` }}
           >
             {/* Left stub — vehicle icon + country flag */}
             <div className="flex w-16 shrink-0 flex-col items-center justify-center gap-1 bg-[rgb(var(--surface-muted))] py-5 text-center">
-              <Train className="h-5 w-5 text-brand-600 dark:text-brand-400" />
-              <span className="font-mono text-[10px] font-bold uppercase tracking-[0.15em] text-subtle">
+              <Train className="text-brand-600 dark:text-brand-400 h-5 w-5" />
+              <span className="text-subtle font-mono text-[10px] font-bold uppercase tracking-[0.15em]">
                 {r.countryCode}
               </span>
             </div>
 
             {/* Body */}
             <div className="relative flex-1 p-4">
-              <div className="flex items-center justify-between gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-subtle">
+              <div className="text-subtle flex items-center justify-between gap-2 text-[11px] font-semibold uppercase tracking-[0.14em]">
                 <span className="inline-flex items-center gap-1.5">
                   {r.modes.slice(0, 2).join(' · ')}
                 </span>
-                <span className="inline-flex items-center gap-1 text-muted">
+                <span className="text-muted inline-flex items-center gap-1">
                   <Clock className="h-3 w-3" />
                   <span className="board-num">{formatDuration(r.durationMin * 60, locale)}</span>
                 </span>
               </div>
 
-              <div className="mt-3 flex items-center gap-2 font-display text-base font-bold">
+              <div className="font-display mt-3 flex items-center gap-2 text-base font-bold">
                 <span className="truncate" title={r.from.name}>
                   {r.from.name}
                 </span>
-                <ArrowRight className="h-4 w-4 shrink-0 text-brand-500 transition-transform duration-300 group-hover:translate-x-0.5" />
-                <span className="truncate text-accent-700 dark:text-accent-400" title={r.to.name}>
+                <ArrowRight className="text-brand-500 h-4 w-4 shrink-0 transition-transform duration-300 group-hover:translate-x-0.5" />
+                <span className="text-accent-700 dark:text-accent-400 truncate" title={r.to.name}>
                   {r.to.name}
                 </span>
               </div>
@@ -90,7 +90,7 @@ export function PopularRoutes() {
                   y1="8"
                   x2="194"
                   y2="8"
-                  className="stroke-[rgb(var(--border-strong))] stroke-dash"
+                  className="stroke-dash stroke-[rgb(var(--border-strong))]"
                   strokeWidth="1.5"
                 />
                 <circle cx="197" cy="8" r="3" className="fill-accent-500" />

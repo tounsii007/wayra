@@ -8,7 +8,13 @@ import { cn } from '@/lib/utils';
  * of the design system).  The whole mark sits on a rounded square with a
  * gentle inner ring so it reads even at favicon sizes.
  */
-export function WayraLogo({ className, variant = 'gradient' }: { className?: string; variant?: 'gradient' | 'mono' }) {
+export function WayraLogo({
+  className,
+  variant = 'gradient',
+}: {
+  className?: string;
+  variant?: 'gradient' | 'mono';
+}) {
   const id = 'wayra-grad-' + variant;
   return (
     <svg
@@ -24,7 +30,14 @@ export function WayraLogo({ className, variant = 'gradient' }: { className?: str
           <stop offset="55%" stopColor="#14b8a6" />
           <stop offset="100%" stopColor="#d97706" />
         </linearGradient>
-        <linearGradient id={id + '-mono'} x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+        <linearGradient
+          id={id + '-mono'}
+          x1="0"
+          y1="0"
+          x2="40"
+          y2="40"
+          gradientUnits="userSpaceOnUse"
+        >
           <stop offset="0%" stopColor="currentColor" stopOpacity="0.92" />
           <stop offset="100%" stopColor="currentColor" stopOpacity="1" />
         </linearGradient>

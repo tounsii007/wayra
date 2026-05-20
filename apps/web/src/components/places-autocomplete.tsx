@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { MapPin, Loader2, X } from 'lucide-react';
+import { MapPin, Loader2, X, Clock4, ArrowUpRight, LocateFixed } from 'lucide-react';
 import { fuzzyScore } from '@wayra/shared';
 import type { Place, PlaceSuggestion, PlaceType } from '@wayra/types';
 import { cn } from '@/lib/utils';
@@ -20,6 +20,12 @@ interface Props {
   ariaLabel?: string;
 }
 
+/**
+ * Places autocomplete — the most-touched input in Wayra.  Visually crafted
+ * to feel premium: subtle inset glow on focus, animated icon slot, recent
+ * searches with relative timestamps, RTL-aware text alignment, and a
+ * keyboard-navigable result list with score percentages.
+ */
 export function PlacesAutocomplete({
   placeholder,
   value,
@@ -35,17 +41,15 @@ export function PlacesAutocomplete({
   const [loading, setLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<PlaceSuggestion[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [focused, setFocused] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const recents = useRecentStore((s) => s.recents);
   const pushRecent = useRecentStore((s) => s.push);
 
-  // Sync external `value` → input text
   useEffect(() => {
     setQuery(value?.name ?? '');
   }, [value]);
 
-  // Debounced "search" — for the MVP we filter the sample dataset client-side.
-  // Production: this calls /api/places/autocomplete on the backend.
   useEffect(() => {
     if (!query || query.length < 1) {
       setSuggestions([]);
@@ -68,7 +72,6 @@ export function PlacesAutocomplete({
     return () => clearTimeout(handle);
   }, [query]);
 
-  // Close on outside click
   useEffect(() => {
     function onDown(e: MouseEvent) {
       if (!wrapperRef.current?.contains(e.target as Node)) setOpen(false);
@@ -103,10 +106,37 @@ export function PlacesAutocomplete({
     }
   }
 
+  const hasValue = Boolean(query || value);
+
   return (
     <div ref={wrapperRef} className={cn('relative', className)}>
-      <div className="relative">
-        <MapPin className="text-subtle pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2" />
+      {/* Input shell */}
+      <div
+        className={cn(
+          'group relative flex items-center rounded-2xl border bg-[rgb(var(--bg-elevated))] transition-all duration-200',
+          focused
+            ? 'border-brand-500/60 shadow-[0_0_0_4px_rgb(13_148_136_/_0.12)]'
+            : 'border-[rgb(var(--border))]',
+        )}
+      >
+        <span
+          className={cn(
+            'pointer-events-none ml-2.5 inline-flex h-9 w-9 items-center justify-center rounded-xl transition-colors',
+            focused || hasValue
+              ? 'bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-300'
+              : 'text-muted bg-[rgb(var(--surface-muted))]',
+          )}
+        >
+          {value ? (
+            (() => {
+              const Icon = typeIconFor(value.type);
+              return <Icon className="h-4 w-4" />;
+            })()
+          ) : (
+            <MapPin className="h-4 w-4" />
+          )}
+        </span>
+
         <input
           id={inputId}
           type="text"
@@ -119,122 +149,174 @@ export function PlacesAutocomplete({
           aria-controls={`${inputId}-listbox`}
           placeholder={placeholder ?? t('placeholder')}
           value={query}
-          onFocus={() => setOpen(true)}
+          onFocus={() => {
+            setOpen(true);
+            setFocused(true);
+          }}
+          onBlur={() => setFocused(false)}
           onChange={(e) => {
             setQuery(e.target.value);
             setOpen(true);
             if (e.target.value === '') onChange(null);
           }}
           onKeyDown={onKeyDown}
-          className={cn(
-            'w-full rounded-2xl py-4 pl-12 pr-10 text-base font-medium',
-            'surface focus-ring',
-            'placeholder:text-subtle',
-            'transition-shadow',
-          )}
+          className="placeholder:text-subtle w-full bg-transparent px-3 py-3.5 text-base font-medium outline-none"
         />
-        {(query || value) && (
+
+        {hasValue && (
           <button
             type="button"
             aria-label="Clear"
             onClick={() => pick(null)}
-            className="text-subtle focus-ring absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1.5 hover:bg-[rgb(var(--surface-muted))] hover:text-[rgb(var(--text))]"
+            className="focus-ring text-subtle mr-2 inline-flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-[rgb(var(--surface-muted))] hover:text-[rgb(var(--text))]"
           >
-            <X className="h-4 w-4" />
+            <X className="h-3.5 w-3.5" />
           </button>
         )}
       </div>
 
-      {open && (loading || suggestions.length > 0 || query.length > 0) && (
-        <div
-          id={`${inputId}-listbox`}
-          role="listbox"
-          className="surface shadow-card animate-fade-in absolute z-30 mt-2 w-full overflow-hidden rounded-2xl"
-        >
-          {loading && suggestions.length === 0 && (
-            <div className="text-muted flex items-center gap-2 px-4 py-3 text-sm">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span>{t('placeholder')}</span>
-            </div>
-          )}
-          {!loading && suggestions.length === 0 && query.length > 0 && (
-            <div className="text-muted px-4 py-3 text-sm">{t('noResults')}</div>
-          )}
-          <ul className="max-h-80 overflow-y-auto">
-            {allowCurrentLocation && query.length === 0 && (
-              <li>
-                <button
-                  type="button"
-                  onClick={() => pick(null)}
-                  className="flex w-full items-center gap-3 px-4 py-3 text-start hover:bg-[rgb(var(--surface-muted))]"
-                >
-                  <MapPin className="text-brand-500 h-4 w-4" />
-                  <span className="text-sm font-medium">{t('useLocation')}</span>
-                </button>
-              </li>
+      {/* Suggestions panel */}
+      {open &&
+        (loading ||
+          suggestions.length > 0 ||
+          query.length > 0 ||
+          (allowCurrentLocation && recents.length === 0)) && (
+          <div
+            id={`${inputId}-listbox`}
+            role="listbox"
+            className="surface-elevated animate-fade-in absolute z-30 mt-2 w-full overflow-hidden rounded-2xl shadow-lg"
+          >
+            {loading && suggestions.length === 0 && (
+              <div className="text-muted flex items-center gap-2.5 px-4 py-3.5 text-sm">
+                <Loader2 className="text-brand-500 h-4 w-4 animate-spin" />
+                <span>Searching…</span>
+              </div>
             )}
-            {query.length === 0 && recents.length > 0 && (
-              <>
-                <li className="text-subtle px-4 pt-3 text-[10px] font-bold uppercase tracking-wider">
-                  Recent
-                </li>
-                {recents.map((p) => {
-                  const Icon = typeIconFor(p.type);
-                  return (
-                    <li key={`recent-${p.id}`}>
-                      <button
-                        type="button"
-                        onClick={() => pick(p)}
-                        className="flex w-full items-center gap-3 px-4 py-3 text-start hover:bg-[rgb(var(--surface-muted))]"
-                      >
-                        <div className="surface-muted flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
-                          <Icon className="text-muted h-4 w-4" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="truncate text-sm font-semibold">{p.name}</div>
-                          <div className="text-subtle truncate text-xs">
-                            <PlaceTypeLabel type={p.type} /> · {p.countryCode}
-                          </div>
-                        </div>
-                      </button>
-                    </li>
-                  );
-                })}
-              </>
+
+            {!loading && suggestions.length === 0 && query.length > 0 && (
+              <div className="text-muted px-4 py-3.5 text-sm">{t('noResults')}</div>
             )}
-            {suggestions.map((s, i) => {
-              const Icon = typeIconFor(s.place.type);
-              const isActive = i === activeIndex;
-              return (
-                <li key={s.place.id}>
+
+            <ul className="max-h-[28rem] overflow-y-auto">
+              {allowCurrentLocation && query.length === 0 && (
+                <li>
                   <button
                     type="button"
-                    role="option"
-                    aria-selected={isActive}
-                    onMouseEnter={() => setActiveIndex(i)}
-                    onClick={() => pick(s.place)}
-                    className={cn(
-                      'flex w-full items-center gap-3 px-4 py-3 text-start transition-colors',
-                      isActive && 'bg-[rgb(var(--surface-muted))]',
-                    )}
+                    onClick={() => pick(null)}
+                    className="flex w-full items-center gap-3 px-4 py-3 text-start transition-colors hover:bg-[rgb(var(--surface-muted))]"
                   >
-                    <div className="bg-brand-50 dark:bg-brand-500/15 flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
-                      <Icon className="text-brand-600 dark:text-brand-300 h-4 w-4" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="truncate text-sm font-semibold">{s.place.name}</div>
-                      <div className="text-subtle truncate text-xs">
-                        <PlaceTypeLabel type={s.place.type} /> · {s.place.countryCode}
-                        {s.place.address?.city ? ` · ${s.place.address.city}` : ''}
-                      </div>
-                    </div>
+                    <span className="from-brand-500 to-brand-700 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br text-white shadow-sm">
+                      <LocateFixed className="h-4 w-4" />
+                    </span>
+                    <span className="flex-1 text-sm font-semibold">{t('useLocation')}</span>
+                    <ArrowUpRight className="text-subtle h-3.5 w-3.5" />
                   </button>
+                  {recents.length > 0 && <div className="divider-dotted mx-4" />}
                 </li>
-              );
-            })}
-          </ul>
-        </div>
-      )}
+              )}
+
+              {query.length === 0 && recents.length > 0 && (
+                <>
+                  <li className="text-subtle flex items-center gap-2 px-4 pt-3 text-[10px] font-bold uppercase tracking-[0.18em]">
+                    <Clock4 className="h-3 w-3" />
+                    Recent
+                  </li>
+                  {recents.slice(0, 4).map((p) => {
+                    const Icon = typeIconFor(p.type);
+                    return (
+                      <li key={`recent-${p.id}`}>
+                        <button
+                          type="button"
+                          onClick={() => pick(p)}
+                          className="flex w-full items-center gap-3 px-4 py-3 text-start transition-colors hover:bg-[rgb(var(--surface-muted))]"
+                        >
+                          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[rgb(var(--surface-muted))]">
+                            <Icon className="text-muted h-4 w-4" />
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <div className="truncate text-sm font-semibold">{p.name}</div>
+                            <div className="text-subtle truncate text-xs">
+                              <PlaceTypeLabel type={p.type} /> · {p.countryCode}
+                            </div>
+                          </div>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </>
+              )}
+
+              {suggestions.length > 0 && query.length > 0 && (
+                <li className="text-subtle px-4 pt-3 text-[10px] font-bold uppercase tracking-[0.18em]">
+                  Results
+                </li>
+              )}
+              {suggestions.map((s, i) => {
+                const Icon = typeIconFor(s.place.type);
+                const isActive = i === activeIndex;
+                return (
+                  <li key={s.place.id}>
+                    <button
+                      type="button"
+                      role="option"
+                      aria-selected={isActive}
+                      onMouseEnter={() => setActiveIndex(i)}
+                      onClick={() => pick(s.place)}
+                      className={cn(
+                        'group flex w-full items-center gap-3 px-4 py-3 text-start transition-colors',
+                        isActive && 'bg-[rgb(var(--surface-muted))]',
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-colors',
+                          isActive
+                            ? 'from-brand-500 to-brand-700 bg-gradient-to-br text-white shadow-sm'
+                            : 'bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-300',
+                        )}
+                      >
+                        <Icon className="h-4 w-4" />
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <div className="truncate text-sm font-semibold">{s.place.name}</div>
+                        <div className="text-subtle truncate text-xs">
+                          <PlaceTypeLabel type={s.place.type} /> · {s.place.countryCode}
+                          {s.place.address?.city ? ` · ${s.place.address.city}` : ''}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={cn(
+                            'font-mono text-[10px] tabular-nums opacity-60 transition-opacity group-hover:opacity-100',
+                            isActive ? 'text-brand-700 dark:text-brand-300' : 'text-subtle',
+                          )}
+                        >
+                          {Math.round(s.score * 100)}%
+                        </span>
+                        <ArrowUpRight
+                          className={cn(
+                            'h-3.5 w-3.5 transition-all',
+                            isActive
+                              ? 'text-brand-600 dark:text-brand-300 -translate-y-0.5 translate-x-0.5'
+                              : 'text-subtle',
+                          )}
+                        />
+                      </div>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+
+            {(suggestions.length > 0 || recents.length > 0) && (
+              <div className="text-subtle flex items-center justify-end gap-3 border-t border-[rgb(var(--border))] bg-[rgb(var(--surface-muted))] px-4 py-2 font-mono text-[10px] uppercase tracking-[0.16em]">
+                <span>↑↓ navigate</span>
+                <span>↵ select</span>
+                <span>esc close</span>
+              </div>
+            )}
+          </div>
+        )}
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import { SiteHeader } from '@/components/site-header';
+import { SiteFooter } from '@/components/site-footer';
 import { StopDetailsClient } from './stop-details-client';
 import { sampleSuggestions } from '@/data/sample-suggestions';
 
@@ -22,9 +23,10 @@ export default async function StopPage({ params }: PageProps) {
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+      <main id="main" className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:py-10">
         <StopDetailsClient place={place} />
       </main>
+      <SiteFooter />
     </>
   );
 }

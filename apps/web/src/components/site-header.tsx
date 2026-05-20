@@ -61,14 +61,14 @@ export function SiteHeader() {
     <>
       <header
         className={cn(
-          'sticky top-0 z-50 transition-all duration-300 ease-arrive',
+          'ease-arrive sticky top-0 z-50 transition-all duration-300',
           scrolled ? 'h-14' : 'h-16',
         )}
       >
         {/* Backdrop — soft cream/ink with progressive blur */}
         <div
           className={cn(
-            'absolute inset-x-0 top-0 transition-all duration-300 ease-arrive',
+            'ease-arrive absolute inset-x-0 top-0 transition-all duration-300',
             scrolled
               ? 'h-14 border-b border-[rgb(var(--border))] bg-[rgb(var(--bg))]/85 backdrop-blur-xl'
               : 'h-16 bg-[rgb(var(--bg))]/40 backdrop-blur-sm',
@@ -83,20 +83,25 @@ export function SiteHeader() {
             aria-label="Wayra — home"
           >
             <span className="relative inline-flex items-center justify-center">
-              <WayraLogo className={cn('transition-transform duration-300', scrolled ? 'h-7 w-7' : 'h-8 w-8')} />
-              <span className="absolute -inset-2 rounded-2xl bg-brand-500/0 transition-colors duration-300 group-hover:bg-brand-500/10" />
+              <WayraLogo
+                className={cn(
+                  'transition-transform duration-300',
+                  scrolled ? 'h-7 w-7' : 'h-8 w-8',
+                )}
+              />
+              <span className="bg-brand-500/0 group-hover:bg-brand-500/10 absolute -inset-2 rounded-2xl transition-colors duration-300" />
             </span>
             <span className="flex flex-col leading-none">
               <span
                 className={cn(
-                  'font-display font-bold tracking-tightest text-[rgb(var(--text))] transition-all duration-300',
+                  'font-display tracking-tightest font-bold text-[rgb(var(--text))] transition-all duration-300',
                   scrolled ? 'text-base' : 'text-lg',
                 )}
               >
                 Wayra
               </span>
               {!scrolled && (
-                <span className="mt-0.5 text-[10px] font-medium uppercase tracking-[0.18em] text-subtle">
+                <span className="text-subtle mt-0.5 text-[10px] font-medium uppercase tracking-[0.18em]">
                   transit · re-imagined
                 </span>
               )}
@@ -112,10 +117,8 @@ export function SiteHeader() {
                   key={href}
                   href={href}
                   className={cn(
-                    'group relative inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium transition-colors focus-ring',
-                    active
-                      ? 'text-[rgb(var(--text))]'
-                      : 'text-muted hover:text-[rgb(var(--text))]',
+                    'focus-ring group relative inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium transition-colors',
+                    active ? 'text-[rgb(var(--text))]' : 'text-muted hover:text-[rgb(var(--text))]',
                   )}
                 >
                   <Icon
@@ -127,7 +130,7 @@ export function SiteHeader() {
                   />
                   <span>{label}</span>
                   {active && (
-                    <span className="pointer-events-none absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full bg-gradient-to-r from-brand-500 via-brand-400 to-accent-500" />
+                    <span className="from-brand-500 via-brand-400 to-accent-500 pointer-events-none absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full bg-gradient-to-r" />
                   )}
                 </Link>
               );
@@ -140,7 +143,7 @@ export function SiteHeader() {
             <Link
               href="/live"
               aria-label="Live network status"
-              className="hidden h-9 items-center gap-1.5 rounded-full px-3 text-xs font-semibold text-muted transition-colors hover:text-[rgb(var(--text))] focus-ring sm:inline-flex"
+              className="text-muted focus-ring hidden h-9 items-center gap-1.5 rounded-full px-3 text-xs font-semibold transition-colors hover:text-[rgb(var(--text))] sm:inline-flex"
             >
               <span className="live-pip text-status-onTime" />
               <span className="ml-1 hidden lg:inline">All systems</span>
@@ -156,11 +159,11 @@ export function SiteHeader() {
               className="focus-ring inline-flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface))] transition-transform hover:scale-105"
             >
               {user ? (
-                <span className="bg-gradient-to-br from-brand-500 to-accent-500 bg-clip-text text-xs font-bold uppercase text-transparent">
+                <span className="from-brand-500 to-accent-500 bg-gradient-to-br bg-clip-text text-xs font-bold uppercase text-transparent">
                   {(user.displayName ?? user.email ?? '?').slice(0, 1)}
                 </span>
               ) : (
-                <UserCircle2 className="h-4 w-4 text-muted" />
+                <UserCircle2 className="text-muted h-4 w-4" />
               )}
             </Link>
 
@@ -212,14 +215,14 @@ function MobileNav({
         type="button"
         aria-label="Close menu"
         onClick={onClose}
-        className="absolute inset-0 bg-ink-950/40 backdrop-blur-sm animate-fade-in"
+        className="bg-ink-950/40 animate-fade-in absolute inset-0 backdrop-blur-sm"
       />
 
       {/* Sheet */}
-      <div className="absolute inset-x-0 bottom-0 animate-fade-in-up">
+      <div className="animate-fade-in-up absolute inset-x-0 bottom-0">
         <div className="surface-elevated mx-3 mb-3 overflow-hidden rounded-3xl shadow-lg">
           {/* Drag handle */}
-          <div className="flex justify-center pt-3 pb-1">
+          <div className="flex justify-center pb-1 pt-3">
             <span className="h-1.5 w-10 rounded-full bg-[rgb(var(--border-strong))]" />
           </div>
 
@@ -248,7 +251,7 @@ function MobileNav({
                       href={href}
                       onClick={onClose}
                       className={cn(
-                        'flex items-center gap-3 rounded-2xl px-3 py-3 text-base font-medium transition-colors focus-ring',
+                        'focus-ring flex items-center gap-3 rounded-2xl px-3 py-3 text-base font-medium transition-colors',
                         active
                           ? 'bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-300'
                           : 'text-[rgb(var(--text))] hover:bg-[rgb(var(--surface-muted))]',
@@ -259,7 +262,7 @@ function MobileNav({
                           'flex h-9 w-9 items-center justify-center rounded-xl',
                           active
                             ? 'bg-brand-500 text-white'
-                            : 'bg-[rgb(var(--surface-muted))] text-muted',
+                            : 'text-muted bg-[rgb(var(--surface-muted))]',
                         )}
                       >
                         <Icon className="h-4 w-4" />
@@ -277,9 +280,9 @@ function MobileNav({
               <Link
                 href={user ? '/me' : '/login'}
                 onClick={onClose}
-                className="flex items-center gap-3 rounded-2xl px-3 py-3 text-base font-medium text-[rgb(var(--text))] transition-colors hover:bg-[rgb(var(--surface-muted))] focus-ring"
+                className="focus-ring flex items-center gap-3 rounded-2xl px-3 py-3 text-base font-medium text-[rgb(var(--text))] transition-colors hover:bg-[rgb(var(--surface-muted))]"
               >
-                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-accent-500 text-white">
+                <span className="from-brand-500 to-accent-500 flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br text-white">
                   <UserCircle2 className="h-4 w-4" />
                 </span>
                 <span className="flex-1">

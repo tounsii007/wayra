@@ -89,16 +89,16 @@ export function LiveStatusBanner() {
           </span>
           <h2
             id="live-status-title"
-            className="mt-3 inline-flex items-center gap-2 font-display text-display-sm font-bold tracking-tightest display-tight"
+            className="font-display text-display-sm tracking-tightest display-tight mt-3 inline-flex items-center gap-2 font-bold"
           >
-            <Activity className="h-6 w-6 text-status-onTime" />
+            <Activity className="text-status-onTime h-6 w-6" />
             {t('liveStatus')}
           </h2>
         </div>
         <div className="flex items-center gap-2">
           <DemoBadge />
           {generatedAt && (
-            <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-subtle">
+            <span className="text-subtle font-mono text-[11px] uppercase tracking-[0.16em]">
               ·{' '}
               {new Date(generatedAt).toLocaleTimeString([], {
                 hour: '2-digit',
@@ -130,7 +130,7 @@ export function LiveStatusBanner() {
                   )}
                 >
                   {it.status === 'ok' && (
-                    <span className="absolute inset-0 animate-ping rounded-full bg-status-onTime/40" />
+                    <span className="bg-status-onTime/40 absolute inset-0 animate-ping rounded-full" />
                   )}
                 </span>
 
@@ -138,7 +138,7 @@ export function LiveStatusBanner() {
 
                 <div className="min-w-0 flex-1">
                   <div className="flex items-baseline gap-2">
-                    <span className="truncate font-display text-sm font-bold text-amber-100">
+                    <span className="font-display truncate text-sm font-bold text-amber-100">
                       {it.city}
                     </span>
                     <span className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-amber-300/70">
@@ -172,8 +172,8 @@ export function LiveStatusBanner() {
           <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-amber-300/80">
             Ticker
           </span>
-          <div className="relative flex-1 overflow-hidden mask-fade-r">
-            <div className="flex w-max gap-8 whitespace-nowrap animate-marquee font-mono text-[11px] text-amber-200/60">
+          <div className="mask-fade-r relative flex-1 overflow-hidden">
+            <div className="animate-marquee flex w-max gap-8 whitespace-nowrap font-mono text-[11px] text-amber-200/60">
               {[
                 '• Berlin ICE 597 — on time',
                 '• Paris RER B — 4 min delay',
