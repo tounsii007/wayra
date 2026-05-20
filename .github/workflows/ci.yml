@@ -55,6 +55,48 @@ jobs:
         run: pnpm --filter @wayra/shared test
       - name: Run backend tests
         run: pnpm --filter @wayra/backend test
+      - name: Run web component tests (Vitest)
+        run: pnpm --filter @wayra/web test
+
+  # ------------------------------------------------------------------ #
+  # E2E (Playwright) — runs against the production Next.js build.       #
+  # Triggered on push to main and manually via workflow_dispatch.        #
+  # ------------------------------------------------------------------ #
+  e2e:
+    name: E2E (Playwright)
+    runs-on: ubuntu-latest
+    # Only run on pushes to main or when manually triggered; skip on PRs
+    # to keep the feedback loop fast (Vitest + unit tests cover PRs).
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+      NEXT_PUBLIC_API_URL: http://localhost:4000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - run: pnpm install --no-frozen-lockfile
+      - name: Build Next.js app
+        run: pnpm --filter @wayra/web build
+      - name: Install Playwright browsers
+        run: pnpm --filter @wayra/web exec playwright install --with-deps chromium
+      - name: Run E2E tests
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:3000
+          CI: "true"
+        run: |
+          pnpm --filter @wayra/web exec next start -p 3000 &
+          npx wait-on http://localhost:3000 --timeout 60000
+          pnpm --filter @wayra/web e2e --project=chromium
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: apps/web/playwright-report/
+          retention-days: 14
 
   build-web:
     name: Build web
