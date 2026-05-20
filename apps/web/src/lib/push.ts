@@ -26,7 +26,11 @@ export async function subscribePush(
   bearer: string | null,
   vapidPublicKey: string | undefined,
 ): Promise<SubscribeResult> {
-  if (typeof window === 'undefined' || !('serviceWorker' in navigator) || !('Notification' in window)) {
+  if (
+    typeof window === 'undefined' ||
+    !('serviceWorker' in navigator) ||
+    !('Notification' in window)
+  ) {
     return 'unsupported';
   }
   if (!vapidPublicKey) return 'unsupported';
@@ -34,13 +38,19 @@ export async function subscribePush(
   const perm = await Notification.requestPermission();
   if (perm !== 'granted') return 'denied';
 
-  const reg = (await navigator.serviceWorker.getRegistration()) ?? (await navigator.serviceWorker.register('/sw.js'));
+  const reg =
+    (await navigator.serviceWorker.getRegistration()) ??
+    (await navigator.serviceWorker.register('/sw.js'));
   await navigator.serviceWorker.ready;
   let sub = await reg.pushManager.getSubscription();
   if (!sub) {
+    // PushManager.subscribe expects BufferSource — pass the underlying
+    // ArrayBuffer so TS lib.dom doesn't trip over the Uint8Array ↔
+    // ArrayBufferView<ArrayBuffer> mismatch introduced in TS 5.7.
+    const keyBuf = urlBase64ToUint8Array(vapidPublicKey).buffer as ArrayBuffer;
     sub = await reg.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
+      applicationServerKey: keyBuf,
     });
   }
 

@@ -63,7 +63,9 @@ describe('HeroSearch', () => {
     await user.click(screen.getByRole('button', { name: 'plan' }));
 
     expect(pushMock).toHaveBeenCalledOnce();
-    const url = pushMock.mock.calls[0][0] as string;
+    const firstCall = pushMock.mock.calls[0];
+    expect(firstCall).toBeDefined();
+    const url = firstCall![0] as string;
     expect(url).toContain('/plan');
     expect(url).toContain('from=');
     expect(url).toContain('to=');

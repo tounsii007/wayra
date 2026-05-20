@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { vi } from 'vitest';
+import { vi, beforeEach } from 'vitest';
 
 // ---------------------------------------------------------------------------
 // next/navigation — provide a minimal mock so components that call useRouter,

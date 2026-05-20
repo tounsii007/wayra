@@ -68,7 +68,14 @@ export class OutboxWorker implements OnModuleInit, OnModuleDestroy {
             await this.outbox.save(row);
             continue;
           }
-          const result = await this.sender.sendToUser(row.userId, row.payload as PushPayload);
+          const payload = this.toPushPayload(row.payload);
+          if (!payload) {
+            row.lastError = 'invalid_payload';
+            row.sentAt = new Date();
+            await this.outbox.save(row);
+            continue;
+          }
+          const result = await this.sender.sendToUser(row.userId, payload);
           if (result.sent > 0) {
             row.sentAt = new Date();
             row.lastError = null;
@@ -93,5 +100,25 @@ export class OutboxWorker implements OnModuleInit, OnModuleDestroy {
   /** Exponential backoff: 5s, 15s, 45s, 2m15s, 7m, 20m, 1h, 3h */
   private backoff(attempt: number): number {
     return Math.min(3 * 3600_000, 5_000 * Math.pow(3, attempt - 1));
+  }
+
+  /**
+   * Validate a stored payload before handing it to the sender.  Producers
+   * write to `payload` as `Record<string, unknown>` (jsonb), so we cannot
+   * trust the shape until we actually inspect it.
+   */
+  private toPushPayload(raw: Record<string, unknown> | null | undefined): PushPayload | null {
+    if (!raw || typeof raw !== 'object') return null;
+    const title = (raw as { title?: unknown }).title;
+    const body = (raw as { body?: unknown }).body;
+    if (typeof title !== 'string' || typeof body !== 'string') return null;
+    const url = (raw as { url?: unknown }).url;
+    const data = (raw as { data?: unknown }).data;
+    return {
+      title,
+      body,
+      ...(typeof url === 'string' ? { url } : {}),
+      ...(data && typeof data === 'object' ? { data: data as Record<string, unknown> } : {}),
+    };
   }
 }

@@ -13,9 +13,10 @@ import {
   verifyRegistrationResponse,
   generateAuthenticationOptions,
   verifyAuthenticationResponse,
-  type RegistrationResponseJSON,
-  type AuthenticationResponseJSON,
 } from '@simplewebauthn/server';
+// In @simplewebauthn/server v11 the response-shape types live in the sibling
+// @simplewebauthn/types package and are no longer re-exported.
+import type { RegistrationResponseJSON, AuthenticationResponseJSON } from '@simplewebauthn/types';
 import {
   UserEntity,
   WebAuthnCredentialEntity,
@@ -44,9 +45,7 @@ export class WebAuthnService {
   private rp(): RpConfig {
     const id = this.config.get<string>('WEBAUTHN_RP_ID') ?? 'localhost';
     const name = this.config.get<string>('WEBAUTHN_RP_NAME') ?? 'Wayra';
-    const origins = (
-      this.config.get<string>('WEBAUTHN_ORIGINS') ?? 'http://localhost:3000'
-    )
+    const origins = (this.config.get<string>('WEBAUTHN_ORIGINS') ?? 'http://localhost:3000')
       .split(',')
       .map((s) => s.trim())
       .filter(Boolean);
@@ -95,7 +94,10 @@ export class WebAuthnService {
   ): Promise<{ ok: true; credentialId: string }> {
     const row = await this.challenges.findOne({ where: { userId, kind: 'register' } });
     if (!row || row.expiresAt < new Date()) {
-      throw new BadRequestException({ code: 'challenge_missing', message: 'Challenge missing or expired.' });
+      throw new BadRequestException({
+        code: 'challenge_missing',
+        message: 'Challenge missing or expired.',
+      });
     }
     const rp = this.rp();
     const verification = await verifyRegistrationResponse({
@@ -106,7 +108,10 @@ export class WebAuthnService {
     });
 
     if (!verification.verified || !verification.registrationInfo) {
-      throw new BadRequestException({ code: 'attestation_invalid', message: 'Attestation invalid.' });
+      throw new BadRequestException({
+        code: 'attestation_invalid',
+        message: 'Attestation invalid.',
+      });
     }
 
     const info = verification.registrationInfo as {
@@ -114,7 +119,10 @@ export class WebAuthnService {
     };
     const cred = info.credential;
     if (!cred) {
-      throw new BadRequestException({ code: 'no_credential', message: 'No credential in registration result.' });
+      throw new BadRequestException({
+        code: 'no_credential',
+        message: 'No credential in registration result.',
+      });
     }
 
     await this.creds.save(
@@ -165,7 +173,10 @@ export class WebAuthnService {
       where: { credentialId: body.response.id, userId },
     });
     if (!credRow) {
-      throw new UnauthorizedException({ code: 'unknown_credential', message: 'Unknown credential.' });
+      throw new UnauthorizedException({
+        code: 'unknown_credential',
+        message: 'Unknown credential.',
+      });
     }
 
     const rp = this.rp();
