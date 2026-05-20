@@ -137,3 +137,50 @@
     animation: fade-in 0.45s cubic-bezier(0.2, 0, 0, 1) both;
   }
 }
+
+/* Skip-link: hidden until focused via keyboard. */
+.skip-link {
+  position: absolute;
+  left: 8px;
+  top: -40px;
+  z-index: 999;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgb(var(--surface));
+  color: rgb(var(--text));
+  border: 1px solid rgb(var(--border));
+  font-weight: 700;
+  transition: top 120ms ease;
+}
+.skip-link:focus {
+  top: 8px;
+  outline: 2px solid rgb(37 99 235);
+  outline-offset: 2px;
+}
+
+/* AAA-leaning contrast tweak — muted variants hit ~7:1 on default bg. */
+:root {
+  --text-muted: 76 85 105;
+  --text-subtle: 113 122 142;
+}
+.dark {
+  --text-muted: 169 180 200;
+  --text-subtle: 134 143 167;
+}
+
+/* Respect OS-level motion preference. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .animate-fade-in,
+  .animate-shimmer,
+  .animate-pulse-soft {
+    animation: none !important;
+  }
+}

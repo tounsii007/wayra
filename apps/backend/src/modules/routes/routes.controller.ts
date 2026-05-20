@@ -22,7 +22,7 @@ export class RoutesController {
       });
     }
     const result = await this.provider.plan(body);
-    for (const r of result.routes) this.cache.cacheRoute(r);
+    await Promise.all(result.routes.map((r) => this.cache.cacheRoute(r)));
     return result;
   }
 

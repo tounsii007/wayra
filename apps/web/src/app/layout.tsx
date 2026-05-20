@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
 import { ThemeProvider } from '@/components/theme-provider';
 import { ServiceWorkerRegister } from '@/components/sw-register';
+import { CookieBanner } from '@/components/cookie-banner';
 import { RTL_LOCALES } from '@wayra/shared';
 import type { Locale } from '@wayra/types';
 import './globals.css';
@@ -62,11 +63,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang={locale} dir={dir} suppressHydrationWarning className={inter.variable}>
       <body className="font-sans">
+        <a href="#main" className="skip-link">
+          Skip to content
+        </a>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <NextIntlClientProvider locale={locale} messages={messages}>
-            {children}
+            <div id="main">{children}</div>
           </NextIntlClientProvider>
           <ServiceWorkerRegister />
+          <CookieBanner />
         </ThemeProvider>
       </body>
     </html>

@@ -14,6 +14,20 @@ env:
   NODE_VERSION: "20"
 
 jobs:
+  format:
+    name: Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - run: pnpm install --no-frozen-lockfile
+      - name: Prettier check
+        run: pnpm prettier --check "**/*.{ts,tsx,js,jsx,json,md,yml,yaml}" --ignore-path .gitignore
+        continue-on-error: true
+
   type-check:
     name: Type-check
     runs-on: ubuntu-latest

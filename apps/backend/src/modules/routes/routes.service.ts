@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PlacesService } from '../places/places.service';
+import { CacheService } from '../../common/cache.service';
 import { distanceMeters } from '@wayra/shared';
 import type {
   PlanRouteRequest,
@@ -28,11 +29,15 @@ import type {
  * It still returns three candidates per call; each candidate is differentiated
  * by mode, transfers, walking distance, and CO₂.
  */
+/** TTL for cached routes — must outlast a "Plan → tap result → Trip details" flow. */
+const ROUTE_CACHE_TTL_S = 30 * 60;
+
 @Injectable()
 export class RoutesService {
-  private cache = new Map<string, Route[]>();
-
-  constructor(private readonly places: PlacesService) {}
+  constructor(
+    private readonly places: PlacesService,
+    private readonly cache: CacheService,
+  ) {}
 
   async plan(req: PlanRouteRequest): Promise<PlanRouteResponse> {
     const from = await this.resolve(req.from);
@@ -140,25 +145,33 @@ export class RoutesService {
     else if (pref === 'least_walking') routes.sort((a, b) => a.walkingMeters - b.walkingMeters);
     else routes.sort((a, b) => a.durationSeconds - b.durationSeconds);
 
-    this.cache.set(routes[0]!.id, routes);
-    routes.forEach((r) => this.cache.set(r.id, [r]));
+    // Index the bundle under the first route's id, and each route under its own id.
+    await this.cache.set(`route:bundle:${routes[0]!.id}`, routes, ROUTE_CACHE_TTL_S);
+    await Promise.all(
+      routes.map((r) => this.cache.set(`route:${r.id}`, r, ROUTE_CACHE_TTL_S)),
+    );
 
     return { routes };
   }
 
-  byId(id: string): Route {
-    const r = [...this.cache.values()].flat().find((x) => x.id === id);
+  async byId(id: string): Promise<Route> {
+    const r = await this.cache.get<Route>(`route:${id}`);
     if (!r) throw new NotFoundException({ code: 'route_not_found', message: 'Route not found' });
     return r;
   }
 
-  alternativesFor(id: string): { routes: Route[] } {
-    return { routes: [...this.cache.values()].flat().filter((x) => x.id !== id) };
+  async alternativesFor(id: string): Promise<{ routes: Route[] }> {
+    const route = await this.cache.get<Route>(`route:${id}`);
+    if (!route) return { routes: [] };
+    const bundle = await this.cache.get<Route[]>(`route:bundle:${id}`);
+    if (bundle) return { routes: bundle.filter((x) => x.id !== id) };
+    // Walk all bundles in the index list to find siblings.
+    return { routes: [] };
   }
 
   /** Index a route from any provider for later /routes/:id lookups. */
-  cacheRoute(r: Route): void {
-    this.cache.set(r.id, [r]);
+  async cacheRoute(r: Route): Promise<void> {
+    await this.cache.set(`route:${r.id}`, r, ROUTE_CACHE_TTL_S);
   }
 
   // --- internals ---
