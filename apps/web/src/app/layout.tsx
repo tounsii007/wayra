@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Bricolage_Grotesque, JetBrains_Mono } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
 import { ThemeProvider } from '@/components/theme-provider';
@@ -9,10 +9,27 @@ import { RTL_LOCALES } from '@wayra/shared';
 import type { Locale } from '@wayra/types';
 import './globals.css';
 
+// Body workhorse — Inter.
 const inter = Inter({
   subsets: ['latin', 'latin-ext'],
   variable: '--font-sans',
   display: 'swap',
+});
+
+// Display headlines — Bricolage Grotesque (variable, optical sizing).
+const bricolage = Bricolage_Grotesque({
+  subsets: ['latin', 'latin-ext'],
+  variable: '--font-display',
+  display: 'swap',
+  weight: ['400', '500', '600', '700', '800'],
+});
+
+// Departure-board numerics — JetBrains Mono.
+const jetbrains = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono',
+  display: 'swap',
+  weight: ['400', '500', '600', '700'],
 });
 
 export const metadata: Metadata = {
@@ -61,7 +78,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const dir = RTL_LOCALES.includes(locale) ? 'rtl' : 'ltr';
 
   return (
-    <html lang={locale} dir={dir} suppressHydrationWarning className={inter.variable}>
+    <html
+      lang={locale}
+      dir={dir}
+      suppressHydrationWarning
+      className={`${inter.variable} ${bricolage.variable} ${jetbrains.variable}`}
+    >
       <body className="font-sans">
         <a href="#main" className="skip-link">
           Skip to content

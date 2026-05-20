@@ -30,11 +30,12 @@ describe('HeroSearch', () => {
     expect(screen.getByRole('button', { name: /swap/i })).toBeInTheDocument();
   });
 
-  it('renders the depart/arrive mode toggles', () => {
+  it('renders the depart/arrive mode toggles as a radio group', () => {
     render(<HeroSearch />);
-    // Translation keys exposed by the mock
-    expect(screen.getByRole('button', { name: 'departAt' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'arriveBy' })).toBeInTheDocument();
+    // The segmented control is a radiogroup of two radio buttons.
+    expect(screen.getByRole('radiogroup', { name: /time mode/i })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'departAt' })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'arriveBy' })).toBeInTheDocument();
   });
 
   it('navigates to /plan on form submit', async () => {

@@ -3,13 +3,28 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { ArrowRight, ArrowDownUp, Clock, LocateFixed } from 'lucide-react';
+import {
+  ArrowRight,
+  ArrowDownUp,
+  Clock,
+  LocateFixed,
+  Calendar,
+  Users,
+  Accessibility,
+} from 'lucide-react';
 import type { Place } from '@wayra/types';
 import { PlacesAutocomplete } from './places-autocomplete';
 import { cn } from '@/lib/utils';
 
 type Mode = 'depart' | 'arrive';
 
+/**
+ * Hero search "ticket" — the central interactive element of the home page.
+ *
+ * Tactile, paper-like card with a route-line motif between origin and
+ * destination, a swap coin in the middle, mode/time/passenger chips on a
+ * dotted-divider row below, and a primary CTA.
+ */
 export function HeroSearch() {
   const t = useTranslations('home.hero');
   const router = useRouter();
@@ -17,6 +32,8 @@ export function HeroSearch() {
   const [to, setTo] = useState<Place | null>(null);
   const [mode, setMode] = useState<Mode>('depart');
   const [when, setWhen] = useState<string>('');
+  const [passengers, setPassengers] = useState(1);
+  const [wheelchair, setWheelchair] = useState(false);
 
   function swap() {
     setFrom(to);
@@ -29,102 +46,214 @@ export function HeroSearch() {
     if (from) params.set('from', from.id);
     if (to) params.set('to', to.id);
     if (when) params.set(mode === 'depart' ? 'departAt' : 'arriveBy', when);
+    if (passengers > 1) params.set('passengers', String(passengers));
+    if (wheelchair) params.set('wheelchair', '1');
     router.push(`/plan?${params.toString()}`);
   }
 
   return (
-    <form onSubmit={submit} className="glass-strong shadow-card rounded-[28px] p-3 sm:p-4">
-      <div className="grid gap-2 md:grid-cols-[1fr_auto_1fr] md:items-center">
-        <PlacesAutocomplete
-          value={from}
-          onChange={setFrom}
-          placeholder={t('fromPlaceholder')}
-          allowCurrentLocation
-          ariaLabel={t('fromPlaceholder')}
-        />
+    <form onSubmit={submit} className="relative mx-auto max-w-4xl" aria-label="Plan a trip">
+      {/* Decorative ticket-stub glow on the sides */}
+      <div className="pointer-events-none absolute -left-1.5 top-1/3 hidden h-32 w-3 -translate-y-1/2 rounded-r-full bg-accent-500/20 blur-md md:block" />
+      <div className="pointer-events-none absolute -right-1.5 top-1/3 hidden h-32 w-3 -translate-y-1/2 rounded-l-full bg-brand-500/20 blur-md md:block" />
 
-        <button
-          type="button"
-          aria-label="Swap from and to"
-          onClick={swap}
-          className="surface focus-ring mx-auto inline-flex h-10 w-10 items-center justify-center rounded-full transition-transform duration-300 hover:rotate-180"
-        >
-          <ArrowDownUp className="h-4 w-4" />
-        </button>
-
-        <PlacesAutocomplete
-          value={to}
-          onChange={setTo}
-          placeholder={t('toPlaceholder')}
-          ariaLabel={t('toPlaceholder')}
-        />
-      </div>
-
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-2 px-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <ToggleChip active={mode === 'depart'} onClick={() => setMode('depart')}>
-            <Clock className="h-3.5 w-3.5" />
-            {t('departAt')}
-          </ToggleChip>
-          <ToggleChip active={mode === 'arrive'} onClick={() => setMode('arrive')}>
-            <ArrowRight className="h-3.5 w-3.5" />
-            {t('arriveBy')}
-          </ToggleChip>
-          <input
-            type="datetime-local"
-            aria-label={mode === 'depart' ? t('departAt') : t('arriveBy')}
-            value={when}
-            onChange={(e) => setWhen(e.target.value)}
-            className="surface focus-ring rounded-full px-3 py-1.5 text-sm"
+      <div className="ticket relative overflow-hidden p-3 shadow-lg sm:p-5">
+        {/* From / Swap / To */}
+        <div className="relative grid gap-2 md:grid-cols-[1fr_auto_1fr] md:items-center">
+          <PlacesAutocomplete
+            value={from}
+            onChange={setFrom}
+            placeholder={t('fromPlaceholder')}
+            allowCurrentLocation
+            ariaLabel={t('fromPlaceholder')}
           />
+
           <button
             type="button"
-            onClick={() => setWhen('')}
-            className="text-muted focus-ring rounded-full px-3 py-1.5 text-xs font-medium hover:bg-[rgb(var(--surface-muted))] hover:text-[rgb(var(--text))]"
+            aria-label="Swap from and to"
+            onClick={swap}
+            className="focus-ring group relative mx-auto inline-flex h-11 w-11 items-center justify-center rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--bg-elevated))] text-muted shadow-sm transition-all duration-300 hover:scale-105 hover:text-[rgb(var(--text))] hover:shadow-md active:scale-95"
           >
-            {t('now')}
+            <ArrowDownUp className="h-4 w-4 transition-transform duration-300 group-hover:rotate-180 md:rotate-90 md:group-hover:rotate-[270deg]" />
+          </button>
+
+          <PlacesAutocomplete
+            value={to}
+            onChange={setTo}
+            placeholder={t('toPlaceholder')}
+            ariaLabel={t('toPlaceholder')}
+          />
+        </div>
+
+        {/* Dotted divider — like a ticket perforation */}
+        <div className="divider-dotted mt-4" />
+
+        {/* Mode + time + passengers + accessibility + submit */}
+        <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Depart / Arrive segmented control */}
+            <div
+              role="radiogroup"
+              aria-label="Time mode"
+              className="inline-flex rounded-full bg-[rgb(var(--surface-muted))] p-0.5"
+            >
+              <ToggleSegment
+                active={mode === 'depart'}
+                onClick={() => setMode('depart')}
+                label={t('departAt')}
+                Icon={Clock}
+              />
+              <ToggleSegment
+                active={mode === 'arrive'}
+                onClick={() => setMode('arrive')}
+                label={t('arriveBy')}
+                Icon={ArrowRight}
+              />
+            </div>
+
+            {/* Datetime — disguised as a chip */}
+            <label className="inline-flex items-center gap-2 rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-3 py-1.5 text-sm focus-within:ring-2 focus-within:ring-brand-500/40">
+              <Calendar className="h-3.5 w-3.5 text-muted" />
+              <input
+                type="datetime-local"
+                aria-label={mode === 'depart' ? t('departAt') : t('arriveBy')}
+                value={when}
+                onChange={(e) => setWhen(e.target.value)}
+                className="bg-transparent text-sm outline-none [color-scheme:light] dark:[color-scheme:dark]"
+              />
+            </label>
+            <button
+              type="button"
+              onClick={() => setWhen('')}
+              className="focus-ring rounded-full px-3 py-1.5 text-xs font-medium text-muted hover:bg-[rgb(var(--surface-muted))] hover:text-[rgb(var(--text))]"
+            >
+              {t('now')}
+            </button>
+
+            {/* Passenger stepper */}
+            <Stepper
+              value={passengers}
+              onChange={setPassengers}
+              min={1}
+              max={9}
+              Icon={Users}
+              ariaLabel="Passengers"
+            />
+
+            {/* Accessibility toggle */}
+            <button
+              type="button"
+              onClick={() => setWheelchair((v) => !v)}
+              aria-pressed={wheelchair}
+              aria-label="Wheelchair accessible"
+              className={cn(
+                'focus-ring inline-flex h-9 items-center gap-1.5 rounded-full border px-3 text-xs font-semibold transition-colors',
+                wheelchair
+                  ? 'border-brand-500/60 bg-brand-50 text-brand-700 dark:bg-brand-500/20 dark:text-brand-300'
+                  : 'border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-muted hover:text-[rgb(var(--text))]',
+              )}
+            >
+              <Accessibility className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Accessible</span>
+            </button>
+          </div>
+
+          <button type="submit" className="btn-primary group">
+            {t('plan')}
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </button>
         </div>
 
-        <button
-          type="submit"
-          className="bg-brand-500 shadow-glow hover:bg-brand-600 focus-ring inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white transition-colors"
-        >
-          {t('plan')}
-          <ArrowRight className="h-4 w-4" />
-        </button>
+        {/* Current location + keyboard hint */}
+        <div className="mt-3 flex items-center justify-between text-xs">
+          <button
+            type="button"
+            className="link-editorial focus-ring inline-flex items-center gap-1.5 font-semibold text-brand-700 dark:text-brand-300"
+          >
+            <LocateFixed className="h-3.5 w-3.5" />
+            {t('useCurrentLocation')}
+          </button>
+          <span className="hidden font-mono text-[10px] uppercase tracking-[0.18em] text-subtle sm:inline">
+            ↵ to plan
+          </span>
+        </div>
       </div>
-
-      <button
-        type="button"
-        className="text-brand-600 dark:text-brand-300 hover:bg-brand-50 dark:hover:bg-brand-500/10 focus-ring mt-3 inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-medium"
-      >
-        <LocateFixed className="h-3.5 w-3.5" />
-        {t('useCurrentLocation')}
-      </button>
     </form>
   );
 }
 
-function ToggleChip({
+/* ---------------------------------------------------------------- */
+
+function ToggleSegment({
   active,
   onClick,
-  children,
+  label,
+  Icon,
 }: {
   active: boolean;
   onClick: () => void;
-  children: React.ReactNode;
+  label: string;
+  Icon: typeof Clock;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
+      role="radio"
+      aria-checked={active}
       className={cn(
-        'focus-ring inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors',
-        active ? 'bg-brand-500 text-white' : 'surface text-muted hover:text-[rgb(var(--text))]',
+        'focus-ring inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all',
+        active
+          ? 'bg-[rgb(var(--bg-elevated))] text-[rgb(var(--text))] shadow-sm'
+          : 'text-muted hover:text-[rgb(var(--text))]',
       )}
     >
-      {children}
+      <Icon className="h-3.5 w-3.5" />
+      {label}
     </button>
+  );
+}
+
+function Stepper({
+  value,
+  onChange,
+  min,
+  max,
+  Icon,
+  ariaLabel,
+}: {
+  value: number;
+  onChange: (n: number) => void;
+  min: number;
+  max: number;
+  Icon: typeof Users;
+  ariaLabel: string;
+}) {
+  return (
+    <div
+      className="inline-flex h-9 items-center gap-1.5 rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--surface))] pl-3 pr-1 text-sm"
+      aria-label={ariaLabel}
+    >
+      <Icon className="h-3.5 w-3.5 text-muted" />
+      <button
+        type="button"
+        onClick={() => onChange(Math.max(min, value - 1))}
+        disabled={value <= min}
+        aria-label="Decrease"
+        className="focus-ring h-7 w-7 rounded-full text-base font-bold text-muted hover:bg-[rgb(var(--surface-muted))] disabled:opacity-30"
+      >
+        −
+      </button>
+      <span className="board-num min-w-[1ch] text-center text-sm font-bold">{value}</span>
+      <button
+        type="button"
+        onClick={() => onChange(Math.min(max, value + 1))}
+        disabled={value >= max}
+        aria-label="Increase"
+        className="focus-ring h-7 w-7 rounded-full text-base font-bold text-muted hover:bg-[rgb(var(--surface-muted))] disabled:opacity-30"
+      >
+        +
+      </button>
+    </div>
   );
 }
