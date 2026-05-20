@@ -1,14 +1,30 @@
 import 'reflect-metadata';
 import { RoutesService } from '../src/modules/routes/routes.service';
 import { PlacesService } from '../src/modules/places/places.service';
+import type { CacheService } from '../src/common/cache.service';
 
 function makeDsStub() {
   return { query: jest.fn().mockResolvedValue([]) };
 }
 
+/** In-memory cache stand-in matching the CacheService surface. */
+function makeCacheStub(): CacheService {
+  const store = new Map<string, unknown>();
+  return {
+    set: jest.fn(async (k: string, v: unknown) => {
+      store.set(k, v);
+    }),
+    get: jest.fn(async (k: string) => store.get(k) ?? null),
+    del: jest.fn(async (k: string) => {
+      store.delete(k);
+    }),
+  } as unknown as CacheService;
+}
+
 describe('RoutesService.plan', () => {
   const places = new PlacesService(makeDsStub() as never);
-  const routes = new RoutesService(places);
+  const cache = makeCacheStub();
+  const routes = new RoutesService(places, cache);
 
   it('returns three preference-tagged candidates for a known pair', async () => {
     const res = await routes.plan({
@@ -29,7 +45,6 @@ describe('RoutesService.plan', () => {
     });
     expect(res.routes.length).toBeGreaterThan(0);
     const first = res.routes[0]!;
-    // Departure must be strictly before the requested arrival.
     expect(new Date(first.departureTime).getTime()).toBeLessThan(new Date(arriveBy).getTime());
   });
 
@@ -74,7 +89,7 @@ describe('RoutesService.plan', () => {
       to: { placeId: 'de:berlin:hbf' },
     });
     const id = planned.routes[0]!.id;
-    const fetched = routes.byId(id);
+    const fetched = await routes.byId(id);
     expect(fetched.id).toBe(id);
   });
 });
