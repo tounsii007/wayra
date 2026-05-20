@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Cookie, Shield } from 'lucide-react';
+import { Cookie, Shield, X } from 'lucide-react';
 
 const KEY = 'wayra-consent-v1';
 type Consent = { essential: true; analytics: boolean; marketing: boolean; ts: number };
@@ -16,10 +16,9 @@ function readConsent(): Consent | null {
 }
 
 /**
- * GDPR-aware cookie consent banner. Wayra's first-party storage
- * (auth, recents, theme, locale, prefs) is all "essential" so the
- * banner doesn't gate it — but if/when analytics or marketing cookies
- * are added, gate them on `useConsent('analytics')`.
+ * GDPR-aware cookie consent banner.  Styled as a paper-warm ticket that
+ * slides up from the bottom; remembered choice is persisted in localStorage
+ * + a duplicate cookie so the SSR layer can also see it.
  */
 export function CookieBanner() {
   const [open, setOpen] = useState(false);
@@ -40,45 +39,55 @@ export function CookieBanner() {
     <div
       role="dialog"
       aria-label="Cookie preferences"
-      className="shadow-card fixed inset-x-3 bottom-3 z-[100] mx-auto max-w-3xl rounded-2xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-4"
+      className="animate-fade-in-up fixed inset-x-3 bottom-3 z-[100] mx-auto max-w-3xl"
     >
-      <div className="flex flex-wrap items-start gap-3">
-        <div className="bg-brand-500/10 text-brand-500 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
-          <Cookie className="h-5 w-5" />
+      <div className="ticket relative overflow-hidden p-5 shadow-lg">
+        {/* Top accent bar */}
+        <div className="from-brand-500 via-accent-500 to-brand-500 absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r" />
+
+        <div className="flex flex-wrap items-start gap-4">
+          <span className="from-accent-400 to-accent-600 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br text-white shadow-md">
+            <Cookie className="h-5 w-5" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <div className="font-display text-base font-bold tracking-tight">
+              Your privacy matters
+            </div>
+            <p className="text-muted mt-1.5 text-sm leading-relaxed">
+              Wayra uses essential storage to keep you signed in, remember your language and theme,
+              and cache the offline regions you download. We don&apos;t run analytics or marketing
+              trackers by default — opt in only if you want.{' '}
+              <a
+                className="link-editorial text-brand-700 dark:text-brand-300 font-semibold"
+                href="/privacy"
+              >
+                Read more
+              </a>
+              .
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => save(false, false)}
+            aria-label="Dismiss — essential only"
+            className="focus-ring text-subtle inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-[rgb(var(--surface-muted))] hover:text-[rgb(var(--text))]"
+          >
+            <X className="h-4 w-4" />
+          </button>
         </div>
-        <div className="min-w-0 flex-1">
-          <div className="font-bold">Your privacy matters</div>
-          <p className="text-muted mt-1 text-sm">
-            We use essential storage to keep you signed in, remember your language and theme, and
-            cache offline regions you choose to download. We don't run analytics or marketing
-            trackers by default — opt in only if you want.{' '}
-            <a className="text-brand-500 font-semibold underline" href="/privacy">
-              Read more
-            </a>
-            .
-          </p>
+
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <button onClick={() => save(false, false)} className="btn-ghost text-xs">
+            Essential only
+          </button>
+          <button onClick={() => save(true, false)} className="btn-surface text-xs">
+            + Analytics
+          </button>
+          <button onClick={() => save(true, true)} className="btn-primary ms-auto text-xs">
+            <Shield className="h-3.5 w-3.5" />
+            Accept all
+          </button>
         </div>
-      </div>
-      <div className="mt-3 flex flex-wrap items-center gap-2">
-        <button
-          onClick={() => save(false, false)}
-          className="surface-muted focus-ring rounded-full px-3 py-1.5 text-xs font-bold"
-        >
-          Essential only
-        </button>
-        <button
-          onClick={() => save(true, false)}
-          className="surface-muted focus-ring rounded-full px-3 py-1.5 text-xs font-bold"
-        >
-          Essential + analytics
-        </button>
-        <button
-          onClick={() => save(true, true)}
-          className="bg-brand-500 shadow-glow focus-ring ms-auto inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-bold text-white"
-        >
-          <Shield className="h-3 w-3" />
-          Accept all
-        </button>
       </div>
     </div>
   );
