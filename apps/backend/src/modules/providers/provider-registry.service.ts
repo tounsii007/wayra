@@ -11,12 +11,7 @@ export class ProviderRegistry {
   private readonly logger = new Logger(ProviderRegistry.name);
   private readonly all: TransitDataProvider[];
 
-  constructor(
-    db: DbProvider,
-    sncf: SncfProvider,
-    idfm: IdfmProvider,
-    sncft: SncftProvider,
-  ) {
+  constructor(db: DbProvider, sncf: SncfProvider, idfm: IdfmProvider, sncft: SncftProvider) {
     this.all = [db, sncf, idfm, sncft];
     const ready = this.all.filter((p) => p.isConfigured());
     this.logger.log(

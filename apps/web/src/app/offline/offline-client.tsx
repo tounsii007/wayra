@@ -59,7 +59,10 @@ export function OfflineClient() {
     (async () => {
       try {
         const res = await fetch(`${base}/api/offline/regions`);
-        const json = (await res.json()) as { data?: { regions: Region[] }; error?: { message: string } };
+        const json = (await res.json()) as {
+          data?: { regions: Region[] };
+          error?: { message: string };
+        };
         if (json.error) throw new Error(json.error.message);
         setRegions(json.data?.regions ?? []);
       } catch (e) {
@@ -90,7 +93,11 @@ export function OfflineClient() {
         setLocal((s) => {
           const next = {
             ...s,
-            [region.id]: { status: 'done' as Status, progress: 100, downloadedAt: new Date().toISOString() },
+            [region.id]: {
+              status: 'done' as Status,
+              progress: 100,
+              downloadedAt: new Date().toISOString(),
+            },
           };
           saveLocal(next);
           return next;
@@ -119,7 +126,7 @@ export function OfflineClient() {
   }
   if (error) {
     return (
-      <div className="surface rounded-2xl p-4 text-sm text-status-severe">
+      <div className="surface text-status-severe rounded-2xl p-4 text-sm">
         Failed to load: {error}
       </div>
     );
@@ -134,32 +141,32 @@ export function OfflineClient() {
           <li key={r.id} className="surface relative overflow-hidden rounded-2xl p-4">
             <header className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-accent-violet text-white shadow-glow">
+                <span className="from-brand-500 to-accent-violet shadow-glow inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br text-white">
                   <CloudDownload className="h-4 w-4" />
                 </span>
                 <div>
                   <div className="text-base font-bold">{r.name}</div>
-                  <div className="text-xs text-subtle">
+                  <div className="text-subtle text-xs">
                     {r.countryCode} · {humanSize(r.sizeBytes)}
                   </div>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 {st?.status === 'done' && !stale && (
-                  <span className="inline-flex items-center gap-1 text-xs font-semibold text-status-onTime">
+                  <span className="text-status-onTime inline-flex items-center gap-1 text-xs font-semibold">
                     <CheckCircle2 className="h-3.5 w-3.5" />
                     downloaded
                   </span>
                 )}
                 {stale && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-status-delay/15 px-2 py-0.5 text-xs font-semibold text-status-delay">
+                  <span className="bg-status-delay/15 text-status-delay inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold">
                     <RefreshCcw className="h-3 w-3" /> stale
                   </span>
                 )}
                 {!st && (
                   <button
                     onClick={() => startDownload(r)}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-brand-500 px-3 py-1.5 text-xs font-bold text-white shadow-glow focus-ring"
+                    className="bg-brand-500 shadow-glow focus-ring inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold text-white"
                   >
                     <CloudDownload className="h-3.5 w-3.5" /> download
                   </button>
@@ -169,7 +176,7 @@ export function OfflineClient() {
                     {stale && (
                       <button
                         onClick={() => startDownload(r)}
-                        className="inline-flex items-center gap-1.5 rounded-full surface-muted px-3 py-1.5 text-xs font-semibold focus-ring"
+                        className="surface-muted focus-ring inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold"
                       >
                         update
                       </button>
@@ -177,14 +184,14 @@ export function OfflineClient() {
                     <button
                       onClick={() => remove(r)}
                       aria-label="Remove offline data"
-                      className="rounded-full p-1.5 text-subtle hover:bg-[rgb(var(--surface-muted))] focus-ring"
+                      className="text-subtle focus-ring rounded-full p-1.5 hover:bg-[rgb(var(--surface-muted))]"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </>
                 )}
                 {st?.status === 'downloading' && (
-                  <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted">
+                  <span className="text-muted inline-flex items-center gap-1.5 text-xs font-semibold">
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
                     {st.progress}%
                   </span>
@@ -195,13 +202,13 @@ export function OfflineClient() {
             {st?.status === 'downloading' && (
               <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-[rgb(var(--surface-muted))]">
                 <div
-                  className={cn('h-full bg-brand-500 transition-all')}
+                  className={cn('bg-brand-500 h-full transition-all')}
                   style={{ width: `${st.progress}%` }}
                 />
               </div>
             )}
             {st?.status === 'done' && (
-              <p className="mt-2 text-xs text-subtle">
+              <p className="text-subtle mt-2 text-xs">
                 Downloaded {daysSince(st.downloadedAt)} day(s) ago — version{' '}
                 {new Date(r.version).toLocaleDateString()}.
               </p>

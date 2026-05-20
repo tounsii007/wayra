@@ -16,7 +16,14 @@ export default function Index() {
 
   if (!target) {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.bg }}>
+      <View
+        style={{
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: theme.bg,
+        }}
+      >
         <ActivityIndicator color={theme.brand} />
       </View>
     );

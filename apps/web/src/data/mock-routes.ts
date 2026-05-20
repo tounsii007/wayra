@@ -47,7 +47,13 @@ export const mockRouteResults: Route[] = [
         mode: {
           kind: 'transit',
           mode: 'rail',
-          line: { id: 'ice-1071', agencyId: 'db', shortName: 'ICE 1071', mode: 'rail', color: '#EC0016' },
+          line: {
+            id: 'ice-1071',
+            agencyId: 'db',
+            shortName: 'ICE 1071',
+            mode: 'rail',
+            color: '#EC0016',
+          },
           trip: { id: 't1', lineId: 'ice-1071', headsign: 'Berlin Hbf' },
         },
         from: fra,
@@ -133,7 +139,13 @@ export const mockRouteResults: Route[] = [
         mode: {
           kind: 'transit',
           mode: 'rail',
-          line: { id: 'ice-12', agencyId: 'db', shortName: 'ICE 12', mode: 'rail', color: '#EC0016' },
+          line: {
+            id: 'ice-12',
+            agencyId: 'db',
+            shortName: 'ICE 12',
+            mode: 'rail',
+            color: '#EC0016',
+          },
           trip: { id: 't3', lineId: 'ice-12', headsign: 'Berlin Hbf' },
         },
         from: fra,

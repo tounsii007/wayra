@@ -2,7 +2,15 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, Share, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useLocalSearchParams, router } from 'expo-router';
-import { ArrowRight, BookmarkPlus, Clock, Footprints, Leaf, Share2, Train } from 'lucide-react-native';
+import {
+  ArrowRight,
+  BookmarkPlus,
+  Clock,
+  Footprints,
+  Leaf,
+  Share2,
+  Train,
+} from 'lucide-react-native';
 import { formatCO2, formatDuration, formatFare, formatTime } from '@wayra/shared';
 import type { Locale, Route } from '@wayra/types';
 import { useTheme } from '@/theme';
@@ -107,111 +115,116 @@ export default function TripScreen() {
             />
           </View>
           <View style={{ padding: 16, gap: 12 }}>
-          <View
-            style={{
-              backgroundColor: theme.surface,
-              borderColor: theme.border,
-              borderWidth: 1,
-              borderRadius: 18,
-              padding: 16,
-              gap: 8,
-            }}
-          >
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <Text style={{ color: theme.text, fontSize: 26, fontWeight: '800' }}>
-                {formatTime(route.departureTime, locale)}
-              </Text>
-              <ArrowRight color={theme.textMuted} size={16} />
-              <Text style={{ color: theme.text, fontSize: 26, fontWeight: '800' }}>
-                {formatTime(route.arrivalTime, locale)}
-              </Text>
-            </View>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}>
-              <Pill color={theme.surfaceMuted} text={theme.text}>
-                <Clock color={theme.text} size={12} />{' '}
-                {formatDuration(route.durationSeconds, locale)}
-              </Pill>
-              {route.fare && (
-                <Pill color={theme.brand + '20'} text={theme.brand}>
-                  {formatFare(route.fare.amount, route.fare.currency, locale)}
-                </Pill>
-              )}
-              <Pill color={theme.surfaceMuted} text={theme.textMuted}>
-                {route.transfers === 0 ? 'direct' : `${route.transfers} transfers`}
-              </Pill>
-              <Pill color={theme.surfaceMuted} text={theme.textMuted}>
-                <Footprints color={theme.textMuted} size={11} /> {Math.round(route.walkingMeters)} m
-              </Pill>
-            </View>
-            <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
-              <Pressable
-                onPress={save}
-                disabled={saved}
-                style={{
-                  flex: 1,
-                  flexDirection: 'row',
-                  gap: 6,
-                  paddingVertical: 12,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderRadius: 999,
-                  backgroundColor: saved ? theme.surfaceMuted : theme.brand,
-                  opacity: saved ? 0.6 : 1,
-                }}
-              >
-                <BookmarkPlus color={saved ? theme.textMuted : '#fff'} size={14} />
-                <Text style={{ color: saved ? theme.textMuted : '#fff', fontWeight: '800' }}>
-                  {saved ? 'Saved' : 'Save trip'}
+            <View
+              style={{
+                backgroundColor: theme.surface,
+                borderColor: theme.border,
+                borderWidth: 1,
+                borderRadius: 18,
+                padding: 16,
+                gap: 8,
+              }}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <Text style={{ color: theme.text, fontSize: 26, fontWeight: '800' }}>
+                  {formatTime(route.departureTime, locale)}
                 </Text>
-              </Pressable>
-              <Pressable
-                onPress={share}
+                <ArrowRight color={theme.textMuted} size={16} />
+                <Text style={{ color: theme.text, fontSize: 26, fontWeight: '800' }}>
+                  {formatTime(route.arrivalTime, locale)}
+                </Text>
+              </View>
+              <View
+                style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}
+              >
+                <Pill color={theme.surfaceMuted} text={theme.text}>
+                  <Clock color={theme.text} size={12} />{' '}
+                  {formatDuration(route.durationSeconds, locale)}
+                </Pill>
+                {route.fare && (
+                  <Pill color={theme.brand + '20'} text={theme.brand}>
+                    {formatFare(route.fare.amount, route.fare.currency, locale)}
+                  </Pill>
+                )}
+                <Pill color={theme.surfaceMuted} text={theme.textMuted}>
+                  {route.transfers === 0 ? 'direct' : `${route.transfers} transfers`}
+                </Pill>
+                <Pill color={theme.surfaceMuted} text={theme.textMuted}>
+                  <Footprints color={theme.textMuted} size={11} /> {Math.round(route.walkingMeters)}{' '}
+                  m
+                </Pill>
+              </View>
+              <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
+                <Pressable
+                  onPress={save}
+                  disabled={saved}
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    gap: 6,
+                    paddingVertical: 12,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: 999,
+                    backgroundColor: saved ? theme.surfaceMuted : theme.brand,
+                    opacity: saved ? 0.6 : 1,
+                  }}
+                >
+                  <BookmarkPlus color={saved ? theme.textMuted : '#fff'} size={14} />
+                  <Text style={{ color: saved ? theme.textMuted : '#fff', fontWeight: '800' }}>
+                    {saved ? 'Saved' : 'Save trip'}
+                  </Text>
+                </Pressable>
+                <Pressable
+                  onPress={share}
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    gap: 6,
+                    paddingVertical: 12,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: 999,
+                    backgroundColor: theme.surface,
+                    borderColor: theme.border,
+                    borderWidth: 1,
+                  }}
+                >
+                  <Share2 color={theme.text} size={14} />
+                  <Text style={{ color: theme.text, fontWeight: '800' }}>Share</Text>
+                </Pressable>
+              </View>
+            </View>
+
+            <Text style={{ color: theme.text, fontWeight: '800', fontSize: 16, marginTop: 8 }}>
+              Legs
+            </Text>
+            {route.legs.map((leg, i) => (
+              <LegRow key={i} leg={leg} locale={locale} />
+            ))}
+
+            {route.co2SavedGrams !== undefined && route.co2SavedGrams > 0 && (
+              <View
                 style={{
-                  flex: 1,
                   flexDirection: 'row',
-                  gap: 6,
-                  paddingVertical: 12,
+                  gap: 8,
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  borderRadius: 999,
+                  padding: 12,
+                  borderRadius: 14,
                   backgroundColor: theme.surface,
                   borderColor: theme.border,
                   borderWidth: 1,
                 }}
               >
-                <Share2 color={theme.text} size={14} />
-                <Text style={{ color: theme.text, fontWeight: '800' }}>Share</Text>
-              </Pressable>
-            </View>
-          </View>
-
-          <Text style={{ color: theme.text, fontWeight: '800', fontSize: 16, marginTop: 8 }}>Legs</Text>
-          {route.legs.map((leg, i) => (
-            <LegRow key={i} leg={leg} locale={locale} />
-          ))}
-
-          {route.co2SavedGrams !== undefined && route.co2SavedGrams > 0 && (
-            <View
-              style={{
-                flexDirection: 'row',
-                gap: 8,
-                alignItems: 'center',
-                padding: 12,
-                borderRadius: 14,
-                backgroundColor: theme.surface,
-                borderColor: theme.border,
-                borderWidth: 1,
-              }}
-            >
-              <Leaf color={theme.status.onTime} size={16} />
-              <Text style={{ color: theme.text }}>
-                <Text style={{ fontWeight: '800', color: theme.status.onTime }}>
-                  {formatCO2(route.co2SavedGrams, locale)}
-                </Text>{' '}
-                CO₂ saved vs driving solo.
-              </Text>
-            </View>
-          )}
+                <Leaf color={theme.status.onTime} size={16} />
+                <Text style={{ color: theme.text }}>
+                  <Text style={{ fontWeight: '800', color: theme.status.onTime }}>
+                    {formatCO2(route.co2SavedGrams, locale)}
+                  </Text>{' '}
+                  CO₂ saved vs driving solo.
+                </Text>
+              </View>
+            )}
           </View>
         </ScrollView>
       )}
@@ -219,7 +232,15 @@ export default function TripScreen() {
   );
 }
 
-function Pill({ children, color, text }: { children: React.ReactNode; color: string; text: string }) {
+function Pill({
+  children,
+  color,
+  text,
+}: {
+  children: React.ReactNode;
+  color: string;
+  text: string;
+}) {
   return (
     <View
       style={{
@@ -305,13 +326,15 @@ function LegRow({ leg, locale }: { leg: Route['legs'][number]; locale: Locale })
             {leg.mode.line.shortName} → {leg.mode.trip.headsign}
           </Text>
           <Text style={{ color: theme.textMuted, fontSize: 12, marginTop: 2 }}>
-            {leg.from.name}  ·  {formatTime(leg.departureTime, locale)}
+            {leg.from.name} · {formatTime(leg.departureTime, locale)}
           </Text>
           <Text style={{ color: theme.textMuted, fontSize: 12 }}>
-            {leg.to.name}  ·  {formatTime(leg.arrivalTime, locale)}
+            {leg.to.name} · {formatTime(leg.arrivalTime, locale)}
           </Text>
           {delayMin > 0 && (
-            <Text style={{ color: theme.status.delay, fontSize: 11, fontWeight: '800', marginTop: 4 }}>
+            <Text
+              style={{ color: theme.status.delay, fontSize: 11, fontWeight: '800', marginTop: 4 }}
+            >
               +{delayMin} min
             </Text>
           )}

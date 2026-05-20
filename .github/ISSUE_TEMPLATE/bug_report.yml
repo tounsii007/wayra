@@ -1,7 +1,7 @@
 name: Bug report
 description: Something broke. Help us reproduce it.
-title: "[bug] "
-labels: ["bug", "triage"]
+title: '[bug] '
+labels: ['bug', 'triage']
 body:
   - type: dropdown
     id: area

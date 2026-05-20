@@ -23,7 +23,9 @@ export default function AssistantScreen() {
   const theme = useTheme();
   const { t, i18n } = useTranslation();
   const locale = i18n.language as Locale;
-  const [msgs, setMsgs] = useState<Msg[]>([{ role: 'assistant', content: t('assistant.greeting') }]);
+  const [msgs, setMsgs] = useState<Msg[]>([
+    { role: 'assistant', content: t('assistant.greeting') },
+  ]);
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -54,7 +56,10 @@ export default function AssistantScreen() {
 
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: theme.bg }}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={{ flex: 1 }}
+      >
         <View style={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: 12 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
             <View
@@ -69,11 +74,16 @@ export default function AssistantScreen() {
             >
               <Sparkles color="#fff" size={20} />
             </View>
-            <Text style={{ color: theme.text, fontSize: 18, fontWeight: '800' }}>Wayra Assistant</Text>
+            <Text style={{ color: theme.text, fontSize: 18, fontWeight: '800' }}>
+              Wayra Assistant
+            </Text>
           </View>
         </View>
 
-        <ScrollView contentContainerStyle={{ padding: 20, gap: 10 }} keyboardShouldPersistTaps="handled">
+        <ScrollView
+          contentContainerStyle={{ padding: 20, gap: 10 }}
+          keyboardShouldPersistTaps="handled"
+        >
           {msgs.map((m, i) => (
             <View
               key={i}
@@ -171,7 +181,9 @@ export default function AssistantScreen() {
                   backgroundColor: theme.surfaceMuted,
                 }}
               >
-                <Text style={{ color: theme.textMuted, fontSize: 11, fontWeight: '600' }}>{ex}</Text>
+                <Text style={{ color: theme.textMuted, fontSize: 11, fontWeight: '600' }}>
+                  {ex}
+                </Text>
               </Pressable>
             ))}
           </View>

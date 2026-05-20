@@ -39,10 +39,22 @@
     "features": {
       "title": "Alles, was du für deine Reise brauchst",
       "items": [
-        { "title": "Multimodale Routen", "body": "Zug, Bus, Metro, Tram und Fußweg — clever kombiniert." },
-        { "title": "Live-Verspätungen", "body": "Pünktlichkeit, Gleisänderungen und Störungen in Echtzeit." },
-        { "title": "Offline-Fahrpläne", "body": "Lade Städte herunter und nutze Wayra ohne Internet." },
-        { "title": "KI-Reiseassistent", "body": "Stelle Fragen in natürlicher Sprache — erhalte sofort Antworten." }
+        {
+          "title": "Multimodale Routen",
+          "body": "Zug, Bus, Metro, Tram und Fußweg — clever kombiniert."
+        },
+        {
+          "title": "Live-Verspätungen",
+          "body": "Pünktlichkeit, Gleisänderungen und Störungen in Echtzeit."
+        },
+        {
+          "title": "Offline-Fahrpläne",
+          "body": "Lade Städte herunter und nutze Wayra ohne Internet."
+        },
+        {
+          "title": "KI-Reiseassistent",
+          "body": "Stelle Fragen in natürlicher Sprache — erhalte sofort Antworten."
+        }
       ]
     }
   },

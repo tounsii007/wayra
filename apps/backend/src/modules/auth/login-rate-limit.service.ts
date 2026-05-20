@@ -39,9 +39,7 @@ export class LoginRateLimitService {
   }
 
   async record(email: string, success: boolean, ip?: string | null): Promise<void> {
-    await this.attempts.save(
-      this.attempts.create({ email, ip: ip ?? null, success }),
-    );
+    await this.attempts.save(this.attempts.create({ email, ip: ip ?? null, success }));
   }
 
   /** Optional periodic cleanup of attempts older than the window. */

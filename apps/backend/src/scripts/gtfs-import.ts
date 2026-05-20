@@ -66,9 +66,7 @@ function parseLine(line: string): string[] {
   return out;
 }
 
-async function* readCsvRows(
-  file: string,
-): AsyncGenerator<Record<string, string>, void, void> {
+async function* readCsvRows(file: string): AsyncGenerator<Record<string, string>, void, void> {
   const stream = createReadStream(file, { encoding: 'utf8' });
   const rl = createInterface({ input: stream, crlfDelay: Infinity });
   let headers: string[] | null = null;

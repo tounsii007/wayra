@@ -39,7 +39,10 @@ export default function LoginScreen() {
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: theme.bg }}>
       <Stack.Screen options={{ title: 'Sign in' }} />
-      <ScrollView contentContainerStyle={{ padding: 20, gap: 12 }} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        contentContainerStyle={{ padding: 20, gap: 12 }}
+        keyboardShouldPersistTaps="handled"
+      >
         <Text style={{ color: theme.text, fontSize: 24, fontWeight: '800' }}>Welcome to Wayra</Text>
         <Text style={{ color: theme.textMuted, fontSize: 13 }}>
           Sign in to sync favorites, saved routes and notifications across devices.

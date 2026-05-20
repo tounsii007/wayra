@@ -7,7 +7,13 @@ import type { Disruption } from '@wayra/types';
 import { api } from '@/lib/api';
 
 const severityTone = (sev: Disruption['severity']) =>
-  sev === 'critical' ? '#991b1b' : sev === 'major' ? '#dc2626' : sev === 'minor' ? '#f59e0b' : '#0ea5e9';
+  sev === 'critical'
+    ? '#991b1b'
+    : sev === 'major'
+      ? '#dc2626'
+      : sev === 'minor'
+        ? '#f59e0b'
+        : '#0ea5e9';
 
 export default function LiveScreen() {
   const theme = useTheme();
@@ -45,7 +51,9 @@ export default function LiveScreen() {
       {loading ? (
         <ActivityIndicator color={theme.brand} style={{ marginTop: 24 }} />
       ) : error ? (
-        <Text style={{ paddingHorizontal: 20, color: theme.status.severe, fontSize: 13 }}>{error}</Text>
+        <Text style={{ paddingHorizontal: 20, color: theme.status.severe, fontSize: 13 }}>
+          {error}
+        </Text>
       ) : (
         <FlatList
           contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 32, gap: 10 }}
@@ -96,7 +104,9 @@ export default function LiveScreen() {
                 </Text>
               </View>
               {item.description && (
-                <Text style={{ color: theme.textMuted, marginTop: 4, fontSize: 13 }}>{item.description}</Text>
+                <Text style={{ color: theme.textMuted, marginTop: 4, fontSize: 13 }}>
+                  {item.description}
+                </Text>
               )}
             </View>
           )}

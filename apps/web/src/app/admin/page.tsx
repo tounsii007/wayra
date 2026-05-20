@@ -1,10 +1,34 @@
 import { Activity, Train, AlertTriangle, Users, Database, MapPin } from 'lucide-react';
 
 const stats = [
-  { label: 'Stops indexed', value: '24,318', sub: '+412 today', Icon: MapPin, accent: 'from-brand-500 to-accent-violet' },
-  { label: 'Lines', value: '1,094', sub: 'DE · FR · TN', Icon: Train, accent: 'from-accent-teal to-brand-500' },
-  { label: 'Active disruptions', value: '38', sub: '4 major', Icon: AlertTriangle, accent: 'from-accent-sunset to-status-severe' },
-  { label: 'Users', value: '2.7k', sub: '+11% this week', Icon: Users, accent: 'from-brand-500 to-accent-teal' },
+  {
+    label: 'Stops indexed',
+    value: '24,318',
+    sub: '+412 today',
+    Icon: MapPin,
+    accent: 'from-brand-500 to-accent-violet',
+  },
+  {
+    label: 'Lines',
+    value: '1,094',
+    sub: 'DE · FR · TN',
+    Icon: Train,
+    accent: 'from-accent-teal to-brand-500',
+  },
+  {
+    label: 'Active disruptions',
+    value: '38',
+    sub: '4 major',
+    Icon: AlertTriangle,
+    accent: 'from-accent-sunset to-status-severe',
+  },
+  {
+    label: 'Users',
+    value: '2.7k',
+    sub: '+11% this week',
+    Icon: Users,
+    accent: 'from-brand-500 to-accent-teal',
+  },
 ];
 
 const feeds = [
@@ -27,19 +51,27 @@ export default function AdminOverviewPage() {
     <div className="space-y-8">
       <header>
         <h1 className="text-2xl font-bold">Overview</h1>
-        <p className="text-sm text-muted">Snapshot across all networks, feeds and live operations.</p>
+        <p className="text-muted text-sm">
+          Snapshot across all networks, feeds and live operations.
+        </p>
       </header>
 
       <section className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
         {stats.map(({ label, value, sub, Icon, accent }) => (
           <article key={label} className="surface relative overflow-hidden rounded-2xl p-5">
-            <div className={`absolute -right-6 -top-6 h-20 w-20 rounded-full bg-gradient-to-br ${accent} opacity-20 blur-2xl`} />
-            <div className={`inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${accent} text-white shadow-glow`}>
+            <div
+              className={`absolute -right-6 -top-6 h-20 w-20 rounded-full bg-gradient-to-br ${accent} opacity-20 blur-2xl`}
+            />
+            <div
+              className={`inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${accent} shadow-glow text-white`}
+            >
               <Icon className="h-5 w-5" />
             </div>
-            <div className="mt-3 text-xs font-semibold uppercase tracking-wide text-subtle">{label}</div>
+            <div className="text-subtle mt-3 text-xs font-semibold uppercase tracking-wide">
+              {label}
+            </div>
             <div className="mt-1 text-2xl font-bold tabular-nums">{value}</div>
-            <div className="text-xs text-muted">{sub}</div>
+            <div className="text-muted text-xs">{sub}</div>
           </article>
         ))}
       </section>
@@ -50,13 +82,13 @@ export default function AdminOverviewPage() {
           <ul className="divide-y divide-[rgb(var(--border))]">
             {feeds.map((f) => (
               <li key={f.id} className="flex items-center gap-3 px-4 py-3">
-                <Database className="h-4 w-4 text-subtle" />
+                <Database className="text-subtle h-4 w-4" />
                 <div className="flex-1">
                   <div className="text-sm font-semibold">{f.name}</div>
-                  <div className="text-xs text-subtle">last sync · {f.lastSync}</div>
+                  <div className="text-subtle text-xs">last sync · {f.lastSync}</div>
                 </div>
                 <span className={`inline-block h-2.5 w-2.5 rounded-full ${statusTone[f.status]}`} />
-                <Activity className="h-4 w-4 text-subtle" />
+                <Activity className="text-subtle h-4 w-4" />
               </li>
             ))}
           </ul>

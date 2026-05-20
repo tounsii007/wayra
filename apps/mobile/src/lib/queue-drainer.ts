@@ -30,7 +30,10 @@ export async function drainQueue(): Promise<number> {
         headers,
         body: item.body !== undefined ? JSON.stringify(item.body) : undefined,
       });
-      if (res.ok || (res.status >= 400 && res.status < 500 && res.status !== 408 && res.status !== 429)) {
+      if (
+        res.ok ||
+        (res.status >= 400 && res.status < 500 && res.status !== 408 && res.status !== 429)
+      ) {
         // Success OR a permanent client error → drop. Retrying a 400/403 won't help.
         remove(item.id);
         if (res.ok) sent++;

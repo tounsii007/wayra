@@ -16,7 +16,8 @@ export class TotpService {
   /** Generate a fresh (un-enabled) secret + provisioning URI for an authenticator app. */
   async setup(userId: string): Promise<{ secret: string; uri: string }> {
     const user = await this.users.findOne({ where: { id: userId } });
-    if (!user) throw new BadRequestException({ code: 'user_not_found', message: 'User not found.' });
+    if (!user)
+      throw new BadRequestException({ code: 'user_not_found', message: 'User not found.' });
     const secret = authenticator.generateSecret();
     await this.secrets.save(
       this.secrets.create({
@@ -34,7 +35,8 @@ export class TotpService {
   /** Verify a code against the stored secret and flip enabled to true on success. */
   async enable(userId: string, code: string): Promise<{ backupCodes: string[] }> {
     const row = await this.secrets.findOne({ where: { userId } });
-    if (!row) throw new BadRequestException({ code: 'totp_not_setup', message: 'TOTP not initialised.' });
+    if (!row)
+      throw new BadRequestException({ code: 'totp_not_setup', message: 'TOTP not initialised.' });
     if (!authenticator.check(code, row.secret)) {
       throw new UnauthorizedException({ code: 'totp_invalid', message: 'Invalid TOTP code.' });
     }

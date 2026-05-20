@@ -18,8 +18,7 @@ export class PlacesController {
     @Query('lng') lng?: string,
     @Query('limit') limit = '8',
   ) {
-    const near =
-      lat && lng ? { lat: Number(lat), lng: Number(lng) } : undefined;
+    const near = lat && lng ? { lat: Number(lat), lng: Number(lng) } : undefined;
     return this.places.autocomplete(q, { near, limit: Number(limit) });
   }
 

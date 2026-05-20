@@ -33,7 +33,7 @@ export function HeroSearch() {
   }
 
   return (
-    <form onSubmit={submit} className="glass-strong rounded-[28px] p-3 sm:p-4 shadow-card">
+    <form onSubmit={submit} className="glass-strong shadow-card rounded-[28px] p-3 sm:p-4">
       <div className="grid gap-2 md:grid-cols-[1fr_auto_1fr] md:items-center">
         <PlacesAutocomplete
           value={from}
@@ -47,7 +47,7 @@ export function HeroSearch() {
           type="button"
           aria-label="Swap from and to"
           onClick={swap}
-          className="mx-auto inline-flex h-10 w-10 items-center justify-center rounded-full surface focus-ring hover:rotate-180 transition-transform duration-300"
+          className="surface focus-ring mx-auto inline-flex h-10 w-10 items-center justify-center rounded-full transition-transform duration-300 hover:rotate-180"
         >
           <ArrowDownUp className="h-4 w-4" />
         </button>
@@ -75,12 +75,12 @@ export function HeroSearch() {
             aria-label={mode === 'depart' ? t('departAt') : t('arriveBy')}
             value={when}
             onChange={(e) => setWhen(e.target.value)}
-            className="surface focus-ring rounded-full text-sm px-3 py-1.5"
+            className="surface focus-ring rounded-full px-3 py-1.5 text-sm"
           />
           <button
             type="button"
             onClick={() => setWhen('')}
-            className="rounded-full px-3 py-1.5 text-xs font-medium text-muted hover:text-[rgb(var(--text))] hover:bg-[rgb(var(--surface-muted))] focus-ring"
+            className="text-muted focus-ring rounded-full px-3 py-1.5 text-xs font-medium hover:bg-[rgb(var(--surface-muted))] hover:text-[rgb(var(--text))]"
           >
             {t('now')}
           </button>
@@ -88,7 +88,7 @@ export function HeroSearch() {
 
         <button
           type="submit"
-          className="inline-flex items-center gap-2 rounded-full bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white shadow-glow hover:bg-brand-600 transition-colors focus-ring"
+          className="bg-brand-500 shadow-glow hover:bg-brand-600 focus-ring inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white transition-colors"
         >
           {t('plan')}
           <ArrowRight className="h-4 w-4" />
@@ -97,7 +97,7 @@ export function HeroSearch() {
 
       <button
         type="button"
-        className="mt-3 inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-medium text-brand-600 dark:text-brand-300 hover:bg-brand-50 dark:hover:bg-brand-500/10 focus-ring"
+        className="text-brand-600 dark:text-brand-300 hover:bg-brand-50 dark:hover:bg-brand-500/10 focus-ring mt-3 inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-medium"
       >
         <LocateFixed className="h-3.5 w-3.5" />
         {t('useCurrentLocation')}
@@ -120,10 +120,8 @@ function ToggleChip({
       type="button"
       onClick={onClick}
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors focus-ring',
-        active
-          ? 'bg-brand-500 text-white'
-          : 'surface text-muted hover:text-[rgb(var(--text))]',
+        'focus-ring inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors',
+        active ? 'bg-brand-500 text-white' : 'surface text-muted hover:text-[rgb(var(--text))]',
       )}
     >
       {children}

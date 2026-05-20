@@ -62,14 +62,24 @@ export const TOOLS: Anthropic.Tool[] = [
           type: 'string',
           description: 'ISO 8601 datetime; omit for "now".',
         },
-        arriveBy: { type: 'string', description: 'ISO 8601 datetime; mutually exclusive with departAt.' },
+        arriveBy: {
+          type: 'string',
+          description: 'ISO 8601 datetime; mutually exclusive with departAt.',
+        },
         wheelchair: { type: 'boolean' },
         stroller: { type: 'boolean' },
         preferences: {
           type: 'array',
           items: {
             type: 'string',
-            enum: ['fastest', 'cheapest', 'fewest_transfers', 'least_walking', 'accessible', 'night'],
+            enum: [
+              'fastest',
+              'cheapest',
+              'fewest_transfers',
+              'least_walking',
+              'accessible',
+              'night',
+            ],
           },
         },
       },

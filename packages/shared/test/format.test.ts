@@ -1,4 +1,10 @@
-import { formatDuration, formatTime, formatDelayMinutes, formatCO2, formatFare } from '../src/format';
+import {
+  formatDuration,
+  formatTime,
+  formatDelayMinutes,
+  formatCO2,
+  formatFare,
+} from '../src/format';
 
 describe('formatDuration', () => {
   it('renders minutes only when under an hour', () => {

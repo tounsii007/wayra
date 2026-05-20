@@ -22,7 +22,10 @@ export const COUNTRY_NAMES: Record<CountryCode, Partial<Record<Locale, string>>>
   DZ: { de: 'Algerien', en: 'Algeria', fr: 'Algérie', ar: 'الجزائر' },
 };
 
-export const COUNTRY_DEFAULT_CENTER: Record<CountryCode, { lat: number; lng: number; zoom: number }> = {
+export const COUNTRY_DEFAULT_CENTER: Record<
+  CountryCode,
+  { lat: number; lng: number; zoom: number }
+> = {
   DE: { lat: 51.165, lng: 10.452, zoom: 6 },
   FR: { lat: 46.603, lng: 1.888, zoom: 6 },
   TN: { lat: 33.886, lng: 9.537, zoom: 7 },

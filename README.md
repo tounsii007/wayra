@@ -10,9 +10,9 @@ A modern, multimodal transit & travel-planning platform for **Europe & North Afr
 
 | Name      | Notes                                                                |
 | --------- | -------------------------------------------------------------------- |
-| **Wayra** | 5 chars, clean in DE/EN/FR/AR, evokes *way* + soft suffix. ✅ chosen   |
-| Navira    | Latin *navigare*, melodic in all four languages                      |
-| Tariqa    | Arabic *طريقة* (way/method), works as international name             |
+| **Wayra** | 5 chars, clean in DE/EN/FR/AR, evokes _way_ + soft suffix. ✅ chosen |
+| Navira    | Latin _navigare_, melodic in all four languages                      |
+| Tariqa    | Arabic _طريقة_ (way/method), works as international name             |
 | Routique  | Route + boutique — premium European feel                             |
 | Movira    | Movement-oriented, neutral across languages                          |
 | Transio   | Short, modern, .app/.io likely available                             |
@@ -44,18 +44,18 @@ wayra/
 
 ## Tech stack
 
-| Layer    | Choice                                | Why                                                                 |
-| -------- | ------------------------------------- | ------------------------------------------------------------------- |
-| Web      | Next.js 15 + Tailwind + next-intl     | App Router for streaming, RTL-friendly i18n, PWA-ready              |
-| Mobile   | Expo (React Native, new arch)         | One codebase iOS/Android, native modules, shared types with web     |
-| Backend  | NestJS 10                             | Modular, decorators, OpenAPI out of the box, easy testing           |
-| DB       | PostgreSQL 16 + PostGIS               | Native geo, `pg_trgm` for typo-tolerant autocomplete                |
-| Cache    | Redis 7                               | Hot-path caching, rate-limit counters, GTFS-RT fan-out              |
-| Realtime | Socket.IO via NestJS                  | WS push for delays, platform changes, disruptions                   |
-| Maps     | MapLibre GL JS / MapLibre Native      | Open-source, no vendor lock-in, MBTiles for offline                 |
-| AI       | Claude (Anthropic) — tool use         | Multilingual, route-explanation, disruption-aware                   |
-| Build    | Turborepo + pnpm workspaces           | Fast incremental builds, perfect for shared types                   |
-| Data     | GTFS · GTFS-RT · OpenStreetMap (OSM)  | Standard, license-friendly, broad European/North African coverage   |
+| Layer    | Choice                               | Why                                                               |
+| -------- | ------------------------------------ | ----------------------------------------------------------------- |
+| Web      | Next.js 15 + Tailwind + next-intl    | App Router for streaming, RTL-friendly i18n, PWA-ready            |
+| Mobile   | Expo (React Native, new arch)        | One codebase iOS/Android, native modules, shared types with web   |
+| Backend  | NestJS 10                            | Modular, decorators, OpenAPI out of the box, easy testing         |
+| DB       | PostgreSQL 16 + PostGIS              | Native geo, `pg_trgm` for typo-tolerant autocomplete              |
+| Cache    | Redis 7                              | Hot-path caching, rate-limit counters, GTFS-RT fan-out            |
+| Realtime | Socket.IO via NestJS                 | WS push for delays, platform changes, disruptions                 |
+| Maps     | MapLibre GL JS / MapLibre Native     | Open-source, no vendor lock-in, MBTiles for offline               |
+| AI       | Claude (Anthropic) — tool use        | Multilingual, route-explanation, disruption-aware                 |
+| Build    | Turborepo + pnpm workspaces          | Fast incremental builds, perfect for shared types                 |
+| Data     | GTFS · GTFS-RT · OpenStreetMap (OSM) | Standard, license-friendly, broad European/North African coverage |
 
 ---
 
@@ -64,6 +64,7 @@ wayra/
 ### Implemented in v0.1 (MVP scaffold)
 
 **Web (Next.js)**
+
 - Beautiful, polished landing page with animated hero, search, quick actions, country picker, live status, popular routes, features grid, map preview.
 - Locale switcher (DE/EN/FR/AR, IT/ES fallback) with **full RTL support** for Arabic.
 - Dark / light / system theme via `next-themes` with custom CSS variables (no flash).
@@ -75,6 +76,7 @@ wayra/
 - Security headers in `next.config.mjs`.
 
 **Mobile (Expo + Expo Router)**
+
 - 5-tab navigation (Plan, Map, Live, Assistant, Profile).
 - Adaptive light/dark theme synced with system.
 - Shared i18n via `i18next` reading the same `@wayra/i18n` resources.
@@ -82,6 +84,7 @@ wayra/
 - Metro config + Babel module-resolver wired for workspace packages.
 
 **Backend (NestJS)**
+
 - REST modules: `places`, `routes`, `realtime`, `fares`, `ai`, `offline`, `health`.
 - Swagger UI at `/docs`, response envelope (`{ data, meta }`), centralized error filter.
 - Throttler + Helmet + global validation pipe.
@@ -90,6 +93,7 @@ wayra/
 - Dockerfile + multi-stage build, Docker Compose with healthchecks and Adminer (dev profile).
 
 **Shared packages**
+
 - `@wayra/types` — every domain entity (Place, Route, Departure, Disruption, FareOffer, User, AI, etc.) plus API request/response envelopes.
 - `@wayra/shared` — `distanceMeters`, `formatDuration`, `formatTime`, `formatFare`, `formatCO2`, `fuzzyScore`, `normalize`, `ApiClient`, constants.
 - `@wayra/i18n` — DE/EN/FR/AR translations with proper Arabic plural rules.
@@ -107,6 +111,7 @@ wayra/
 ## Quick start
 
 ### Prerequisites
+
 - Node 20+
 - pnpm 9+ (enable via `corepack enable`)
 - Docker Desktop (for Postgres + Redis)
@@ -123,6 +128,7 @@ pnpm dev                     # runs web + backend + mobile (Metro) in parallel
 ```
 
 Open:
+
 - Web: <http://localhost:3000>
 - API docs: <http://localhost:4000/docs>
 - Adminer (DB UI): <http://localhost:8080> (run with `--profile dev`)
@@ -185,6 +191,7 @@ PostGIS-enabled. Key tables (full DDL in `apps/backend/db/init/02-schema.sql`):
 - `app_user`, `favorite_place`, `saved_route`, `offline_region`, `notification_preference` — user-facing entities.
 
 Two key indexes for autocomplete + nearby:
+
 ```sql
 CREATE INDEX place_geom_idx  ON place USING GIST (geom);
 CREATE INDEX place_name_trgm ON place USING GIN  (name gin_trgm_ops);
@@ -217,11 +224,11 @@ Web utility classes: `.surface`, `.surface-muted`, `.glass`, `.glass-strong`, `.
 
 ## Country focus (MVP)
 
-| Country     | Networks targeted                                     | Provider feeds                                  |
-| ----------- | ----------------------------------------------------- | ----------------------------------------------- |
-| 🇩🇪 Germany  | DB, S-Bahn, U-Bahn, BVG, HVV, VRR, RMV, RNV, …        | DB Open Data + Verbund GTFS + Deutschlandticket |
-| 🇫🇷 France   | SNCF (TGV, Intercités, TER), RATP, IDFM, Metro Paris, RER | SNCF API + IDFM open data + RATP                |
-| 🇹🇳 Tunisia  | SNCFT, TRANSTU (Métro Tunis, bus), regional buses     | Curated GTFS + scheduled crawls + estimates     |
+| Country    | Networks targeted                                         | Provider feeds                                  |
+| ---------- | --------------------------------------------------------- | ----------------------------------------------- |
+| 🇩🇪 Germany | DB, S-Bahn, U-Bahn, BVG, HVV, VRR, RMV, RNV, …            | DB Open Data + Verbund GTFS + Deutschlandticket |
+| 🇫🇷 France  | SNCF (TGV, Intercités, TER), RATP, IDFM, Metro Paris, RER | SNCF API + IDFM open data + RATP                |
+| 🇹🇳 Tunisia | SNCFT, TRANSTU (Métro Tunis, bus), regional buses         | Curated GTFS + scheduled crawls + estimates     |
 
 Country selector on the home page filters search, popular routes, fares.
 
@@ -230,6 +237,7 @@ Country selector on the home page filters search, popular routes, fares.
 ## Roadmap
 
 ### v0.1 — MVP scaffold
+
 - Monorepo, shared packages, design system, i18n with RTL.
 - Beautiful web landing page + plan + assistant + map preview.
 - Mobile shell with 5 tabs, theme-aware.
@@ -237,6 +245,7 @@ Country selector on the home page filters search, popular routes, fares.
 - Postgres+PostGIS schema, Docker Compose, OpenAPI.
 
 ### v0.2 — Data foundation (this commit)
+
 - **TypeORM entities** mapping every table; `PlacesService` now queries Postgres with `pg_trgm` + `ST_Distance` and falls back to in-memory samples when the DB is empty or unreachable.
 - **Real MapLibre map on web** — interactive `/map` with country + mode filters, lazy-loaded teaser on the landing page, clickable markers → stop details.
 - **Stop details page** (`/stops/[id]`) — live departures board with `useLiveDepartures` WebSocket hook, route shortcuts, map view.
@@ -247,6 +256,7 @@ Country selector on the home page filters search, popular routes, fares.
 - **PWA service worker** — app-shell cache, map-tile cache-first, API network-first with short-TTL fallback, push handlers (`/sw.js`).
 
 ### v0.3 — Assistant, accounts & realtime worker (this commit)
+
 - **Claude-powered assistant** with tool-use (find_place, plan_route, get_departures, get_disruptions). Falls back to deterministic localized stubs when `ANTHROPIC_API_KEY` is unset.
 - **JWT auth** (`/api/auth/signup`, `/api/auth/login`, `/api/auth/me`) with bcrypt + Postgres users.
 - **Favorites & saved routes** API (`/api/me/favorites`, `/api/me/routes`) with `JwtAuthGuard`.
@@ -262,6 +272,7 @@ Country selector on the home page filters search, popular routes, fares.
 ### v0.4 — Real routing & operations
 
 ### v0.4 — Real routing & operations
+
 - Embed OpenTripPlanner 2 (Java sidecar) and proxy through `RoutesService`.
 - GTFS-RT decoder using `gtfs-realtime-bindings` — replaces the worker stub.
 - Web Push subscription flow + Expo Push for mobile.
@@ -269,11 +280,13 @@ Country selector on the home page filters search, popular routes, fares.
 - Conversation memory + structured `attachments` (route, disruption) in AI replies.
 
 ### v0.5 — Account & favorites
+
 - Email + Google + Apple sign-in.
 - Saved routes, home/work shortcuts, history sync.
 - Notification preferences per channel and per route.
 
 ### v0.6 — Fares (real money)
+
 - DB Sparpreis / Flexpreis lookup, Deutschlandticket detection.
 - SNCF tariffs, Pass Rail Jeune.
 - SNCFT estimates (no public price API yet).
@@ -281,11 +294,13 @@ Country selector on the home page filters search, popular routes, fares.
 - Affiliate / deep-link booking out to provider checkouts.
 
 ### v0.7 — Admin & ops
+
 - Admin dashboard (Next.js route group): provider status, GTFS reload, disruption editor, feedback inbox, data-quality dashboard.
 - Observability: OpenTelemetry → Grafana / Prometheus.
 - Synthetic monitors on key endpoints.
 
 ### v1.0 — Wider Europe & North Africa
+
 - Add AT, CH, BE, NL, IT, ES.
 - Add MA, DZ, EG (where data is available).
 - Accessibility audit (WCAG 2.1 AA).
@@ -298,6 +313,7 @@ Country selector on the home page filters search, popular routes, fares.
 This commit scaffolds the full monorepo and code surface. **No `pnpm install` has been run in this environment**, so dev servers haven't been booted — that's a one-time step the user runs locally (see Quick start). Once deps install, `pnpm dev` runs web + backend + mobile concurrently via Turborepo.
 
 To verify the web app locally:
+
 ```powershell
 cd C:\projects\wayra
 pnpm install
@@ -306,6 +322,7 @@ pnpm --filter @wayra/web dev
 ```
 
 For verification of the backend independently of the web app:
+
 ```powershell
 pnpm docker:up
 pnpm --filter @wayra/backend dev

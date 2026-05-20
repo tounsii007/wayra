@@ -145,7 +145,9 @@ export function PlacesAutocomplete({ value, onChange, placeholder, testID }: Pro
                       <Text style={{ color: theme.text, fontSize: 14, fontWeight: '600' }}>
                         {item.name}
                       </Text>
-                      <Text style={{ color: theme.textSubtle, fontSize: 11 }}>{item.countryCode}</Text>
+                      <Text style={{ color: theme.textSubtle, fontSize: 11 }}>
+                        {item.countryCode}
+                      </Text>
                     </View>
                   </Pressable>
                 )}

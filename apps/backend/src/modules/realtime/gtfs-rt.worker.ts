@@ -167,8 +167,12 @@ export class GtfsRtWorker implements OnModuleInit, OnModuleDestroy {
             desc,
             start ? new Date(Number(start) * 1000) : null,
             end ? new Date(Number(end) * 1000) : null,
-            (a.informedEntity ?? []).filter((e) => e.routeId).map((e) => `${src.feedPrefix}:${e.routeId}`),
-            (a.informedEntity ?? []).filter((e) => e.stopId).map((e) => `${src.feedPrefix}:${e.stopId}`),
+            (a.informedEntity ?? [])
+              .filter((e) => e.routeId)
+              .map((e) => `${src.feedPrefix}:${e.routeId}`),
+            (a.informedEntity ?? [])
+              .filter((e) => e.stopId)
+              .map((e) => `${src.feedPrefix}:${e.stopId}`),
             language,
           ],
         );

@@ -21,7 +21,7 @@ export function LocaleSwitcher({ className }: { className?: string }) {
 
   return (
     <div className={cn('relative inline-flex items-center', className)}>
-      <Globe className="pointer-events-none absolute left-3 h-4 w-4 text-subtle" />
+      <Globe className="text-subtle pointer-events-none absolute left-3 h-4 w-4" />
       <select
         aria-label="Language"
         value={current}

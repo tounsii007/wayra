@@ -1,12 +1,5 @@
 import { useRef, useState } from 'react';
-import {
-  Dimensions,
-  FlatList,
-  Pressable,
-  Text,
-  View,
-  ViewToken,
-} from 'react-native';
+import { Dimensions, FlatList, Pressable, Text, View, ViewToken } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -30,10 +23,30 @@ export default function Onboarding() {
   const listRef = useRef<FlatList<Slide>>(null);
 
   const slides: Slide[] = [
-    { key: 'plan', title: t('home.features.items.0.title'), body: t('home.features.items.0.body'), Icon: Train },
-    { key: 'live', title: t('home.features.items.1.title'), body: t('home.features.items.1.body'), Icon: Activity },
-    { key: 'offline', title: t('home.features.items.2.title'), body: t('home.features.items.2.body'), Icon: DownloadCloud },
-    { key: 'ai', title: t('home.features.items.3.title'), body: t('home.features.items.3.body'), Icon: Sparkles },
+    {
+      key: 'plan',
+      title: t('home.features.items.0.title'),
+      body: t('home.features.items.0.body'),
+      Icon: Train,
+    },
+    {
+      key: 'live',
+      title: t('home.features.items.1.title'),
+      body: t('home.features.items.1.body'),
+      Icon: Activity,
+    },
+    {
+      key: 'offline',
+      title: t('home.features.items.2.title'),
+      body: t('home.features.items.2.body'),
+      Icon: DownloadCloud,
+    },
+    {
+      key: 'ai',
+      title: t('home.features.items.3.title'),
+      body: t('home.features.items.3.body'),
+      Icon: Sparkles,
+    },
   ];
 
   function onView({ viewableItems }: { viewableItems: ViewToken[] }) {
@@ -68,7 +81,15 @@ export default function Onboarding() {
           renderItem={({ item }) => {
             const Icon = item.Icon;
             return (
-              <View style={{ width, padding: 28, alignItems: 'center', justifyContent: 'center', gap: 14 }}>
+              <View
+                style={{
+                  width,
+                  padding: 28,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 14,
+                }}
+              >
                 <View
                   style={{
                     width: 88,
@@ -85,7 +106,14 @@ export default function Onboarding() {
                 >
                   <Icon color="white" size={36} />
                 </View>
-                <Text style={{ color: theme.text, fontSize: 24, fontWeight: '800', textAlign: 'center' }}>
+                <Text
+                  style={{
+                    color: theme.text,
+                    fontSize: 24,
+                    fontWeight: '800',
+                    textAlign: 'center',
+                  }}
+                >
                   {item.title}
                 </Text>
                 <Text
@@ -104,7 +132,9 @@ export default function Onboarding() {
           }}
         />
 
-        <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 6, paddingVertical: 12 }}>
+        <View
+          style={{ flexDirection: 'row', justifyContent: 'center', gap: 6, paddingVertical: 12 }}
+        >
           {slides.map((_, i) => (
             <View
               key={i}

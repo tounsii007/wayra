@@ -52,8 +52,8 @@ export default function DeleteAccountScreen() {
         >
           <AlertTriangle color={theme.status.severe} size={20} />
           <Text style={{ color: theme.status.severe, flex: 1, fontWeight: '700', fontSize: 13 }}>
-            This wipes your account, favorites, saved routes and notification subscriptions.
-            Cannot be undone.
+            This wipes your account, favorites, saved routes and notification subscriptions. Cannot
+            be undone.
           </Text>
         </View>
 
@@ -79,9 +79,7 @@ export default function DeleteAccountScreen() {
           />
         </View>
 
-        {error && (
-          <Text style={{ color: theme.status.severe, fontSize: 13 }}>{error}</Text>
-        )}
+        {error && <Text style={{ color: theme.status.severe, fontSize: 13 }}>{error}</Text>}
 
         <Pressable
           onPress={confirmDelete}
@@ -101,7 +99,10 @@ export default function DeleteAccountScreen() {
           )}
         </Pressable>
 
-        <Pressable onPress={() => router.back()} style={{ alignSelf: 'center', paddingVertical: 8 }}>
+        <Pressable
+          onPress={() => router.back()}
+          style={{ alignSelf: 'center', paddingVertical: 8 }}
+        >
           <Text style={{ color: theme.textMuted, fontWeight: '700' }}>Cancel</Text>
         </Pressable>
       </View>

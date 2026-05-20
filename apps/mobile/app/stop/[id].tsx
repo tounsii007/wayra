@@ -58,9 +58,7 @@ export default function StopDetailsScreen() {
         />
       </View>
       <ScrollView contentContainerStyle={{ padding: 16, gap: 8 }}>
-        <Text style={{ color: theme.text, fontSize: 22, fontWeight: '800' }}>
-          {name ?? id}
-        </Text>
+        <Text style={{ color: theme.text, fontSize: 22, fontWeight: '800' }}>{name ?? id}</Text>
 
         <View style={{ flexDirection: 'row', gap: 8, marginVertical: 8 }}>
           <Pressable
@@ -105,14 +103,13 @@ export default function StopDetailsScreen() {
         )}
         {departures.map((d) => {
           const delayMin = Math.round((d.delaySeconds ?? 0) / 60);
-          const tone =
-            d.cancelled
-              ? theme.status.cancelled
-              : delayMin === 0
-                ? theme.status.onTime
-                : delayMin <= 5
-                  ? theme.status.delay
-                  : theme.status.severe;
+          const tone = d.cancelled
+            ? theme.status.cancelled
+            : delayMin === 0
+              ? theme.status.onTime
+              : delayMin <= 5
+                ? theme.status.delay
+                : theme.status.severe;
           return (
             <View
               key={`${d.tripId}-${d.scheduledTime}`}
@@ -144,9 +141,7 @@ export default function StopDetailsScreen() {
               <View style={{ flex: 1 }}>
                 <Text style={{ color: theme.text, fontWeight: '700' }}>{d.headsign}</Text>
                 {d.platform ? (
-                  <Text style={{ color: theme.textSubtle, fontSize: 12 }}>
-                    Gleis {d.platform}
-                  </Text>
+                  <Text style={{ color: theme.textSubtle, fontSize: 12 }}>Gleis {d.platform}</Text>
                 ) : null}
               </View>
               <View style={{ alignItems: 'flex-end' }}>

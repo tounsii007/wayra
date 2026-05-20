@@ -28,11 +28,7 @@ test.describe('Search & plan flow', () => {
     await listbox.getByRole('option').first().click();
 
     // Clear button should now be visible.
-    const clearBtn = page
-      .locator('form')
-      .first()
-      .getByRole('button', { name: /clear/i })
-      .first();
+    const clearBtn = page.locator('form').first().getByRole('button', { name: /clear/i }).first();
     await expect(clearBtn).toBeVisible();
     await clearBtn.click();
     await expect(fromInput).toHaveValue('');

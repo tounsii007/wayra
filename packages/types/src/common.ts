@@ -4,7 +4,18 @@ export type UUID = string;
 
 export type Locale = 'de' | 'en' | 'fr' | 'ar' | 'it' | 'es';
 
-export type CountryCode = 'DE' | 'FR' | 'TN' | 'AT' | 'CH' | 'BE' | 'NL' | 'IT' | 'ES' | 'MA' | 'DZ';
+export type CountryCode =
+  | 'DE'
+  | 'FR'
+  | 'TN'
+  | 'AT'
+  | 'CH'
+  | 'BE'
+  | 'NL'
+  | 'IT'
+  | 'ES'
+  | 'MA'
+  | 'DZ';
 
 export type Theme = 'light' | 'dark' | 'system';
 

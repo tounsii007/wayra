@@ -31,7 +31,10 @@ export class ConversationService {
     private readonly msgs: Repository<AiMessageEntity>,
   ) {}
 
-  async findOrCreate(input: { userId?: string | null; clientId?: string | null }): Promise<AiConversationEntity> {
+  async findOrCreate(input: {
+    userId?: string | null;
+    clientId?: string | null;
+  }): Promise<AiConversationEntity> {
     if (input.userId) {
       const existing = await this.convos.findOne({
         where: { userId: input.userId },
@@ -59,9 +62,7 @@ export class ConversationService {
       order: { createdAt: 'DESC' },
       take: limit,
     });
-    return rows
-      .reverse()
-      .map((r) => ({ role: r.role, content: r.content }));
+    return rows.reverse().map((r) => ({ role: r.role, content: r.content }));
   }
 
   async append(

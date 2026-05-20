@@ -24,10 +24,10 @@ export const colors = {
   },
   // Semantic status colors
   status: {
-    onTime: '#16a34a',       // green
-    delay: '#f59e0b',        // amber
-    severe: '#dc2626',       // red
-    info: '#0ea5e9',         // sky
+    onTime: '#16a34a', // green
+    delay: '#f59e0b', // amber
+    severe: '#dc2626', // red
+    info: '#0ea5e9', // sky
     cancelled: '#991b1b',
   },
   // Neutral scales

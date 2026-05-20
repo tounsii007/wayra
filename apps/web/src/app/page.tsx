@@ -19,10 +19,10 @@ export default function HomePage() {
           <div className="grid-pattern absolute inset-0 -z-10 opacity-60 dark:opacity-30" />
           <div className="mx-auto max-w-7xl px-4 pb-12 pt-10 sm:px-6 sm:pt-14 lg:pb-20 lg:pt-20">
             <HeroIntro />
-            <div className="mt-8 animate-fade-in">
+            <div className="animate-fade-in mt-8">
               <HeroSearch />
             </div>
-            <div className="mt-6 animate-fade-in">
+            <div className="animate-fade-in mt-6">
               <QuickActions />
             </div>
           </div>
@@ -56,14 +56,14 @@ function HeroIntro() {
   const tb = useTranslations('brand');
   return (
     <div className="max-w-3xl">
-      <span className="inline-flex items-center gap-2 rounded-full surface px-3 py-1 text-xs font-semibold text-muted shadow-sm">
-        <span className="inline-block h-2 w-2 animate-pulse-soft rounded-full bg-status-onTime" />
+      <span className="surface text-muted inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold shadow-sm">
+        <span className="animate-pulse-soft bg-status-onTime inline-block h-2 w-2 rounded-full" />
         {tb('tagline')}
       </span>
-      <h1 className="mt-5 text-4xl font-bold tracking-tight text-balance sm:text-5xl lg:text-6xl">
+      <h1 className="mt-5 text-balance text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
         {t('title')}
       </h1>
-      <p className="mt-4 max-w-2xl text-lg text-muted">{t('subtitle')}</p>
+      <p className="text-muted mt-4 max-w-2xl text-lg">{t('subtitle')}</p>
     </div>
   );
 }
@@ -72,14 +72,20 @@ function SiteFooter() {
   const t = useTranslations('brand');
   return (
     <footer className="border-t border-[rgb(var(--border))]">
-      <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-8 text-sm text-subtle sm:flex-row sm:px-6">
+      <div className="text-subtle mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-8 text-sm sm:flex-row sm:px-6">
         <p>
           © {new Date().getFullYear()} {t('name')} · v0.5
         </p>
         <nav className="flex items-center gap-4">
-          <a className="hover:text-[rgb(var(--text))]" href="/about">About</a>
-          <a className="hover:text-[rgb(var(--text))]" href="/privacy">Privacy</a>
-          <a className="hover:text-[rgb(var(--text))]" href="/terms">Terms</a>
+          <a className="hover:text-[rgb(var(--text))]" href="/about">
+            About
+          </a>
+          <a className="hover:text-[rgb(var(--text))]" href="/privacy">
+            Privacy
+          </a>
+          <a className="hover:text-[rgb(var(--text))]" href="/terms">
+            Terms
+          </a>
           <a
             className="hover:text-[rgb(var(--text))]"
             href="https://github.com/tounsii007/wayra"

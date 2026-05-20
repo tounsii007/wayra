@@ -30,7 +30,10 @@ export class SncfProvider implements TransitDataProvider {
     return { Authorization: this.apiKey ?? '', 'user-agent': 'wayra/0.7' };
   }
 
-  async searchPlaces(query: string, opts: { near?: Coordinates; limit?: number } = {}): Promise<PlaceSuggestion[]> {
+  async searchPlaces(
+    query: string,
+    opts: { near?: Coordinates; limit?: number } = {},
+  ): Promise<PlaceSuggestion[]> {
     if (!this.isConfigured()) return [];
     try {
       const url = new URL(`${this.base}/places`);
@@ -62,7 +65,9 @@ export class SncfProvider implements TransitDataProvider {
         };
         const score = p.name.toLowerCase().includes(query.toLowerCase()) ? 0.85 : 0.5;
         const distance = opts.near ? distanceMeters(opts.near, coords) : undefined;
-        return [distance !== undefined ? { place, score, distanceMeters: distance } : { place, score }];
+        return [
+          distance !== undefined ? { place, score, distanceMeters: distance } : { place, score },
+        ];
       });
     } catch (e) {
       this.logger.warn(`searchPlaces failed: ${(e as Error).message}`);
@@ -96,12 +101,17 @@ export class SncfProvider implements TransitDataProvider {
         }>;
       };
       const isoFromNavitia = (s?: string): string | undefined =>
-        s ? `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)}T${s.slice(9, 11)}:${s.slice(11, 13)}:${s.slice(13, 15)}` : undefined;
+        s
+          ? `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)}T${s.slice(9, 11)}:${s.slice(11, 13)}:${s.slice(13, 15)}`
+          : undefined;
 
       return (data.departures ?? []).map((d, i) => {
         const sched = isoFromNavitia(d.stop_date_time?.base_departure_date_time);
         const pred = isoFromNavitia(d.stop_date_time?.departure_date_time);
-        const delay = sched && pred ? Math.round((new Date(pred).getTime() - new Date(sched).getTime()) / 1000) : 0;
+        const delay =
+          sched && pred
+            ? Math.round((new Date(pred).getTime() - new Date(sched).getTime()) / 1000)
+            : 0;
         const headsign = d.display_informations?.direction ?? '';
         return {
           tripId: `sncf:trip:${i}`,

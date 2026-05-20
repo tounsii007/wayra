@@ -22,9 +22,9 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50">
-      <div className="absolute inset-x-0 top-0 h-16 backdrop-blur-xl bg-[rgb(var(--bg))]/70 border-b border-[rgb(var(--border))]" />
+      <div className="absolute inset-x-0 top-0 h-16 border-b border-[rgb(var(--border))] bg-[rgb(var(--bg))]/70 backdrop-blur-xl" />
       <div className="relative mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-2 focus-ring rounded-md">
+        <Link href="/" className="focus-ring flex items-center gap-2 rounded-md">
           <WayraLogo className="h-8 w-8" />
           <span className="text-lg font-semibold tracking-tight">Wayra</span>
         </Link>
@@ -34,7 +34,7 @@ export function SiteHeader() {
             <Link
               key={link.href}
               href={link.href}
-              className="rounded-full px-3 py-2 text-sm font-medium text-muted hover:text-[rgb(var(--text))] hover:bg-[rgb(var(--surface-muted))] transition-colors focus-ring"
+              className="text-muted focus-ring rounded-full px-3 py-2 text-sm font-medium transition-colors hover:bg-[rgb(var(--surface-muted))] hover:text-[rgb(var(--text))]"
             >
               {link.label}
             </Link>
@@ -47,7 +47,7 @@ export function SiteHeader() {
           <Link
             href={user ? '/me' : '/login'}
             aria-label={user ? 'Profile' : 'Sign in'}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full glass focus-ring transition-transform hover:scale-105"
+            className="glass focus-ring inline-flex h-9 w-9 items-center justify-center rounded-full transition-transform hover:scale-105"
           >
             {user ? (
               <span className="text-xs font-bold uppercase">

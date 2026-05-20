@@ -38,8 +38,7 @@ const isProd = process.env.NODE_ENV === 'production';
           ? undefined
           : { target: 'pino-pretty', options: { singleLine: true, colorize: true } },
         genReqId: (req, res) => {
-          const incoming =
-            (req.headers['x-request-id'] as string | undefined) ?? randomUUID();
+          const incoming = (req.headers['x-request-id'] as string | undefined) ?? randomUUID();
           res.setHeader('x-request-id', incoming);
           return incoming;
         },

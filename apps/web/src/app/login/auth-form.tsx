@@ -55,14 +55,16 @@ export function AuthForm() {
 
   return (
     <form onSubmit={submit} className="surface space-y-3 rounded-2xl p-5">
-      <div className="flex gap-1 rounded-full surface-muted p-1">
+      <div className="surface-muted flex gap-1 rounded-full p-1">
         {(['login', 'signup'] as const).map((m) => (
           <button
             key={m}
             type="button"
             onClick={() => setMode(m)}
-            className={`flex-1 rounded-full px-3 py-2 text-sm font-semibold transition-colors focus-ring ${
-              mode === m ? 'bg-[rgb(var(--surface))] shadow-sm' : 'text-muted hover:text-[rgb(var(--text))]'
+            className={`focus-ring flex-1 rounded-full px-3 py-2 text-sm font-semibold transition-colors ${
+              mode === m
+                ? 'bg-[rgb(var(--surface))] shadow-sm'
+                : 'text-muted hover:text-[rgb(var(--text))]'
             }`}
           >
             {m === 'login' ? 'Sign in' : 'Create account'}
@@ -71,18 +73,18 @@ export function AuthForm() {
       </div>
 
       {mode === 'signup' && (
-        <Field icon={<User className="h-4 w-4 text-subtle" />}>
+        <Field icon={<User className="text-subtle h-4 w-4" />}>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Display name"
             autoComplete="name"
-            className="w-full bg-transparent py-3 pe-3 ps-2 text-sm outline-none placeholder:text-subtle"
+            className="placeholder:text-subtle w-full bg-transparent py-3 pe-3 ps-2 text-sm outline-none"
           />
         </Field>
       )}
 
-      <Field icon={<Mail className="h-4 w-4 text-subtle" />}>
+      <Field icon={<Mail className="text-subtle h-4 w-4" />}>
         <input
           required
           type="email"
@@ -90,11 +92,11 @@ export function AuthForm() {
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@example.com"
           autoComplete={mode === 'signup' ? 'email' : 'username'}
-          className="w-full bg-transparent py-3 pe-3 ps-2 text-sm outline-none placeholder:text-subtle"
+          className="placeholder:text-subtle w-full bg-transparent py-3 pe-3 ps-2 text-sm outline-none"
         />
       </Field>
 
-      <Field icon={<Lock className="h-4 w-4 text-subtle" />}>
+      <Field icon={<Lock className="text-subtle h-4 w-4" />}>
         <input
           required
           type="password"
@@ -103,12 +105,12 @@ export function AuthForm() {
           onChange={(e) => setPassword(e.target.value)}
           placeholder={mode === 'signup' ? 'Choose a password (≥8 chars)' : 'Password'}
           autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
-          className="w-full bg-transparent py-3 pe-3 ps-2 text-sm outline-none placeholder:text-subtle"
+          className="placeholder:text-subtle w-full bg-transparent py-3 pe-3 ps-2 text-sm outline-none"
         />
       </Field>
 
       {error && (
-        <div className="rounded-xl bg-status-severe/10 px-3 py-2 text-sm text-status-severe">
+        <div className="bg-status-severe/10 text-status-severe rounded-xl px-3 py-2 text-sm">
           {error}
         </div>
       )}
@@ -116,14 +118,17 @@ export function AuthForm() {
       <button
         type="submit"
         disabled={busy}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand-500 px-5 py-3 text-sm font-semibold text-white shadow-glow transition-opacity hover:bg-brand-600 disabled:opacity-60 focus-ring"
+        className="bg-brand-500 shadow-glow hover:bg-brand-600 focus-ring inline-flex w-full items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-white transition-opacity disabled:opacity-60"
       >
         {busy && <Loader2 className="h-4 w-4 animate-spin" />}
         {mode === 'signup' ? 'Create account' : 'Sign in'}
       </button>
 
-      <p className="text-center text-xs text-subtle">
-        Continue without account? <a href="/" className="font-semibold text-brand-500">Skip</a>
+      <p className="text-subtle text-center text-xs">
+        Continue without account?{' '}
+        <a href="/" className="text-brand-500 font-semibold">
+          Skip
+        </a>
       </p>
     </form>
   );
@@ -131,7 +136,7 @@ export function AuthForm() {
 
 function Field({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
   return (
-    <label className="flex items-center gap-2 rounded-2xl surface-muted ps-3">
+    <label className="surface-muted flex items-center gap-2 rounded-2xl ps-3">
       {icon}
       {children}
     </label>

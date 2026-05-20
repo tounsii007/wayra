@@ -33,7 +33,10 @@ export class ConversationalAiService {
 
     const enrichedReq: AiAssistantRequest = {
       ...req,
-      history: [...history.map((m) => ({ role: m.role, content: m.content })), ...(req.history ?? [])],
+      history: [
+        ...history.map((m) => ({ role: m.role, content: m.content })),
+        ...(req.history ?? []),
+      ],
     };
 
     const reply = await this.ai.respond(enrichedReq);
@@ -43,12 +46,18 @@ export class ConversationalAiService {
     return reply;
   }
 
-  async *stream(req: AiAssistantRequest, ctx: ConversationContext): AsyncGenerator<string, void, void> {
+  async *stream(
+    req: AiAssistantRequest,
+    ctx: ConversationContext,
+  ): AsyncGenerator<string, void, void> {
     const conversation = await this.convos.findOrCreate(ctx);
     const history = await this.convos.getHistory(conversation.id);
     const enrichedReq: AiAssistantRequest = {
       ...req,
-      history: [...history.map((m) => ({ role: m.role, content: m.content })), ...(req.history ?? [])],
+      history: [
+        ...history.map((m) => ({ role: m.role, content: m.content })),
+        ...(req.history ?? []),
+      ],
     };
 
     await this.convos.append(conversation.id, 'user', req.message);

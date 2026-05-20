@@ -24,9 +24,7 @@ import { Redis } from 'ioredis';
  * single-instance but still works for dev.
  */
 @WebSocketGateway({ namespace: '/live', cors: { origin: true, credentials: true } })
-export class RealtimeGateway
-  implements OnGatewayConnection, OnGatewayDisconnect, OnModuleInit
-{
+export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect, OnModuleInit {
   private readonly logger = new Logger(RealtimeGateway.name);
   @WebSocketServer() server!: Server;
 

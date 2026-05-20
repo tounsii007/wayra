@@ -88,9 +88,17 @@ export default function OfflineScreen() {
                 gap: 10,
               }}
             >
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
                 <View>
-                  <Text style={{ color: theme.text, fontWeight: '800', fontSize: 16 }}>{r.name}</Text>
+                  <Text style={{ color: theme.text, fontWeight: '800', fontSize: 16 }}>
+                    {r.name}
+                  </Text>
                   <Text style={{ color: theme.textSubtle, fontSize: 12 }}>
                     {r.countryCode} · {(r.sizeBytes / 1024 / 1024).toFixed(0)} MB
                   </Text>
@@ -108,7 +116,9 @@ export default function OfflineScreen() {
                     }}
                   >
                     <CloudDownload color="white" size={14} />
-                    <Text style={{ color: 'white', fontWeight: '800', fontSize: 12 }}>Download</Text>
+                    <Text style={{ color: 'white', fontWeight: '800', fontSize: 12 }}>
+                      Download
+                    </Text>
                   </Pressable>
                 )}
                 {st && st.pct >= 100 && (

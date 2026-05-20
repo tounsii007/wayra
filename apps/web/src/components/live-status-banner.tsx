@@ -59,17 +59,18 @@ export function LiveStatusBanner() {
     <section aria-labelledby="live-status-title">
       <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
         <h2 id="live-status-title" className="inline-flex items-center gap-2 text-lg font-semibold">
-          <Activity className="h-5 w-5 text-status-onTime" />
+          <Activity className="text-status-onTime h-5 w-5" />
           {t('liveStatus')}
         </h2>
         <div className="flex items-center gap-2">
           <DemoBadge />
           {generatedAt && (
-            <span className="text-xs text-subtle">
-              · updated {new Date(generatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            <span className="text-subtle text-xs">
+              · updated{' '}
+              {new Date(generatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </span>
           )}
-          {usedFallback && <span className="text-xs text-status-delay">offline preview</span>}
+          {usedFallback && <span className="text-status-delay text-xs">offline preview</span>}
         </div>
       </div>
       <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
@@ -78,13 +79,13 @@ export function LiveStatusBanner() {
           return (
             <li
               key={`${it.country}-${it.city}`}
-              className="flex items-center gap-3 rounded-xl surface px-4 py-3"
+              className="surface flex items-center gap-3 rounded-xl px-4 py-3"
             >
               <span
                 className={`relative inline-flex h-2.5 w-2.5 rounded-full ${tone[it.status].dot} ring-4 ${tone[it.status].ring}`}
               >
                 {it.status === 'ok' && (
-                  <span className="absolute inset-0 animate-ping rounded-full bg-status-onTime/40" />
+                  <span className="bg-status-onTime/40 absolute inset-0 animate-ping rounded-full" />
                 )}
               </span>
               <Icon
@@ -99,9 +100,9 @@ export function LiveStatusBanner() {
               <div className="min-w-0 flex-1">
                 <div className="flex items-baseline gap-2">
                   <span className="truncate text-sm font-semibold">{it.city}</span>
-                  <span className="text-[10px] font-bold uppercase text-subtle">{it.country}</span>
+                  <span className="text-subtle text-[10px] font-bold uppercase">{it.country}</span>
                 </div>
-                <div className="truncate text-xs text-muted">{it.note}</div>
+                <div className="text-muted truncate text-xs">{it.note}</div>
               </div>
             </li>
           );

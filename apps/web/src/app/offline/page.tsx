@@ -10,9 +10,9 @@ export default function OfflinePage() {
       <main className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
         <header className="mb-6">
           <h1 className="text-2xl font-bold">Offline regions</h1>
-          <p className="mt-1 text-sm text-muted">
-            Download cities to navigate even without internet. Useful for Tunis, Paris metro
-            and German cities with patchy underground coverage.
+          <p className="text-muted mt-1 text-sm">
+            Download cities to navigate even without internet. Useful for Tunis, Paris metro and
+            German cities with patchy underground coverage.
           </p>
         </header>
         <OfflineClient />

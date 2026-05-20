@@ -8,7 +8,7 @@ export type RoutePreference =
   | 'cheapest'
   | 'fewest_transfers'
   | 'least_walking'
-  | 'accessible'      // wheelchair / stroller friendly
+  | 'accessible' // wheelchair / stroller friendly
   | 'most_comfortable'
   | 'night';
 

@@ -12,7 +12,7 @@ export type TicketType =
   | 'family'
   | 'student'
   | 'senior'
-  | 'saver'        // Sparpreis / Prem's
+  | 'saver' // Sparpreis / Prem's
   | 'flex';
 
 export interface FareOffer {

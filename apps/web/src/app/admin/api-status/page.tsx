@@ -51,24 +51,26 @@ export default function ApiStatusPage() {
     <div className="space-y-6">
       <header>
         <h1 className="text-2xl font-bold">API status</h1>
-        <p className="text-sm text-muted">Live probe of backend endpoints. Re-runs on each page load.</p>
+        <p className="text-muted text-sm">
+          Live probe of backend endpoints. Re-runs on each page load.
+        </p>
       </header>
 
       <ul className="surface divide-y divide-[rgb(var(--border))] overflow-hidden rounded-2xl">
         {items.map((it) => (
           <li key={it.url} className="flex items-center gap-3 px-4 py-3">
-            <Activity className="h-4 w-4 text-subtle" />
+            <Activity className="text-subtle h-4 w-4" />
             <div className="flex-1">
               <div className="text-sm font-semibold">{it.name}</div>
-              <div className="font-mono text-xs text-subtle">{it.url}</div>
+              <div className="text-subtle font-mono text-xs">{it.url}</div>
             </div>
             {it.state === 'ok' && (
-              <span className="inline-flex items-center gap-1 text-xs font-semibold text-status-onTime">
+              <span className="text-status-onTime inline-flex items-center gap-1 text-xs font-semibold">
                 <CheckCircle2 className="h-3.5 w-3.5" /> {it.latencyMs} ms
               </span>
             )}
             {it.state === 'fail' && (
-              <span className="inline-flex items-center gap-1 text-xs font-semibold text-status-severe">
+              <span className="text-status-severe inline-flex items-center gap-1 text-xs font-semibold">
                 <AlertTriangle className="h-3.5 w-3.5" /> unreachable
               </span>
             )}

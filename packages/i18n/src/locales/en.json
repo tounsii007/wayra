@@ -39,10 +39,22 @@
     "features": {
       "title": "Everything you need for your trip",
       "items": [
-        { "title": "Multimodal routes", "body": "Train, bus, metro, tram and walking — smartly combined." },
-        { "title": "Live delays", "body": "On-time status, platform changes and disruptions in real time." },
-        { "title": "Offline timetables", "body": "Download cities and use Wayra without internet." },
-        { "title": "AI travel assistant", "body": "Ask questions in plain language — get instant answers." }
+        {
+          "title": "Multimodal routes",
+          "body": "Train, bus, metro, tram and walking — smartly combined."
+        },
+        {
+          "title": "Live delays",
+          "body": "On-time status, platform changes and disruptions in real time."
+        },
+        {
+          "title": "Offline timetables",
+          "body": "Download cities and use Wayra without internet."
+        },
+        {
+          "title": "AI travel assistant",
+          "body": "Ask questions in plain language — get instant answers."
+        }
       ]
     }
   },

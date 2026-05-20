@@ -46,10 +46,8 @@ interface Props {
 }
 
 const TILES = {
-  light:
-    'https://api.maptiler.com/maps/streets-v2/style.json?key=PASTE_MAPTILER_KEY_HERE',
-  dark:
-    'https://api.maptiler.com/maps/streets-v2-dark/style.json?key=PASTE_MAPTILER_KEY_HERE',
+  light: 'https://api.maptiler.com/maps/streets-v2/style.json?key=PASTE_MAPTILER_KEY_HERE',
+  dark: 'https://api.maptiler.com/maps/streets-v2-dark/style.json?key=PASTE_MAPTILER_KEY_HERE',
 };
 
 /** Fallback raster style — works without any API key (OSM tiles, attribution required). */
@@ -284,7 +282,10 @@ export function MapLibreMap({
             const src2 = map.getSource(c.id) as maplibregl.GeoJSONSource;
             src2.getClusterExpansionZoom(clusterId).then((zoom) => {
               if (typeof zoom === 'number') {
-                map.easeTo({ center: (features[0]!.geometry as GeoJSON.Point).coordinates as [number, number], zoom });
+                map.easeTo({
+                  center: (features[0]!.geometry as GeoJSON.Point).coordinates as [number, number],
+                  zoom,
+                });
               }
             });
           });
@@ -294,7 +295,11 @@ export function MapLibreMap({
             const id = String(f.properties?.id ?? '');
             onClusterPointClick?.(c.id, id);
           });
-          map.on('mouseenter', `${c.id}-clusters`, () => (map.getCanvas().style.cursor = 'pointer'));
+          map.on(
+            'mouseenter',
+            `${c.id}-clusters`,
+            () => (map.getCanvas().style.cursor = 'pointer'),
+          );
           map.on('mouseleave', `${c.id}-clusters`, () => (map.getCanvas().style.cursor = ''));
           map.on('mouseenter', `${c.id}-points`, () => (map.getCanvas().style.cursor = 'pointer'));
           map.on('mouseleave', `${c.id}-points`, () => (map.getCanvas().style.cursor = ''));
@@ -314,10 +319,7 @@ export function MapLibreMap({
       ...routes.flatMap((r) => r.coordinates),
     ];
     if (all.length === 0) return;
-    const bounds = all.reduce(
-      (b, p) => b.extend(p),
-      new maplibregl.LngLatBounds(all[0]!, all[0]!),
-    );
+    const bounds = all.reduce((b, p) => b.extend(p), new maplibregl.LngLatBounds(all[0]!, all[0]!));
     map.fitBounds(bounds, { padding: 60, duration: 700, maxZoom: 13 });
   }, [fitToContent, markers, routes]);
 

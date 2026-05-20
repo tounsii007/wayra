@@ -36,7 +36,10 @@ export default function HomeScreen() {
   const [status, setStatus] = useState<StatusItem[]>([]);
 
   useEffect(() => {
-    api.networkStatus().then((r) => setStatus(r.items.slice(0, 3))).catch(() => undefined);
+    api
+      .networkStatus()
+      .then((r) => setStatus(r.items.slice(0, 3)))
+      .catch(() => undefined);
   }, []);
 
   function plan() {
@@ -53,7 +56,10 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: theme.bg }}>
-      <ScrollView contentContainerStyle={{ padding: 20, gap: 16 }} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        contentContainerStyle={{ padding: 20, gap: 16 }}
+        keyboardShouldPersistTaps="handled"
+      >
         <View style={{ paddingTop: 8 }}>
           <Text style={{ color: theme.textMuted, fontSize: 13, fontWeight: '700' }}>
             {t('brand.tagline')}
@@ -148,10 +154,26 @@ export default function HomeScreen() {
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
           {[
             { label: t('home.quickActions.home'), Icon: Home, action: () => router.push('/me') },
-            { label: t('home.quickActions.work'), Icon: Briefcase, action: () => router.push('/me') },
-            { label: t('home.quickActions.findStation'), Icon: Train, action: () => router.push('/search') },
-            { label: t('home.quickActions.findStop'), Icon: Bus, action: () => router.push('/search') },
-            { label: t('home.quickActions.compareFares'), Icon: Ticket, action: () => router.push('/plan') },
+            {
+              label: t('home.quickActions.work'),
+              Icon: Briefcase,
+              action: () => router.push('/me'),
+            },
+            {
+              label: t('home.quickActions.findStation'),
+              Icon: Train,
+              action: () => router.push('/search'),
+            },
+            {
+              label: t('home.quickActions.findStop'),
+              Icon: Bus,
+              action: () => router.push('/search'),
+            },
+            {
+              label: t('home.quickActions.compareFares'),
+              Icon: Ticket,
+              action: () => router.push('/plan'),
+            },
           ].map(({ label, Icon, action }) => (
             <Pressable
               key={label}
@@ -257,11 +279,7 @@ function UseLocationButton({ onCoords }: { onCoords: (c: { lat: number; lng: num
       }}
       style={{ flexDirection: 'row', gap: 6, alignItems: 'center', paddingVertical: 6 }}
     >
-      {busy ? (
-        <Loader2 color={theme.brand} size={14} />
-      ) : (
-        <Locate color={theme.brand} size={14} />
-      )}
+      {busy ? <Loader2 color={theme.brand} size={14} /> : <Locate color={theme.brand} size={14} />}
       <Text style={{ color: theme.brand, fontSize: 12, fontWeight: '700' }}>
         {t('home.hero.useCurrentLocation')}
       </Text>

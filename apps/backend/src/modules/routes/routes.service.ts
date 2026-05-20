@@ -62,7 +62,7 @@ export class RoutesService {
 
     const departIso = req.arriveBy
       ? this.backComputeDeparture(req.arriveBy, km)
-      : req.departAt ?? new Date().toISOString();
+      : (req.departAt ?? new Date().toISOString());
     const departMs = new Date(departIso).getTime();
     if (Number.isNaN(departMs)) {
       return { routes: [], partial: true, notice: 'Invalid departure timestamp.' };
@@ -147,9 +147,7 @@ export class RoutesService {
 
     // Index the bundle under the first route's id, and each route under its own id.
     await this.cache.set(`route:bundle:${routes[0]!.id}`, routes, ROUTE_CACHE_TTL_S);
-    await Promise.all(
-      routes.map((r) => this.cache.set(`route:${r.id}`, r, ROUTE_CACHE_TTL_S)),
-    );
+    await Promise.all(routes.map((r) => this.cache.set(`route:${r.id}`, r, ROUTE_CACHE_TTL_S)));
 
     return { routes };
   }
@@ -283,9 +281,12 @@ export class RoutesService {
   private lineFor(tag: 'fastest' | 'cheapest' | 'fewest_transfers', mode: TransitMode) {
     if (mode === 'coach')
       return { id: 'flx-coach', agencyId: 'flx', shortName: 'FlixBus', mode, color: '#73d700' };
-    if (mode === 'bus') return { id: 'b-line', agencyId: 'local', shortName: '100', mode, color: '#7c3aed' };
-    if (mode === 'tram') return { id: 't-line', agencyId: 'local', shortName: 'T1', mode, color: '#0ea5a5' };
-    if (mode === 'subway') return { id: 'u-line', agencyId: 'local', shortName: 'U1', mode, color: '#1d4fd1' };
+    if (mode === 'bus')
+      return { id: 'b-line', agencyId: 'local', shortName: '100', mode, color: '#7c3aed' };
+    if (mode === 'tram')
+      return { id: 't-line', agencyId: 'local', shortName: 'T1', mode, color: '#0ea5a5' };
+    if (mode === 'subway')
+      return { id: 'u-line', agencyId: 'local', shortName: 'U1', mode, color: '#1d4fd1' };
     const isCheap = tag === 'cheapest';
     return {
       id: isCheap ? 'ic-2' : 'ice-fast',

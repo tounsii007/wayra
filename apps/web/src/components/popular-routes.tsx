@@ -22,10 +22,10 @@ export function PopularRoutes() {
         {popularRoutes.map((r) => (
           <article
             key={r.id}
-            className="group relative overflow-hidden rounded-2xl surface p-5 transition-all hover:-translate-y-0.5 hover:shadow-card"
+            className="surface hover:shadow-card group relative overflow-hidden rounded-2xl p-5 transition-all hover:-translate-y-0.5"
           >
-            <div className="absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-brand-500/40 to-transparent" />
-            <div className="flex items-center justify-between text-xs font-medium text-muted">
+            <div className="via-brand-500/40 absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent to-transparent" />
+            <div className="text-muted flex items-center justify-between text-xs font-medium">
               <span className="inline-flex items-center gap-1">
                 <Train className="h-3.5 w-3.5" />
                 {r.modes.join(' · ')}
@@ -37,10 +37,10 @@ export function PopularRoutes() {
             </div>
             <div className="mt-3 flex items-center gap-2 text-base font-semibold">
               <span className="truncate">{r.from.name}</span>
-              <ArrowRight className="h-4 w-4 text-brand-500 shrink-0" />
+              <ArrowRight className="text-brand-500 h-4 w-4 shrink-0" />
               <span className="truncate">{r.to.name}</span>
             </div>
-            <div className="mt-3 text-xs text-subtle">{r.countryCode}</div>
+            <div className="text-subtle mt-3 text-xs">{r.countryCode}</div>
           </article>
         ))}
       </div>

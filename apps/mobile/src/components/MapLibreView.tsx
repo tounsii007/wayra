@@ -12,8 +12,11 @@ import * as MapLibreRN from '@maplibre/maplibre-react-native';
 // `UserLocation` is exported by the runtime module but isn't in the
 // shipped typings. Pull it through the namespace and cast.
 const UserLocation: React.ComponentType<{ visible?: boolean; animated?: boolean }> =
-  (MapLibreRN as unknown as { UserLocation: React.ComponentType<{ visible?: boolean; animated?: boolean }> })
-    .UserLocation ?? (() => null);
+  (
+    MapLibreRN as unknown as {
+      UserLocation: React.ComponentType<{ visible?: boolean; animated?: boolean }>;
+    }
+  ).UserLocation ?? (() => null);
 import { useMemo } from 'react';
 import type { Coordinates } from '@wayra/types';
 

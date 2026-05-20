@@ -40,9 +40,9 @@ export function CountryPicker() {
               type="button"
               onClick={() => setSelected(cc)}
               className={cn(
-                'inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-all focus-ring',
+                'focus-ring inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-all',
                 active
-                  ? 'border-brand-500 bg-brand-500 text-white shadow-glow'
+                  ? 'border-brand-500 bg-brand-500 shadow-glow text-white'
                   : 'border-[rgb(var(--border))] bg-[rgb(var(--surface))] text-[rgb(var(--text))] hover:bg-[rgb(var(--surface-muted))]',
               )}
             >

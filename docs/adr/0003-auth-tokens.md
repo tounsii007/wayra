@@ -25,7 +25,7 @@ Where the refresh token lives:
 
 - **Web**: `wayra_rt` HttpOnly + SameSite=lax + Secure (in prod) cookie,
   scoped to `/api/auth`. The cookie is set by `/api/auth/{signup,login,
-  refresh,oauth}` and cleared by `/api/auth/{logout, me DELETE}`. JS
+refresh,oauth}` and cleared by `/api/auth/{logout, me DELETE}`. JS
   cannot read it; CSRF is mitigated by the SameSite default plus the
   fact that the refresh endpoint also rotates the token.
 - **Mobile**: SecureStore (iOS Keychain / Android EncryptedStorage),

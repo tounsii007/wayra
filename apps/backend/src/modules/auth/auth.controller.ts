@@ -90,14 +90,22 @@ export class AuthController {
   ) {}
 
   @Post('signup')
-  async signup(@Body() dto: SignupDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+  async signup(
+    @Body() dto: SignupDto,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const result = await this.auth.signup(dto, ctxFromReq(req));
     res.cookie(REFRESH_COOKIE, result.refreshToken, REFRESH_COOKIE_OPTS);
     return result;
   }
 
   @Post('login')
-  async login(@Body() dto: LoginDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+  async login(
+    @Body() dto: LoginDto,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const result = await this.auth.login(dto, ctxFromReq(req));
     if ('totpRequired' in result) return result;
     res.cookie(REFRESH_COOKIE, result.refreshToken, REFRESH_COOKIE_OPTS);
@@ -105,16 +113,25 @@ export class AuthController {
   }
 
   @Post('refresh')
-  async refresh(@Body() dto: RefreshDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+  async refresh(
+    @Body() dto: RefreshDto,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const token = dto.refreshToken ?? (req.cookies?.[REFRESH_COOKIE] as string | undefined);
-    if (!token) throw new BadRequestException({ code: 'missing_refresh', message: 'No refresh token.' });
+    if (!token)
+      throw new BadRequestException({ code: 'missing_refresh', message: 'No refresh token.' });
     const result = await this.auth.refresh(token, ctxFromReq(req));
     res.cookie(REFRESH_COOKIE, result.refreshToken, REFRESH_COOKIE_OPTS);
     return result;
   }
 
   @Post('logout')
-  async logout(@Body() dto: RefreshDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+  async logout(
+    @Body() dto: RefreshDto,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const token = dto.refreshToken ?? (req.cookies?.[REFRESH_COOKIE] as string | undefined);
     if (token) await this.auth.logout(token, ctxFromReq(req));
     res.clearCookie(REFRESH_COOKIE, REFRESH_COOKIE_OPTS);
@@ -137,7 +154,11 @@ export class AuthController {
   }
 
   @Post('oauth')
-  async oauth(@Body() dto: OauthDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+  async oauth(
+    @Body() dto: OauthDto,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const result = await this.auth.oauthSignIn(dto, ctxFromReq(req));
     res.cookie(REFRESH_COOKIE, result.refreshToken, REFRESH_COOKIE_OPTS);
     return result;
@@ -160,10 +181,7 @@ export class AuthController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post('me/password')
-  changePassword(
-    @Req() req: AuthedRequest,
-    @Body() dto: ChangePasswordDto,
-  ) {
+  changePassword(@Req() req: AuthedRequest, @Body() dto: ChangePasswordDto) {
     return this.auth.changePassword(req.user.sub, dto, ctxFromReq(req));
   }
 
@@ -246,10 +264,7 @@ export class AuthController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post('me/passkeys/auth/verify')
-  passkeysAuthVerify(
-    @Req() req: AuthedRequest,
-    @Body() body: { response: never },
-  ) {
+  passkeysAuthVerify(@Req() req: AuthedRequest, @Body() body: { response: never }) {
     return this.webauthn.verifyAuthentication(req.user.sub, body);
   }
 

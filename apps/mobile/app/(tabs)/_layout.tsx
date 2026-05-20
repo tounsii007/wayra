@@ -23,11 +23,15 @@ export default function TabsLayout() {
         tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
         tabBarIcon: ({ color, size }) => {
           const Icon =
-            route.name === 'index' ? Home
-              : route.name === 'map' ? Map
-              : route.name === 'live' ? Activity
-              : route.name === 'assistant' ? Sparkles
-              : User;
+            route.name === 'index'
+              ? Home
+              : route.name === 'map'
+                ? Map
+                : route.name === 'live'
+                  ? Activity
+                  : route.name === 'assistant'
+                    ? Sparkles
+                    : User;
           return <Icon color={color} size={size ?? 22} />;
         },
       })}

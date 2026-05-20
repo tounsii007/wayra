@@ -42,7 +42,7 @@ export function SettingsClient() {
           <Row label={auth.user.displayName ?? 'Signed in'} hint={auth.user.email ?? undefined}>
             <Link
               href="/me"
-              className="rounded-full bg-brand-500 px-3 py-1.5 text-xs font-bold text-white focus-ring"
+              className="bg-brand-500 focus-ring rounded-full px-3 py-1.5 text-xs font-bold text-white"
             >
               Manage
             </Link>
@@ -54,7 +54,7 @@ export function SettingsClient() {
           >
             <Link
               href="/login"
-              className="inline-flex items-center gap-1.5 rounded-full bg-brand-500 px-3 py-1.5 text-xs font-bold text-white focus-ring"
+              className="bg-brand-500 focus-ring inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold text-white"
             >
               <KeyRound className="h-3 w-3" /> Sign in
             </Link>
@@ -75,8 +75,8 @@ export function SettingsClient() {
           checked={prefs.emailEnabled}
           onChange={prefs.setEmailEnabled}
         />
-        <div className="border-t border-[rgb(var(--border))] pt-3 mt-2">
-          <div className="mb-2 text-xs font-bold uppercase tracking-wide text-subtle">Channels</div>
+        <div className="mt-2 border-t border-[rgb(var(--border))] pt-3">
+          <div className="text-subtle mb-2 text-xs font-bold uppercase tracking-wide">Channels</div>
           <div className="grid gap-2 sm:grid-cols-2">
             {(Object.keys(channelLabels) as Array<keyof NotificationChannels>).map((k) => (
               <Toggle
@@ -96,7 +96,7 @@ export function SettingsClient() {
           <button
             disabled={recents.recents.length === 0}
             onClick={recents.clear}
-            className="rounded-full surface-muted px-3 py-1.5 text-xs font-semibold disabled:opacity-50 focus-ring"
+            className="surface-muted focus-ring rounded-full px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
           >
             Clear
           </button>
@@ -104,7 +104,7 @@ export function SettingsClient() {
         <Row label="Offline regions" hint="Downloaded cities for offline routing">
           <Link
             href="/offline"
-            className="inline-flex items-center gap-1.5 rounded-full surface-muted px-3 py-1.5 text-xs font-semibold focus-ring"
+            className="surface-muted focus-ring inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold"
           >
             <CloudDownload className="h-3 w-3" /> Manage
           </Link>
@@ -112,14 +112,14 @@ export function SettingsClient() {
         <Row label="Favorites" hint="Manage saved places and routes">
           <Link
             href="/me"
-            className="inline-flex items-center gap-1.5 rounded-full surface-muted px-3 py-1.5 text-xs font-semibold focus-ring"
+            className="surface-muted focus-ring inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold"
           >
             <Heart className="h-3 w-3" /> Open
           </Link>
         </Row>
       </Section>
 
-      <p className="px-1 pb-6 text-xs text-subtle">
+      <p className="text-subtle px-1 pb-6 text-xs">
         Wayra v0.3 · Data: OSM (ODbL), GTFS / GTFS-RT per provider, MapLibre tiles.
       </p>
     </div>
@@ -129,7 +129,7 @@ export function SettingsClient() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="surface rounded-2xl p-5">
-      <h2 className="mb-3 text-sm font-bold uppercase tracking-wide text-subtle">{title}</h2>
+      <h2 className="text-subtle mb-3 text-sm font-bold uppercase tracking-wide">{title}</h2>
       <div className="space-y-3">{children}</div>
     </section>
   );
@@ -148,7 +148,7 @@ function Row({
     <div className="flex items-center justify-between gap-4">
       <div className="min-w-0">
         <div className="text-sm font-semibold">{label}</div>
-        {hint && <div className="text-xs text-muted">{hint}</div>}
+        {hint && <div className="text-muted text-xs">{hint}</div>}
       </div>
       {children}
     </div>
@@ -172,14 +172,14 @@ function Toggle({
     <label className={`flex items-center justify-between gap-3 ${compact ? '' : 'py-1'}`}>
       <div className="min-w-0">
         <div className="text-sm font-semibold">{label}</div>
-        {hint && !compact && <div className="text-xs text-muted">{hint}</div>}
+        {hint && !compact && <div className="text-muted text-xs">{hint}</div>}
       </div>
       <button
         type="button"
         role="switch"
         aria-checked={checked}
         onClick={() => onChange(!checked)}
-        className={`relative h-6 w-11 shrink-0 rounded-full transition-colors focus-ring ${
+        className={`focus-ring relative h-6 w-11 shrink-0 rounded-full transition-colors ${
           checked ? 'bg-brand-500' : 'bg-[rgb(var(--border))]'
         }`}
       >

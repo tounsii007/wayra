@@ -1,11 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Anthropic from '@anthropic-ai/sdk';
-import type {
-  AiAssistantRequest,
-  AiAssistantResponse,
-  Locale,
-} from '@wayra/types';
+import type { AiAssistantRequest, AiAssistantResponse, Locale } from '@wayra/types';
 import { PlacesService } from '../places/places.service';
 import { RoutesService } from '../routes/routes.service';
 import { RealtimeService } from '../realtime/realtime.service';
@@ -232,9 +228,7 @@ export class AiService {
         return this.realtime.departures(String(input.stopId), Number(input.limit ?? 8), 90);
       }
       case 'get_disruptions': {
-        return this.realtime.disruptions(
-          input.countryCode ? String(input.countryCode) : undefined,
-        );
+        return this.realtime.disruptions(input.countryCode ? String(input.countryCode) : undefined);
       }
       default:
         return { error: 'unknown_tool' };

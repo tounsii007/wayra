@@ -13,8 +13,15 @@ export interface TransitDataProvider {
   /** True only if the env keys this client needs are configured. */
   isConfigured(): boolean;
 
-  searchPlaces?(query: string, opts?: { near?: Coordinates; limit?: number }): Promise<PlaceSuggestion[]>;
-  nearbyStops?(coords: Coordinates, radiusMeters: number, limit: number): Promise<Array<Place & { distanceMeters: number }>>;
+  searchPlaces?(
+    query: string,
+    opts?: { near?: Coordinates; limit?: number },
+  ): Promise<PlaceSuggestion[]>;
+  nearbyStops?(
+    coords: Coordinates,
+    radiusMeters: number,
+    limit: number,
+  ): Promise<Array<Place & { distanceMeters: number }>>;
   departures?(stopExternalId: string, limit?: number): Promise<Departure[]>;
   disruptions?(): Promise<Disruption[]>;
 }

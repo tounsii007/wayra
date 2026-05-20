@@ -5,7 +5,10 @@ import { distanceMeters } from '@wayra/shared';
 import type { TransitDataProvider } from './provider.interface';
 
 interface DbStation {
-  evaNumbers?: Array<{ number: number; geographicCoordinates?: { latitude: number; longitude: number } }>;
+  evaNumbers?: Array<{
+    number: number;
+    geographicCoordinates?: { latitude: number; longitude: number };
+  }>;
   number: number;
   name: string;
   category?: number;
@@ -38,7 +41,10 @@ export class DbProvider implements TransitDataProvider {
     return Boolean(this.apiKey && this.clientId);
   }
 
-  async searchPlaces(query: string, opts: { near?: Coordinates; limit?: number } = {}): Promise<PlaceSuggestion[]> {
+  async searchPlaces(
+    query: string,
+    opts: { near?: Coordinates; limit?: number } = {},
+  ): Promise<PlaceSuggestion[]> {
     try {
       const url = new URL('https://v6.db.transport.rest/locations');
       url.searchParams.set('query', query);
@@ -68,7 +74,9 @@ export class DbProvider implements TransitDataProvider {
           };
           const score = query && d.name.toLowerCase().includes(query.toLowerCase()) ? 0.85 : 0.5;
           const distance = opts.near ? distanceMeters(opts.near, coords) : undefined;
-          return distance !== undefined ? { place, score, distanceMeters: distance } : { place, score };
+          return distance !== undefined
+            ? { place, score, distanceMeters: distance }
+            : { place, score };
         });
     } catch (e) {
       this.logger.warn(`searchPlaces failed: ${(e as Error).message}`);
@@ -80,7 +88,9 @@ export class DbProvider implements TransitDataProvider {
     if (!this.isConfigured()) return [];
     try {
       const id = stopExternalId.replace(/^db:/, '');
-      const url = new URL(`https://v6.db.transport.rest/stops/${encodeURIComponent(id)}/departures`);
+      const url = new URL(
+        `https://v6.db.transport.rest/stops/${encodeURIComponent(id)}/departures`,
+      );
       url.searchParams.set('duration', '90');
       url.searchParams.set('results', String(limit));
       const res = await fetch(url.toString(), {
@@ -113,7 +123,11 @@ export class DbProvider implements TransitDataProvider {
           shortName: d.line?.name ?? '—',
           mode: this.modeFromProduct(d.line?.product),
         },
-        trip: { id: `db:${d.tripId}`, lineId: d.line?.id ?? 'unknown', headsign: d.direction ?? '' },
+        trip: {
+          id: `db:${d.tripId}`,
+          lineId: d.line?.id ?? 'unknown',
+          headsign: d.direction ?? '',
+        },
         scheduledTime: d.plannedWhen ?? d.when ?? new Date().toISOString(),
         ...(d.when && d.plannedWhen && d.when !== d.plannedWhen ? { predictedTime: d.when } : {}),
         delaySeconds: d.delay ?? 0,

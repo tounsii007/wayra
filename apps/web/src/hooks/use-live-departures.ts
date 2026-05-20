@@ -52,7 +52,8 @@ export function useLiveDepartures(stopId: string | undefined) {
       const wsUrl = apiUrl.replace(/^http/, 'ws') + '/live';
       const ws = new WebSocket(wsUrl);
       wsRef.current = ws;
-      ws.onopen = () => ws.send(JSON.stringify({ event: 'subscribe', data: { stopIds: [stopId] } }));
+      ws.onopen = () =>
+        ws.send(JSON.stringify({ event: 'subscribe', data: { stopIds: [stopId] } }));
       ws.onmessage = (ev) => {
         try {
           const msg = JSON.parse(ev.data) as { event?: string; data?: Departure };

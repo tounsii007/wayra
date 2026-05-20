@@ -19,8 +19,7 @@ async function bootstrap() {
 
   const app = await NestFactory.create(AppModule, {
     cors: {
-      origin:
-        allowedOrigins.length === 1 && allowedOrigins[0] === '*' ? true : allowedOrigins,
+      origin: allowedOrigins.length === 1 && allowedOrigins[0] === '*' ? true : allowedOrigins,
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     },

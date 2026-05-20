@@ -36,10 +36,19 @@
     "features": {
       "title": "Tutto ciò che serve per il tuo viaggio",
       "items": [
-        { "title": "Percorsi multimodali", "body": "Treno, bus, metro, tram e a piedi — combinati con intelligenza." },
-        { "title": "Ritardi in tempo reale", "body": "Puntualità, cambi binario e perturbazioni in tempo reale." },
+        {
+          "title": "Percorsi multimodali",
+          "body": "Treno, bus, metro, tram e a piedi — combinati con intelligenza."
+        },
+        {
+          "title": "Ritardi in tempo reale",
+          "body": "Puntualità, cambi binario e perturbazioni in tempo reale."
+        },
         { "title": "Orari offline", "body": "Scarica città e usa Wayra senza Internet." },
-        { "title": "Assistente IA", "body": "Fai domande in linguaggio naturale — risposte immediate." }
+        {
+          "title": "Assistente IA",
+          "body": "Fai domande in linguaggio naturale — risposte immediate."
+        }
       ]
     }
   },

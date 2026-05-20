@@ -8,13 +8,15 @@ export default function TermsPage() {
       <SiteHeader />
       <main className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
         <h1 className="text-3xl font-bold">Terms of Service</h1>
-        <section className="mt-6 space-y-4 text-sm leading-relaxed text-muted">
+        <section className="text-muted mt-6 space-y-4 text-sm leading-relaxed">
           <p>
             Wayra is provided as-is for personal travel planning. Schedule and disruption data
-            originate from third parties (OpenStreetMap, GTFS / GTFS-RT feeds of the carriers
-            named below). We aggregate but do not certify accuracy.
+            originate from third parties (OpenStreetMap, GTFS / GTFS-RT feeds of the carriers named
+            below). We aggregate but do not certify accuracy.
           </p>
-          <h2 className="mt-6 text-base font-semibold text-[rgb(var(--text))]">Data attributions</h2>
+          <h2 className="mt-6 text-base font-semibold text-[rgb(var(--text))]">
+            Data attributions
+          </h2>
           <ul className="list-disc pl-5">
             <li>OpenStreetMap contributors (ODbL)</li>
             <li>Deutsche Bahn Open Data</li>

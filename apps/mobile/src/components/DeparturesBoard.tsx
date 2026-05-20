@@ -47,8 +47,18 @@ export function DeparturesBoard({ stopId, locale }: { stopId: string; locale: Lo
   }
   if (departures.length === 0) {
     return (
-      <View style={{ padding: 16, borderRadius: 14, backgroundColor: theme.surface, borderColor: theme.border, borderWidth: 1 }}>
-        <Text style={{ color: theme.textMuted, fontSize: 13 }}>No departures in the next window.</Text>
+      <View
+        style={{
+          padding: 16,
+          borderRadius: 14,
+          backgroundColor: theme.surface,
+          borderColor: theme.border,
+          borderWidth: 1,
+        }}
+      >
+        <Text style={{ color: theme.textMuted, fontSize: 13 }}>
+          No departures in the next window.
+        </Text>
       </View>
     );
   }
@@ -68,7 +78,9 @@ export function DeparturesBoard({ stopId, locale }: { stopId: string; locale: Lo
           }}
         >
           <Loader2 color={theme.textMuted} size={12} />
-          <Text style={{ color: theme.textMuted, fontSize: 11 }}>Live feed unavailable — scheduled times shown.</Text>
+          <Text style={{ color: theme.textMuted, fontSize: 11 }}>
+            Live feed unavailable — scheduled times shown.
+          </Text>
         </View>
       )}
       {departures.map((d) => {
@@ -110,10 +122,7 @@ export function DeparturesBoard({ stopId, locale }: { stopId: string; locale: Lo
             <View style={{ flex: 1 }}>
               <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 6 }}>
                 <Text style={{ color: theme.text, fontWeight: '800' }}>{d.line.shortName}</Text>
-                <Text
-                  numberOfLines={1}
-                  style={{ color: theme.textMuted, fontSize: 13, flex: 1 }}
-                >
+                <Text numberOfLines={1} style={{ color: theme.textMuted, fontSize: 13, flex: 1 }}>
                   → {d.headsign}
                 </Text>
               </View>

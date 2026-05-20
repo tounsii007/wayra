@@ -9,10 +9,10 @@ import { COUNTRY_DEFAULT_CENTER, MVP_COUNTRIES } from '@wayra/shared';
 import type { CountryCode, Place } from '@wayra/types';
 import { cn } from '@/lib/utils';
 
-const MapLibreMap = dynamic(
-  () => import('@/components/maplibre-map').then((m) => m.MapLibreMap),
-  { ssr: false, loading: () => <div className="skeleton h-full w-full rounded-3xl" /> },
-);
+const MapLibreMap = dynamic(() => import('@/components/maplibre-map').then((m) => m.MapLibreMap), {
+  ssr: false,
+  loading: () => <div className="skeleton h-full w-full rounded-3xl" />,
+});
 
 const MODE_COLORS: Record<string, string> = {
   station: '#EC0016',
@@ -76,16 +76,18 @@ export function MapView() {
   }));
 
   return (
-    <div className="relative h-full rounded-3xl overflow-hidden surface">
+    <div className="surface relative h-full overflow-hidden rounded-3xl">
       <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex flex-wrap items-start justify-between gap-2 p-3">
-        <div className="pointer-events-auto inline-flex gap-1 rounded-full glass-strong p-1 shadow-card">
+        <div className="glass-strong shadow-card pointer-events-auto inline-flex gap-1 rounded-full p-1">
           {MVP_COUNTRIES.map((c) => (
             <button
               key={c}
               onClick={() => setCountry(c)}
               className={cn(
                 'rounded-full px-3 py-1.5 text-xs font-bold tracking-wide transition-colors',
-                country === c ? 'bg-brand-500 text-white' : 'text-muted hover:text-[rgb(var(--text))]',
+                country === c
+                  ? 'bg-brand-500 text-white'
+                  : 'text-muted hover:text-[rgb(var(--text))]',
               )}
             >
               {c}
@@ -93,8 +95,8 @@ export function MapView() {
           ))}
         </div>
 
-        <div className="pointer-events-auto inline-flex flex-wrap gap-1 rounded-2xl glass-strong p-1.5 shadow-card">
-          <span className="self-center pl-2 text-xs font-semibold uppercase tracking-wide text-subtle">
+        <div className="glass-strong shadow-card pointer-events-auto inline-flex flex-wrap gap-1 rounded-2xl p-1.5">
+          <span className="text-subtle self-center pl-2 text-xs font-semibold uppercase tracking-wide">
             <Filter className="mr-1 inline h-3 w-3" />
             Modes
           </span>
@@ -133,7 +135,7 @@ export function MapView() {
       <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center pb-4">
         <a
           href="/search"
-          className="pointer-events-auto inline-flex items-center gap-2 rounded-full glass-strong px-4 py-2.5 text-sm font-semibold shadow-card focus-ring"
+          className="glass-strong shadow-card focus-ring pointer-events-auto inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold"
         >
           <Search className="h-4 w-4" />
           Search stops, lines, addresses

@@ -17,10 +17,10 @@ import type { Locale, Route } from '@wayra/types';
 import { useAuthStore } from '@/lib/auth-store';
 import { useState } from 'react';
 
-const MapLibreMap = dynamic(
-  () => import('@/components/maplibre-map').then((m) => m.MapLibreMap),
-  { ssr: false, loading: () => <div className="skeleton h-full w-full rounded-3xl" /> },
-);
+const MapLibreMap = dynamic(() => import('@/components/maplibre-map').then((m) => m.MapLibreMap), {
+  ssr: false,
+  loading: () => <div className="skeleton h-full w-full rounded-3xl" />,
+});
 
 export function TripDetailsClient({ route }: { route: Route }) {
   const locale = useLocale() as Locale;
@@ -33,7 +33,12 @@ export function TripDetailsClient({ route }: { route: Route }) {
   const lastLeg = route.legs[route.legs.length - 1]!;
 
   const markers = route.legs.flatMap((l) => [
-    { id: `${l.from.id}-from`, coordinates: l.from.coordinates, color: '#2563eb', label: l.from.name },
+    {
+      id: `${l.from.id}-from`,
+      coordinates: l.from.coordinates,
+      color: '#2563eb',
+      label: l.from.name,
+    },
     { id: `${l.to.id}-to`, coordinates: l.to.coordinates, color: '#7c3aed', label: l.to.name },
   ]);
 
@@ -88,33 +93,35 @@ export function TripDetailsClient({ route }: { route: Route }) {
   return (
     <div className="space-y-6">
       <header className="surface relative overflow-hidden rounded-3xl p-5">
-        <div className="absolute -right-12 -top-12 h-40 w-40 rounded-full bg-gradient-to-br from-brand-500 to-accent-violet opacity-20 blur-3xl" />
+        <div className="from-brand-500 to-accent-violet absolute -right-12 -top-12 h-40 w-40 rounded-full bg-gradient-to-br opacity-20 blur-3xl" />
         <div className="relative flex flex-wrap items-start justify-between gap-3">
           <div>
             <div className="text-3xl font-bold tabular-nums">
               {formatTime(route.departureTime, locale)}
-              <ArrowRight className="mx-2 inline h-5 w-5 text-muted" />
+              <ArrowRight className="text-muted mx-2 inline h-5 w-5" />
               {formatTime(route.arrivalTime, locale)}
             </div>
-            <div className="mt-1 text-sm text-muted">
+            <div className="text-muted mt-1 text-sm">
               <span className="font-semibold">{firstLeg.from.name}</span> →{' '}
               <span className="font-semibold">{lastLeg.to.name}</span>
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             {route.fare && (
-              <span className="rounded-full bg-brand-500/10 px-3 py-1 text-sm font-bold text-brand-700 dark:text-brand-300">
+              <span className="bg-brand-500/10 text-brand-700 dark:text-brand-300 rounded-full px-3 py-1 text-sm font-bold">
                 {formatFare(route.fare.amount, route.fare.currency, locale)}
               </span>
             )}
-            <span className="inline-flex items-center gap-1 rounded-full surface-muted px-3 py-1 text-sm font-semibold">
+            <span className="surface-muted inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-semibold">
               <Clock className="h-3.5 w-3.5" /> {formatDuration(route.durationSeconds, locale)}
             </span>
-            <span className="inline-flex items-center gap-1 rounded-full surface-muted px-3 py-1 text-sm font-semibold">
-              {route.transfers === 0 ? tRoute('noTransfer') : `${route.transfers} ${tRoute('transfers')}`}
+            <span className="surface-muted inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-semibold">
+              {route.transfers === 0
+                ? tRoute('noTransfer')
+                : `${route.transfers} ${tRoute('transfers')}`}
             </span>
             {route.tags?.includes('recommended') && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-brand-500/15 px-3 py-1 text-sm font-bold text-brand-700 dark:text-brand-300">
+              <span className="bg-brand-500/15 text-brand-700 dark:text-brand-300 inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-bold">
                 <Sparkles className="h-3.5 w-3.5" /> recommended
               </span>
             )}
@@ -125,19 +132,21 @@ export function TripDetailsClient({ route }: { route: Route }) {
           <button
             onClick={save}
             disabled={saved}
-            className="inline-flex items-center gap-2 rounded-full bg-brand-500 px-4 py-2 text-sm font-semibold text-white shadow-glow disabled:opacity-60 focus-ring"
+            className="bg-brand-500 shadow-glow focus-ring inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
           >
             <BookmarkPlus className="h-4 w-4" />
             {saved ? 'Saved' : 'Save trip'}
           </button>
           <button
             onClick={share}
-            className="inline-flex items-center gap-2 rounded-full surface px-4 py-2 text-sm font-semibold focus-ring"
+            className="surface focus-ring inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold"
           >
             <Share2 className="h-4 w-4" />
             Share
           </button>
-          {savingError && <span className="text-xs text-status-severe self-center">{savingError}</span>}
+          {savingError && (
+            <span className="text-status-severe self-center text-xs">{savingError}</span>
+          )}
         </div>
       </header>
 
@@ -150,14 +159,15 @@ export function TripDetailsClient({ route }: { route: Route }) {
                 return (
                   <li key={i} className="surface rounded-2xl p-4">
                     <div className="flex items-center gap-3">
-                      <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl surface-muted">
-                        <Footprints className="h-4 w-4 text-muted" />
+                      <span className="surface-muted inline-flex h-10 w-10 items-center justify-center rounded-xl">
+                        <Footprints className="text-muted h-4 w-4" />
                       </span>
                       <div className="flex-1 text-sm">
                         Walk · {Math.round(leg.distanceMeters)} m
                       </div>
-                      <div className="text-xs text-muted">
-                        {formatTime(leg.departureTime, locale)} → {formatTime(leg.arrivalTime, locale)}
+                      <div className="text-muted text-xs">
+                        {formatTime(leg.departureTime, locale)} →{' '}
+                        {formatTime(leg.arrivalTime, locale)}
                       </div>
                     </div>
                   </li>
@@ -177,16 +187,22 @@ export function TripDetailsClient({ route }: { route: Route }) {
                       <div className="flex-1">
                         <div className="flex items-baseline gap-2">
                           <span className="text-base font-bold">{leg.mode.line.shortName}</span>
-                          <span className="truncate text-sm text-muted">→ {leg.mode.trip.headsign}</span>
+                          <span className="text-muted truncate text-sm">
+                            → {leg.mode.trip.headsign}
+                          </span>
                         </div>
                         <div className="mt-2 grid grid-cols-2 gap-y-1 text-sm">
                           <div className="font-semibold">{leg.from.name}</div>
-                          <div className="text-right tabular-nums">{formatTime(leg.departureTime, locale)}</div>
+                          <div className="text-right tabular-nums">
+                            {formatTime(leg.departureTime, locale)}
+                          </div>
                           <div className="font-semibold">{leg.to.name}</div>
-                          <div className="text-right tabular-nums">{formatTime(leg.arrivalTime, locale)}</div>
+                          <div className="text-right tabular-nums">
+                            {formatTime(leg.arrivalTime, locale)}
+                          </div>
                         </div>
                         {delayMin > 0 && (
-                          <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-status-delay/15 px-2 py-0.5 text-xs font-bold text-status-delay">
+                          <div className="bg-status-delay/15 text-status-delay mt-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-bold">
                             +{delayMin} min
                           </div>
                         )}
@@ -200,10 +216,10 @@ export function TripDetailsClient({ route }: { route: Route }) {
           </ol>
 
           {route.co2SavedGrams !== undefined && (
-            <div className="mt-6 surface flex items-center gap-3 rounded-2xl p-4">
-              <Leaf className="h-5 w-5 text-status-onTime" />
+            <div className="surface mt-6 flex items-center gap-3 rounded-2xl p-4">
+              <Leaf className="text-status-onTime h-5 w-5" />
               <div className="text-sm">
-                <span className="font-bold text-status-onTime">
+                <span className="text-status-onTime font-bold">
                   {formatCO2(route.co2SavedGrams, locale)}
                 </span>{' '}
                 CO₂ saved vs driving solo.

@@ -44,7 +44,9 @@ export default function ProfileScreen() {
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: theme.bg }}>
       <ScrollView contentContainerStyle={{ padding: 20, gap: 14 }}>
-        <Text style={{ color: theme.text, fontSize: 26, fontWeight: '800' }}>{t('nav.settings')}</Text>
+        <Text style={{ color: theme.text, fontSize: 26, fontWeight: '800' }}>
+          {t('nav.settings')}
+        </Text>
 
         <Section title="Account">
           {auth.user ? (
@@ -132,7 +134,15 @@ export default function ProfileScreen() {
             </View>
           </Row>
           <Row label="Language">
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4, justifyContent: 'flex-end', maxWidth: 200 }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                gap: 4,
+                justifyContent: 'flex-end',
+                maxWidth: 200,
+              }}
+            >
               {SUPPORTED_LOCALES.map((loc) => (
                 <Pressable
                   key={loc}
@@ -141,7 +151,8 @@ export default function ProfileScreen() {
                     paddingHorizontal: 8,
                     paddingVertical: 4,
                     borderRadius: 999,
-                    backgroundColor: prefs.localeOverride === loc ? theme.brand : theme.surfaceMuted,
+                    backgroundColor:
+                      prefs.localeOverride === loc ? theme.brand : theme.surfaceMuted,
                   }}
                 >
                   <Text
@@ -250,7 +261,14 @@ export default function ProfileScreen() {
           </Pressable>
         </Section>
 
-        <Text style={{ color: theme.textSubtle, fontSize: 11, paddingVertical: 12, textAlign: 'center' }}>
+        <Text
+          style={{
+            color: theme.textSubtle,
+            fontSize: 11,
+            paddingVertical: 12,
+            textAlign: 'center',
+          }}
+        >
           Wayra v0.4 · Data: OSM, GTFS / GTFS-RT, MapLibre tiles.
         </Text>
       </ScrollView>

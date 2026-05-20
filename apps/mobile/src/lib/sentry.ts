@@ -7,8 +7,7 @@ export function maybeInitSentry(): boolean {
   if (!dsn) return false;
   try {
     // Lazy require so the SDK isn't pulled into bundles without a DSN.
-    const Sentry =
-      require('@sentry/react-native') as typeof import('@sentry/react-native');
+    const Sentry = require('@sentry/react-native') as typeof import('@sentry/react-native');
     Sentry.init({
       dsn,
       enableAutoSessionTracking: true,

@@ -17,10 +17,7 @@ interface Envelope<T> {
   error?: { code: string; message: string };
 }
 
-async function request<T>(
-  path: string,
-  init: RequestInit & { auth?: boolean } = {},
-): Promise<T> {
+async function request<T>(path: string, init: RequestInit & { auth?: boolean } = {}): Promise<T> {
   const headers: Record<string, string> = {
     'content-type': 'application/json',
     ...((init.headers ?? {}) as Record<string, string>),
@@ -32,14 +29,22 @@ async function request<T>(
   const res = await fetch(`${BASE}${path}`, { ...init, headers });
   const payload = (await res.json().catch(() => ({}))) as Envelope<T>;
   if (!res.ok || payload.error) {
-    throw new ApiError(payload.error?.code ?? `http_${res.status}`, payload.error?.message ?? res.statusText, res.status);
+    throw new ApiError(
+      payload.error?.code ?? `http_${res.status}`,
+      payload.error?.message ?? res.statusText,
+      res.status,
+    );
   }
   if (payload.data === undefined) throw new ApiError('invalid_response', 'Empty data', res.status);
   return payload.data;
 }
 
 export class ApiError extends Error {
-  constructor(public code: string, message: string, public status?: number) {
+  constructor(
+    public code: string,
+    message: string,
+    public status?: number,
+  ) {
     super(message);
     this.name = 'ApiError';
   }
@@ -64,7 +69,10 @@ export const api = {
 
   // --- places ---
   search(query: string, opts: { limit?: number; lat?: number; lng?: number } = {}) {
-    const q = new URLSearchParams({ q: query, ...(opts.limit ? { limit: String(opts.limit) } : {}) });
+    const q = new URLSearchParams({
+      q: query,
+      ...(opts.limit ? { limit: String(opts.limit) } : {}),
+    });
     if (opts.lat !== undefined) q.set('lat', String(opts.lat));
     if (opts.lng !== undefined) q.set('lng', String(opts.lng));
     return request<{ suggestions: PlaceSuggestion[] }>(`/api/search?${q}`);
@@ -80,7 +88,10 @@ export const api = {
 
   // --- routes ---
   plan(body: PlanRouteRequest) {
-    return request<PlanRouteResponse>('/api/routes/plan', { method: 'POST', body: JSON.stringify(body) });
+    return request<PlanRouteResponse>('/api/routes/plan', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
   },
   route(id: string) {
     return request<Route>(`/api/routes/${encodeURIComponent(id)}`);
@@ -88,9 +99,11 @@ export const api = {
 
   // --- realtime ---
   departures(stopId: string, limit = 12) {
-    return request<{ stop: { id: string; name?: string }; departures: Departure[]; liveDataAvailable: boolean }>(
-      `/api/realtime/departures?stopId=${encodeURIComponent(stopId)}&limit=${limit}`,
-    );
+    return request<{
+      stop: { id: string; name?: string };
+      departures: Departure[];
+      liveDataAvailable: boolean;
+    }>(`/api/realtime/departures?stopId=${encodeURIComponent(stopId)}&limit=${limit}`);
   },
   disruptions(country?: string) {
     const q = country ? `?country=${encodeURIComponent(country)}` : '';
@@ -99,7 +112,13 @@ export const api = {
   networkStatus(country?: string) {
     const q = country ? `?country=${encodeURIComponent(country)}` : '';
     return request<{
-      items: Array<{ city: string; country: string; status: 'ok' | 'minor' | 'major'; note: string; locale: string }>;
+      items: Array<{
+        city: string;
+        country: string;
+        status: 'ok' | 'minor' | 'major';
+        note: string;
+        locale: string;
+      }>;
       generatedAt: string;
     }>(`/api/realtime/network-status${q}`);
   },
@@ -166,11 +185,19 @@ export const api = {
       emailVerified?: boolean;
     }>('/api/auth/me', { auth: true });
   },
-  updateProfile(body: { displayName?: string; locale?: string; theme?: string; homeCountry?: string }) {
-    return request<{ id: string; email: string | null; displayName: string | null; locale: string; theme: string }>(
-      '/api/auth/me',
-      { method: 'PATCH', body: JSON.stringify(body), auth: true },
-    );
+  updateProfile(body: {
+    displayName?: string;
+    locale?: string;
+    theme?: string;
+    homeCountry?: string;
+  }) {
+    return request<{
+      id: string;
+      email: string | null;
+      displayName: string | null;
+      locale: string;
+      theme: string;
+    }>('/api/auth/me', { method: 'PATCH', body: JSON.stringify(body), auth: true });
   },
   changePassword(body: { currentPassword: string; newPassword: string }) {
     return request<{ ok: true }>('/api/auth/me/password', {
@@ -189,10 +216,14 @@ export const api = {
 
   // --- account ---
   favorites() {
-    return request<Array<{ id: string; kind: 'home' | 'work' | 'custom'; label: string | null; placeId: string | null }>>(
-      '/api/me/favorites',
-      { auth: true },
-    );
+    return request<
+      Array<{
+        id: string;
+        kind: 'home' | 'work' | 'custom';
+        label: string | null;
+        placeId: string | null;
+      }>
+    >('/api/me/favorites', { auth: true });
   },
   addFavorite(body: { kind: 'home' | 'work' | 'custom'; placeId: string; label?: string }) {
     return request<{ id: string }>('/api/me/favorites', {
@@ -208,10 +239,14 @@ export const api = {
     });
   },
   savedRoutes() {
-    return request<Array<{ id: string; label: string | null; data: Record<string, unknown>; notifyOnDisruption: boolean }>>(
-      '/api/me/routes',
-      { auth: true },
-    );
+    return request<
+      Array<{
+        id: string;
+        label: string | null;
+        data: Record<string, unknown>;
+        notifyOnDisruption: boolean;
+      }>
+    >('/api/me/routes', { auth: true });
   },
   saveRoute(body: { label?: string; data: Record<string, unknown>; notify?: boolean }) {
     return request<{ id: string }>('/api/me/routes', {
@@ -244,20 +279,26 @@ export const api = {
     });
   },
   getNotificationPrefs() {
-    return request<{ pushEnabled: boolean; emailEnabled: boolean; channels: Record<string, boolean> }>(
-      '/api/me/notifications/preferences',
-      { auth: true },
-    );
+    return request<{
+      pushEnabled: boolean;
+      emailEnabled: boolean;
+      channels: Record<string, boolean>;
+    }>('/api/me/notifications/preferences', { auth: true });
   },
   setNotificationPrefs(body: {
     pushEnabled?: boolean;
     emailEnabled?: boolean;
     channels?: Record<string, boolean>;
   }) {
-    return request<{ pushEnabled: boolean; emailEnabled: boolean; channels: Record<string, boolean> }>(
-      '/api/me/notifications/preferences',
-      { method: 'PATCH', body: JSON.stringify(body), auth: true },
-    );
+    return request<{
+      pushEnabled: boolean;
+      emailEnabled: boolean;
+      channels: Record<string, boolean>;
+    }>('/api/me/notifications/preferences', {
+      method: 'PATCH',
+      body: JSON.stringify(body),
+      auth: true,
+    });
   },
 
   // --- offline ---

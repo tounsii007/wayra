@@ -21,14 +21,14 @@ export function FeatureGrid() {
           return (
             <article
               key={item.title}
-              className="surface group relative overflow-hidden rounded-2xl p-6 transition-shadow hover:shadow-card"
+              className="surface hover:shadow-card group relative overflow-hidden rounded-2xl p-6 transition-shadow"
             >
-              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-brand-500/0 via-brand-500/60 to-brand-500/0 opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 dark:bg-brand-500/15">
-                <Icon className="h-5 w-5 text-brand-600 dark:text-brand-300" />
+              <div className="from-brand-500/0 via-brand-500/60 to-brand-500/0 absolute inset-x-0 top-0 h-px bg-gradient-to-r opacity-0 transition-opacity group-hover:opacity-100" />
+              <div className="bg-brand-50 dark:bg-brand-500/15 inline-flex h-11 w-11 items-center justify-center rounded-xl">
+                <Icon className="text-brand-600 dark:text-brand-300 h-5 w-5" />
               </div>
               <h3 className="mt-4 text-base font-semibold">{item.title}</h3>
-              <p className="mt-1.5 text-sm text-muted leading-relaxed">{item.body}</p>
+              <p className="text-muted mt-1.5 text-sm leading-relaxed">{item.body}</p>
             </article>
           );
         })}

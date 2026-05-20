@@ -1,6 +1,13 @@
 import Link from 'next/link';
 import * as React from 'react';
-import { ShieldCheck, AlertTriangle, Database, Activity, MessageSquare, BarChart3 } from 'lucide-react';
+import {
+  ShieldCheck,
+  AlertTriangle,
+  Database,
+  Activity,
+  MessageSquare,
+  BarChart3,
+} from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LocaleSwitcher } from '@/components/locale-switcher';
 import { WayraLogo } from '@/components/wayra-logo';
@@ -32,7 +39,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
           <WayraLogo className="h-7 w-7" />
           <div>
             <div className="text-sm font-bold leading-tight">Wayra</div>
-            <div className="text-[10px] font-bold uppercase tracking-widest text-brand-500 inline-flex items-center gap-1">
+            <div className="text-brand-500 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest">
               <ShieldCheck className="h-3 w-3" /> Admin
             </div>
           </div>
@@ -42,7 +49,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
             <Link
               key={href}
               href={href}
-              className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-[rgb(var(--surface-muted))] hover:text-[rgb(var(--text))]"
+              className="text-muted flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors hover:bg-[rgb(var(--surface-muted))] hover:text-[rgb(var(--text))]"
             >
               <Icon className="h-4 w-4" />
               {label}

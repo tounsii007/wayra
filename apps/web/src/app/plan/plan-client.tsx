@@ -99,57 +99,59 @@ export function PlanClient() {
   return (
     <div className="grid gap-6 lg:grid-cols-[360px_1fr]">
       <aside className="surface sticky top-20 h-fit rounded-2xl p-5">
-        <div className="text-sm text-muted">{tHero('title')}</div>
+        <div className="text-muted text-sm">{tHero('title')}</div>
         <div className="mt-2 flex items-start gap-2">
           <div className="flex flex-col items-center pt-1">
-            <span className="h-2 w-2 rounded-full bg-brand-500" />
+            <span className="bg-brand-500 h-2 w-2 rounded-full" />
             <span className="my-1 h-8 w-px bg-[rgb(var(--border))]" />
-            <span className="h-2 w-2 rounded-full bg-accent-violet" />
+            <span className="bg-accent-violet h-2 w-2 rounded-full" />
           </div>
           <div className="min-w-0 flex-1 space-y-3">
             <div>
-              <div className="text-xs text-subtle">{tRoute('departure')}</div>
+              <div className="text-subtle text-xs">{tRoute('departure')}</div>
               <div className="truncate text-sm font-semibold">{from?.name ?? '—'}</div>
             </div>
             <div>
-              <div className="text-xs text-subtle">{tRoute('arrival')}</div>
+              <div className="text-subtle text-xs">{tRoute('arrival')}</div>
               <div className="truncate text-sm font-semibold">{to?.name ?? '—'}</div>
             </div>
           </div>
         </div>
 
         <div className="mt-5 border-t border-[rgb(var(--border))] pt-4">
-          <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-subtle">Sort by</div>
+          <div className="text-subtle mb-2 text-xs font-semibold uppercase tracking-wide">
+            Sort by
+          </div>
           <div className="flex flex-wrap gap-1.5">
-            {(['fastest', 'cheapest', 'fewest_transfers', 'least_walking', 'accessible'] as const).map(
-              (p) => (
-                <button
-                  key={p}
-                  onClick={() => setPref(p)}
-                  className={cn(
-                    'rounded-full px-3 py-1.5 text-xs font-semibold transition-colors focus-ring',
-                    pref === p
-                      ? 'bg-brand-500 text-white'
-                      : 'border border-[rgb(var(--border))] text-muted hover:text-[rgb(var(--text))]',
-                  )}
-                >
-                  {tRoute(`preferences.${p}`)}
-                </button>
-              ),
-            )}
+            {(
+              ['fastest', 'cheapest', 'fewest_transfers', 'least_walking', 'accessible'] as const
+            ).map((p) => (
+              <button
+                key={p}
+                onClick={() => setPref(p)}
+                className={cn(
+                  'focus-ring rounded-full px-3 py-1.5 text-xs font-semibold transition-colors',
+                  pref === p
+                    ? 'bg-brand-500 text-white'
+                    : 'text-muted border border-[rgb(var(--border))] hover:text-[rgb(var(--text))]',
+                )}
+              >
+                {tRoute(`preferences.${p}`)}
+              </button>
+            ))}
           </div>
         </div>
       </aside>
 
       <section>
         {usedFallback && (
-          <div className="mb-3 surface-muted rounded-xl px-3 py-2 text-xs text-muted inline-flex items-center gap-2">
+          <div className="surface-muted text-muted mb-3 inline-flex items-center gap-2 rounded-xl px-3 py-2 text-xs">
             <Loader2 className="h-3.5 w-3.5 animate-spin" />
             Backend unreachable — showing offline preview.
           </div>
         )}
         {notice && (
-          <div className="mb-3 rounded-xl bg-status-delay/10 px-3 py-2 text-xs text-status-delay">
+          <div className="bg-status-delay/10 text-status-delay mb-3 rounded-xl px-3 py-2 text-xs">
             {notice}
           </div>
         )}
@@ -163,8 +165,9 @@ export function PlanClient() {
           <>
             <div className="mb-2 flex items-center gap-2">
               <DemoBadge label="Estimated" />
-              <span className="text-xs text-subtle">
-                Synthesised from distance + per-km energy mix; production uses OpenTripPlanner over GTFS.
+              <span className="text-subtle text-xs">
+                Synthesised from distance + per-km energy mix; production uses OpenTripPlanner over
+                GTFS.
               </span>
             </div>
             <ul className="space-y-3">
@@ -172,7 +175,7 @@ export function PlanClient() {
                 <li key={r.id}>
                   <Link
                     href={`/trips/${encodeURIComponent(r.id)}`}
-                    className="block focus-ring rounded-2xl"
+                    className="focus-ring block rounded-2xl"
                   >
                     <RouteCard route={r} locale={locale} />
                   </Link>
@@ -192,28 +195,28 @@ function RouteCard({ route, locale }: { route: Route; locale: Locale }) {
   const delayMin = Math.round(delay / 60);
 
   return (
-    <article className="surface group relative overflow-hidden rounded-2xl p-5 transition-shadow hover:shadow-card">
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-500/40 to-transparent" />
+    <article className="surface hover:shadow-card group relative overflow-hidden rounded-2xl p-5 transition-shadow">
+      <div className="via-brand-500/40 absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent" />
       <header className="flex flex-wrap items-baseline justify-between gap-2">
         <div className="flex items-baseline gap-3">
           <div className="text-2xl font-bold tabular-nums">
             {formatTime(route.departureTime, locale)}
-            <ArrowRight className="mx-2 inline h-4 w-4 text-muted" />
+            <ArrowRight className="text-muted mx-2 inline h-4 w-4" />
             {formatTime(route.arrivalTime, locale)}
           </div>
           {delayMin > 0 && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-status-delay/15 px-2 py-0.5 text-xs font-semibold text-status-delay">
+            <span className="bg-status-delay/15 text-status-delay inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold">
               +{delayMin} min
             </span>
           )}
         </div>
         <div className="flex items-center gap-3 text-sm font-semibold">
-          <span className="inline-flex items-center gap-1 text-muted">
+          <span className="text-muted inline-flex items-center gap-1">
             <Clock className="h-4 w-4" />
             {formatDuration(route.durationSeconds, locale)}
           </span>
           {route.fare && (
-            <span className="rounded-full bg-brand-500/10 px-3 py-1 text-brand-700 dark:text-brand-300">
+            <span className="bg-brand-500/10 text-brand-700 dark:text-brand-300 rounded-full px-3 py-1">
               {formatFare(route.fare.amount, route.fare.currency, locale)}
             </span>
           )}
@@ -226,7 +229,7 @@ function RouteCard({ route, locale }: { route: Route; locale: Locale }) {
             return (
               <span
                 key={i}
-                className="inline-flex items-center gap-1 rounded-full surface-muted px-2 py-1 text-xs font-medium text-muted"
+                className="surface-muted text-muted inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium"
               >
                 <Footprints className="h-3.5 w-3.5" />
                 {Math.round(leg.distanceMeters)} m
@@ -249,9 +252,11 @@ function RouteCard({ route, locale }: { route: Route; locale: Locale }) {
         })}
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-muted">
+      <div className="text-muted mt-4 flex flex-wrap items-center gap-3 text-xs">
         <span>
-          {route.transfers === 0 ? tRoute('noTransfer') : `${route.transfers} ${tRoute('transfers')}`}
+          {route.transfers === 0
+            ? tRoute('noTransfer')
+            : `${route.transfers} ${tRoute('transfers')}`}
         </span>
         <span>·</span>
         <span className="inline-flex items-center gap-1">
@@ -261,7 +266,7 @@ function RouteCard({ route, locale }: { route: Route; locale: Locale }) {
         {route.co2SavedGrams !== undefined && route.co2SavedGrams > 0 && (
           <>
             <span>·</span>
-            <span className="inline-flex items-center gap-1 text-status-onTime">
+            <span className="text-status-onTime inline-flex items-center gap-1">
               <Leaf className="h-3.5 w-3.5" />
               {tRoute('co2Saved', { value: formatCO2(route.co2SavedGrams, locale) })}
             </span>
@@ -270,7 +275,7 @@ function RouteCard({ route, locale }: { route: Route; locale: Locale }) {
         {route.tags?.includes('recommended') && (
           <>
             <span>·</span>
-            <span className="inline-flex items-center gap-1 rounded-full bg-brand-500/15 px-2 py-0.5 font-semibold text-brand-700 dark:text-brand-300">
+            <span className="bg-brand-500/15 text-brand-700 dark:text-brand-300 inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-semibold">
               <Sparkles className="h-3 w-3" /> recommended
             </span>
           </>
@@ -293,8 +298,8 @@ function RouteListSkeleton() {
 function EmptyState({ message }: { message: string }) {
   return (
     <div className="surface flex flex-col items-center rounded-2xl px-6 py-16 text-center">
-      <AlertTriangle className="h-10 w-10 text-status-delay" />
-      <p className="mt-3 max-w-sm text-sm text-muted">{message}</p>
+      <AlertTriangle className="text-status-delay h-10 w-10" />
+      <p className="text-muted mt-3 max-w-sm text-sm">{message}</p>
     </div>
   );
 }

@@ -39,10 +39,22 @@
     "features": {
       "title": "Tout ce qu'il faut pour ton voyage",
       "items": [
-        { "title": "Itinéraires multimodaux", "body": "Train, bus, métro, tram et marche — intelligemment combinés." },
-        { "title": "Retards en direct", "body": "Ponctualité, changements de quai et perturbations en temps réel." },
-        { "title": "Horaires hors ligne", "body": "Télécharge des villes et utilise Wayra sans Internet." },
-        { "title": "Assistant IA", "body": "Pose tes questions en langage naturel — réponses instantanées." }
+        {
+          "title": "Itinéraires multimodaux",
+          "body": "Train, bus, métro, tram et marche — intelligemment combinés."
+        },
+        {
+          "title": "Retards en direct",
+          "body": "Ponctualité, changements de quai et perturbations en temps réel."
+        },
+        {
+          "title": "Horaires hors ligne",
+          "body": "Télécharge des villes et utilise Wayra sans Internet."
+        },
+        {
+          "title": "Assistant IA",
+          "body": "Pose tes questions en langage naturel — réponses instantanées."
+        }
       ]
     }
   },

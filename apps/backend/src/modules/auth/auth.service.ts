@@ -124,14 +124,29 @@ export class AuthService {
     const user = await this.users.findOne({ where: { email } });
     if (!user || !user.passwordHash) {
       await this.limiter.record(email, false, ctx.ip);
-      await this.audit.record('login.fail', { actorEmail: email, ...ctx, metadata: { reason: 'no_user' } });
-      throw new UnauthorizedException({ code: 'invalid_credentials', message: 'Invalid credentials.' });
+      await this.audit.record('login.fail', {
+        actorEmail: email,
+        ...ctx,
+        metadata: { reason: 'no_user' },
+      });
+      throw new UnauthorizedException({
+        code: 'invalid_credentials',
+        message: 'Invalid credentials.',
+      });
     }
     const ok = await bcrypt.compare(input.password, user.passwordHash);
     if (!ok) {
       await this.limiter.record(email, false, ctx.ip);
-      await this.audit.record('login.fail', { userId: user.id, actorEmail: email, ...ctx, metadata: { reason: 'bad_password' } });
-      throw new UnauthorizedException({ code: 'invalid_credentials', message: 'Invalid credentials.' });
+      await this.audit.record('login.fail', {
+        userId: user.id,
+        actorEmail: email,
+        ...ctx,
+        metadata: { reason: 'bad_password' },
+      });
+      throw new UnauthorizedException({
+        code: 'invalid_credentials',
+        message: 'Invalid credentials.',
+      });
     }
 
     if (await this.totp.isEnabled(user.id)) {
@@ -139,7 +154,12 @@ export class AuthService {
       const totpOk = await this.totp.verifyCode(user.id, input.totp);
       if (!totpOk) {
         await this.limiter.record(email, false, ctx.ip);
-        await this.audit.record('login.fail', { userId: user.id, actorEmail: email, ...ctx, metadata: { reason: 'bad_totp' } });
+        await this.audit.record('login.fail', {
+          userId: user.id,
+          actorEmail: email,
+          ...ctx,
+          metadata: { reason: 'bad_totp' },
+        });
         throw new UnauthorizedException({ code: 'invalid_totp', message: 'Invalid TOTP code.' });
       }
     }
@@ -153,10 +173,14 @@ export class AuthService {
     const hash = this.hash(refreshToken);
     const row = await this.refreshes.findOne({ where: { tokenHash: hash } });
     if (!row || row.revokedAt || row.expiresAt < new Date()) {
-      throw new UnauthorizedException({ code: 'invalid_refresh', message: 'Invalid refresh token.' });
+      throw new UnauthorizedException({
+        code: 'invalid_refresh',
+        message: 'Invalid refresh token.',
+      });
     }
     const user = await this.users.findOne({ where: { id: row.userId } });
-    if (!user) throw new UnauthorizedException({ code: 'invalid_refresh', message: 'User missing.' });
+    if (!user)
+      throw new UnauthorizedException({ code: 'invalid_refresh', message: 'User missing.' });
 
     row.revokedAt = new Date();
     await this.refreshes.save(row);
@@ -277,7 +301,11 @@ export class AuthService {
     return { ok: true };
   }
 
-  async resetPassword(token: string, newPassword: string, ctx: RequestContext = {}): Promise<{ ok: true }> {
+  async resetPassword(
+    token: string,
+    newPassword: string,
+    ctx: RequestContext = {},
+  ): Promise<{ ok: true }> {
     if (!this.isStrongEnough(newPassword)) {
       throw new BadRequestException({
         code: 'weak_password',
@@ -288,7 +316,10 @@ export class AuthService {
       where: { tokenHash: this.hash(token), kind: 'password_reset' },
     });
     if (!action || action.usedAt || action.expiresAt < new Date()) {
-      throw new BadRequestException({ code: 'invalid_token', message: 'Invalid or expired token.' });
+      throw new BadRequestException({
+        code: 'invalid_token',
+        message: 'Invalid or expired token.',
+      });
     }
     const user = await this.users.findOne({ where: { id: action.userId } });
     if (!user) throw new BadRequestException({ code: 'invalid_token', message: 'User missing.' });
@@ -315,7 +346,10 @@ export class AuthService {
         usedAt: null,
       }),
     );
-    await this.audit.record('email.verification.request', { userId: user.id, actorEmail: user.email });
+    await this.audit.record('email.verification.request', {
+      userId: user.id,
+      actorEmail: user.email,
+    });
     const baseUrl = this.config.get<string>('PUBLIC_WEB_URL') ?? 'http://localhost:3000';
     await this.mailer.send({
       to: user.email,
@@ -332,7 +366,10 @@ export class AuthService {
       where: { tokenHash: this.hash(token), kind: 'email_verification' },
     });
     if (!action || action.usedAt || action.expiresAt < new Date()) {
-      throw new BadRequestException({ code: 'invalid_token', message: 'Invalid or expired token.' });
+      throw new BadRequestException({
+        code: 'invalid_token',
+        message: 'Invalid or expired token.',
+      });
     }
     const user = await this.users.findOne({ where: { id: action.userId } });
     if (!user) throw new BadRequestException({ code: 'invalid_token', message: 'User missing.' });
@@ -340,7 +377,10 @@ export class AuthService {
     action.usedAt = new Date();
     await this.users.save(user);
     await this.actions.save(action);
-    await this.audit.record('email.verification.complete', { userId: user.id, actorEmail: user.email });
+    await this.audit.record('email.verification.complete', {
+      userId: user.id,
+      actorEmail: user.email,
+    });
     return { ok: true };
   }
 

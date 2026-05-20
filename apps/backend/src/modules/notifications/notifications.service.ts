@@ -45,7 +45,11 @@ export class NotificationsService {
 
   async getPreferences(userId: string): Promise<NotificationPreferences> {
     const rows = await this.ds.query<
-      Array<{ push_enabled: boolean; email_enabled: boolean; channels: NotificationChannels | null }>
+      Array<{
+        push_enabled: boolean;
+        email_enabled: boolean;
+        channels: NotificationChannels | null;
+      }>
     >(
       `SELECT push_enabled, email_enabled, channels
        FROM notification_preference WHERE user_id = $1`,

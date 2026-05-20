@@ -51,7 +51,10 @@ export class OtpRoutingProvider implements RoutingProvider {
   private readonly url: string;
   private readonly router: string;
 
-  constructor(config: ConfigService, private readonly places: PlacesService) {
+  constructor(
+    config: ConfigService,
+    private readonly places: PlacesService,
+  ) {
     this.url = config.get<string>('OTP_URL') ?? '';
     this.router = config.get<string>('OTP_ROUTER') ?? 'default';
   }
@@ -191,7 +194,9 @@ export class OtpRoutingProvider implements RoutingProvider {
       transfers: it.transfers,
       walkingMeters: Math.round(it.walkDistance),
       legs,
-      fare: it.fare ? { amount: it.fare.amount, currency: it.fare.currency, source: 'estimated' } : undefined,
+      fare: it.fare
+        ? { amount: it.fare.amount, currency: it.fare.currency, source: 'estimated' }
+        : undefined,
       tags: i === 0 ? ['recommended'] : [],
     };
   }

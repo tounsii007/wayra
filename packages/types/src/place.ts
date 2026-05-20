@@ -6,8 +6,8 @@ export type PlaceType =
   | 'neighborhood'
   | 'street'
   | 'address'
-  | 'station'        // major rail station (Hbf, Gare)
-  | 'stop'           // bus/tram/metro stop
+  | 'station' // major rail station (Hbf, Gare)
+  | 'stop' // bus/tram/metro stop
   | 'metro_station'
   | 'tram_stop'
   | 'bus_stop'
@@ -33,11 +33,11 @@ export interface Place {
 }
 
 export type TransitMode =
-  | 'rail'           // long-distance and regional trains
-  | 'subway'         // metro / U-Bahn
+  | 'rail' // long-distance and regional trains
+  | 'subway' // metro / U-Bahn
   | 'tram'
   | 'bus'
-  | 'coach'          // long-distance bus (Fernbus)
+  | 'coach' // long-distance bus (Fernbus)
   | 'ferry'
   | 'cable'
   | 'walk'

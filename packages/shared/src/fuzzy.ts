@@ -42,9 +42,9 @@ export function levenshtein(a: string, b: string): number {
     for (let j = 1; j <= n; j++) {
       const cost = a[i - 1] === b[j - 1] ? 0 : 1;
       curr[j] = Math.min(
-        (curr[j - 1] ?? 0) + 1,        // insert
-        (prev[j] ?? 0) + 1,            // delete
-        (prev[j - 1] ?? 0) + cost,     // substitute
+        (curr[j - 1] ?? 0) + 1, // insert
+        (prev[j] ?? 0) + 1, // delete
+        (prev[j - 1] ?? 0) + cost, // substitute
       );
     }
     for (let j = 0; j <= n; j++) prev[j] = curr[j] ?? 0;

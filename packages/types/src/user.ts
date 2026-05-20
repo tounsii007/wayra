@@ -36,7 +36,7 @@ export interface SavedRoute {
 
 export interface OfflineRegion {
   id: UUID;
-  userId?: UUID;          // optional for anonymous downloads
+  userId?: UUID; // optional for anonymous downloads
   name: string;
   countryCode: CountryCode;
   /** Bounding box or city ID */

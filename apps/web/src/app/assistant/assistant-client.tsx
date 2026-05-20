@@ -40,14 +40,16 @@ export function AssistantClient() {
   const examples = t.raw('examples') as string[];
 
   return (
-    <section className="surface rounded-3xl p-4 sm:p-6 min-h-[70vh] flex flex-col">
+    <section className="surface flex min-h-[70vh] flex-col rounded-3xl p-4 sm:p-6">
       <header className="flex items-center gap-3">
-        <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-accent-violet text-white">
+        <div className="from-brand-500 to-accent-violet inline-flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br text-white">
           <Sparkles className="h-5 w-5" />
         </div>
         <div>
           <div className="text-sm font-semibold">Wayra Assistant</div>
-          <div className="text-xs text-subtle">Multilingual · context-aware · routes & disruptions</div>
+          <div className="text-subtle text-xs">
+            Multilingual · context-aware · routes & disruptions
+          </div>
         </div>
       </header>
 
@@ -55,27 +57,26 @@ export function AssistantClient() {
         {messages.map((m, i) => (
           <li
             key={i}
-            className={cn(
-              'flex gap-3 animate-fade-in',
-              m.role === 'user' && 'flex-row-reverse',
-            )}
+            className={cn('animate-fade-in flex gap-3', m.role === 'user' && 'flex-row-reverse')}
           >
             <div
               className={cn(
                 'flex h-8 w-8 shrink-0 items-center justify-center rounded-full',
                 m.role === 'assistant'
-                  ? 'bg-gradient-to-br from-brand-500 to-accent-violet text-white'
+                  ? 'from-brand-500 to-accent-violet bg-gradient-to-br text-white'
                   : 'surface text-muted',
               )}
             >
-              {m.role === 'assistant' ? <Bot className="h-4 w-4" /> : <UserIcon className="h-4 w-4" />}
+              {m.role === 'assistant' ? (
+                <Bot className="h-4 w-4" />
+              ) : (
+                <UserIcon className="h-4 w-4" />
+              )}
             </div>
             <div
               className={cn(
                 'max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed',
-                m.role === 'assistant'
-                  ? 'surface-muted'
-                  : 'bg-brand-500 text-white',
+                m.role === 'assistant' ? 'surface-muted' : 'bg-brand-500 text-white',
               )}
             >
               {m.content}
@@ -84,14 +85,14 @@ export function AssistantClient() {
         ))}
         {busy && (
           <li className="flex gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-accent-violet text-white">
+            <div className="from-brand-500 to-accent-violet flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br text-white">
               <Bot className="h-4 w-4" />
             </div>
             <div className="surface-muted rounded-2xl px-4 py-3">
               <span className="inline-flex gap-1">
-                <span className="h-2 w-2 animate-bounce rounded-full bg-muted [animation-delay:-0.3s]" />
-                <span className="h-2 w-2 animate-bounce rounded-full bg-muted [animation-delay:-0.15s]" />
-                <span className="h-2 w-2 animate-bounce rounded-full bg-muted" />
+                <span className="bg-muted h-2 w-2 animate-bounce rounded-full [animation-delay:-0.3s]" />
+                <span className="bg-muted h-2 w-2 animate-bounce rounded-full [animation-delay:-0.15s]" />
+                <span className="bg-muted h-2 w-2 animate-bounce rounded-full" />
               </span>
             </div>
           </li>
@@ -104,7 +105,7 @@ export function AssistantClient() {
             <button
               key={ex}
               onClick={() => send(ex)}
-              className="rounded-full surface-muted px-3 py-1.5 text-xs font-medium text-muted hover:text-[rgb(var(--text))] focus-ring"
+              className="surface-muted text-muted focus-ring rounded-full px-3 py-1.5 text-xs font-medium hover:text-[rgb(var(--text))]"
             >
               {ex}
             </button>
@@ -131,12 +132,12 @@ export function AssistantClient() {
           }}
           placeholder={t('placeholder')}
           dir="auto"
-          className="min-h-[40px] max-h-32 flex-1 resize-none bg-transparent px-3 py-2 text-sm outline-none placeholder:text-subtle"
+          className="placeholder:text-subtle max-h-32 min-h-[40px] flex-1 resize-none bg-transparent px-3 py-2 text-sm outline-none"
         />
         <button
           type="submit"
           disabled={!input.trim() || busy}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-brand-500 text-white disabled:opacity-40 transition-opacity focus-ring"
+          className="bg-brand-500 focus-ring inline-flex h-10 w-10 items-center justify-center rounded-xl text-white transition-opacity disabled:opacity-40"
         >
           <Send className="h-4 w-4" />
         </button>

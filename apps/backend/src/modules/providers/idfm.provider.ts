@@ -24,7 +24,10 @@ export class IdfmProvider implements TransitDataProvider {
     return !!this.apiKey;
   }
 
-  async searchPlaces(query: string, opts: { near?: Coordinates; limit?: number } = {}): Promise<PlaceSuggestion[]> {
+  async searchPlaces(
+    query: string,
+    opts: { near?: Coordinates; limit?: number } = {},
+  ): Promise<PlaceSuggestion[]> {
     if (!this.isConfigured()) return [];
     try {
       const url = new URL(
@@ -59,7 +62,9 @@ export class IdfmProvider implements TransitDataProvider {
         };
         const score = p.name.toLowerCase().includes(query.toLowerCase()) ? 0.85 : 0.5;
         const distance = opts.near ? distanceMeters(opts.near, coords) : undefined;
-        return [distance !== undefined ? { place, score, distanceMeters: distance } : { place, score }];
+        return [
+          distance !== undefined ? { place, score, distanceMeters: distance } : { place, score },
+        ];
       });
     } catch (e) {
       this.logger.warn(`searchPlaces failed: ${(e as Error).message}`);

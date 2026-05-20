@@ -59,9 +59,17 @@ export class OAuthVerifierService {
         issuer: cfg.issuer,
         audience,
       });
-      const p = payload as JWTPayload & { sub?: string; email?: string; name?: string; email_verified?: boolean };
+      const p = payload as JWTPayload & {
+        sub?: string;
+        email?: string;
+        name?: string;
+        email_verified?: boolean;
+      };
       if (!p.sub) {
-        throw new BadRequestException({ code: 'oauth_no_subject', message: 'No subject in id_token.' });
+        throw new BadRequestException({
+          code: 'oauth_no_subject',
+          message: 'No subject in id_token.',
+        });
       }
       return {
         subject: p.sub,

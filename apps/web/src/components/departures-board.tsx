@@ -1,15 +1,7 @@
 'use client';
 
 import { useLocale, useTranslations } from 'next-intl';
-import {
-  Train,
-  TramFront,
-  Bus,
-  Plane,
-  AlertCircle,
-  Clock,
-  Loader2,
-} from 'lucide-react';
+import { Train, TramFront, Bus, Plane, AlertCircle, Clock, Loader2 } from 'lucide-react';
 import { formatTime, formatDelayMinutes } from '@wayra/shared';
 import type { Departure, Locale, TransitMode } from '@wayra/types';
 import { useLiveDepartures } from '@/hooks/use-live-departures';
@@ -55,7 +47,7 @@ export function DeparturesBoard({ stopId }: { stopId: string }) {
 
   if (error) {
     return (
-      <div className="surface rounded-2xl p-4 text-sm text-status-severe">
+      <div className="surface text-status-severe rounded-2xl p-4 text-sm">
         <AlertCircle className="mr-2 inline h-4 w-4" />
         {error}
       </div>
@@ -64,7 +56,7 @@ export function DeparturesBoard({ stopId }: { stopId: string }) {
 
   if (departures.length === 0) {
     return (
-      <div className="surface rounded-2xl p-6 text-sm text-muted">
+      <div className="surface text-muted rounded-2xl p-6 text-sm">
         <Clock className="mr-2 inline h-4 w-4" />
         No departures in the next window.
       </div>
@@ -74,19 +66,22 @@ export function DeparturesBoard({ stopId }: { stopId: string }) {
   return (
     <div className="space-y-2">
       {liveDataAvailable === false && (
-        <div className="surface-muted rounded-xl px-3 py-2 text-xs text-muted inline-flex items-center gap-2">
+        <div className="surface-muted text-muted inline-flex items-center gap-2 rounded-xl px-3 py-2 text-xs">
           <Loader2 className="h-3.5 w-3.5 animate-spin" />
           {t('noLive')}
         </div>
       )}
 
-      <ul className="divide-y divide-[rgb(var(--border))] surface overflow-hidden rounded-2xl">
+      <ul className="surface divide-y divide-[rgb(var(--border))] overflow-hidden rounded-2xl">
         {departures.map((d) => {
           const status = statusFor(d);
           const Icon = MODE_ICON[d.line.mode] ?? Bus;
           const delayMin = d.delaySeconds ? formatDelayMinutes(d.delaySeconds) : '';
           return (
-            <li key={`${d.tripId}-${d.scheduledTime}`} className="flex items-center gap-3 px-4 py-3">
+            <li
+              key={`${d.tripId}-${d.scheduledTime}`}
+              className="flex items-center gap-3 px-4 py-3"
+            >
               <span
                 className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-white"
                 style={{ background: d.line.color ?? '#2563eb' }}
@@ -96,12 +91,12 @@ export function DeparturesBoard({ stopId }: { stopId: string }) {
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <span className="font-bold">{d.line.shortName}</span>
-                  <span className="truncate text-sm text-muted">→ {d.headsign}</span>
+                  <span className="text-muted truncate text-sm">→ {d.headsign}</span>
                 </div>
-                <div className="flex items-baseline gap-2 text-xs text-subtle">
+                <div className="text-subtle flex items-baseline gap-2 text-xs">
                   {d.platform && <span>Gleis {d.platform}</span>}
                   {d.platformChanged && (
-                    <span className="rounded-full bg-status-delay/20 px-1.5 py-0.5 font-semibold text-status-delay">
+                    <span className="bg-status-delay/20 text-status-delay rounded-full px-1.5 py-0.5 font-semibold">
                       changed
                     </span>
                   )}
@@ -110,7 +105,7 @@ export function DeparturesBoard({ stopId }: { stopId: string }) {
               <div className="text-right">
                 <div
                   className={cn(
-                    'tabular-nums text-base font-bold',
+                    'text-base font-bold tabular-nums',
                     status === 'cancelled' && 'line-through',
                   )}
                 >

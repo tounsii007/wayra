@@ -40,19 +40,19 @@ export function CookieBanner() {
     <div
       role="dialog"
       aria-label="Cookie preferences"
-      className="fixed inset-x-3 bottom-3 z-[100] mx-auto max-w-3xl rounded-2xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-4 shadow-card"
+      className="shadow-card fixed inset-x-3 bottom-3 z-[100] mx-auto max-w-3xl rounded-2xl border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-4"
     >
       <div className="flex flex-wrap items-start gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-500/10 text-brand-500">
+        <div className="bg-brand-500/10 text-brand-500 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
           <Cookie className="h-5 w-5" />
         </div>
         <div className="min-w-0 flex-1">
           <div className="font-bold">Your privacy matters</div>
-          <p className="mt-1 text-sm text-muted">
-            We use essential storage to keep you signed in, remember your language and theme,
-            and cache offline regions you choose to download. We don't run analytics or
-            marketing trackers by default — opt in only if you want.{' '}
-            <a className="font-semibold text-brand-500 underline" href="/privacy">
+          <p className="text-muted mt-1 text-sm">
+            We use essential storage to keep you signed in, remember your language and theme, and
+            cache offline regions you choose to download. We don't run analytics or marketing
+            trackers by default — opt in only if you want.{' '}
+            <a className="text-brand-500 font-semibold underline" href="/privacy">
               Read more
             </a>
             .
@@ -62,19 +62,19 @@ export function CookieBanner() {
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <button
           onClick={() => save(false, false)}
-          className="rounded-full surface-muted px-3 py-1.5 text-xs font-bold focus-ring"
+          className="surface-muted focus-ring rounded-full px-3 py-1.5 text-xs font-bold"
         >
           Essential only
         </button>
         <button
           onClick={() => save(true, false)}
-          className="rounded-full surface-muted px-3 py-1.5 text-xs font-bold focus-ring"
+          className="surface-muted focus-ring rounded-full px-3 py-1.5 text-xs font-bold"
         >
           Essential + analytics
         </button>
         <button
           onClick={() => save(true, true)}
-          className="ms-auto inline-flex items-center gap-1.5 rounded-full bg-brand-500 px-4 py-1.5 text-xs font-bold text-white shadow-glow focus-ring"
+          className="bg-brand-500 shadow-glow focus-ring ms-auto inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-bold text-white"
         >
           <Shield className="h-3 w-3" />
           Accept all

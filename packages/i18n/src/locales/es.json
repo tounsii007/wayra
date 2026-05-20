@@ -36,10 +36,19 @@
     "features": {
       "title": "Todo lo que necesitas para tu viaje",
       "items": [
-        { "title": "Rutas multimodales", "body": "Tren, autobús, metro, tranvía y a pie — combinados con inteligencia." },
-        { "title": "Retrasos en directo", "body": "Puntualidad, cambios de andén e incidencias en tiempo real." },
+        {
+          "title": "Rutas multimodales",
+          "body": "Tren, autobús, metro, tranvía y a pie — combinados con inteligencia."
+        },
+        {
+          "title": "Retrasos en directo",
+          "body": "Puntualidad, cambios de andén e incidencias en tiempo real."
+        },
         { "title": "Horarios offline", "body": "Descarga ciudades y usa Wayra sin Internet." },
-        { "title": "Asistente IA", "body": "Pregunta en lenguaje natural — respuestas instantáneas." }
+        {
+          "title": "Asistente IA",
+          "body": "Pregunta en lenguaje natural — respuestas instantáneas."
+        }
       ]
     }
   },

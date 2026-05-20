@@ -37,7 +37,11 @@ export function usePushSubscription() {
   const token = useAuthStore((s) => s.token);
 
   useEffect(() => {
-    if (typeof window === 'undefined' || !('Notification' in window) || !('serviceWorker' in navigator)) {
+    if (
+      typeof window === 'undefined' ||
+      !('Notification' in window) ||
+      !('serviceWorker' in navigator)
+    ) {
       setState({ supported: false, permission: 'unsupported', subscribed: false });
       return;
     }

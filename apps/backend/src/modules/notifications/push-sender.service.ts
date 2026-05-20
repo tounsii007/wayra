@@ -56,7 +56,10 @@ export class PushSender implements OnModuleInit {
     }
   }
 
-  async sendToUser(userId: string, payload: PushPayload): Promise<{ sent: number; failed: number }> {
+  async sendToUser(
+    userId: string,
+    payload: PushPayload,
+  ): Promise<{ sent: number; failed: number }> {
     const subs = await this.subs.find({ where: { userId } });
     let sent = 0;
     let failed = 0;

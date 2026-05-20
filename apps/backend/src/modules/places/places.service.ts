@@ -2,13 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { distanceMeters, fuzzyScore } from '@wayra/shared';
-import type {
-  Coordinates,
-  Place,
-  PlaceSuggestion,
-  PlaceType,
-  TransitMode,
-} from '@wayra/types';
+import type { Coordinates, Place, PlaceSuggestion, PlaceType, TransitMode } from '@wayra/types';
 import { sampleSuggestions } from './sample-data';
 
 interface PlaceRow {
@@ -130,9 +124,7 @@ export class PlacesService {
     const stopTypes = ['stop', 'bus_stop', 'tram_stop', 'metro_station', 'station'];
     if (this.dbReady) {
       try {
-        const rows = await this.ds.query<
-          Array<PlaceRow & { distance_m: number }>
-        >(
+        const rows = await this.ds.query<Array<PlaceRow & { distance_m: number }>>(
           `SELECT id, type, name,
                   ST_Y(geom::geometry) AS lat,
                   ST_X(geom::geometry) AS lng,
@@ -144,12 +136,7 @@ export class PlacesService {
              AND ST_DWithin(geom, ST_GeographyFromText($1), $3)
            ORDER BY distance_m ASC
            LIMIT $4`,
-          [
-            `SRID=4326;POINT(${coords.lng} ${coords.lat})`,
-            stopTypes,
-            radiusMeters,
-            limit,
-          ],
+          [`SRID=4326;POINT(${coords.lng} ${coords.lat})`, stopTypes, radiusMeters, limit],
         );
         if (rows.length > 0) {
           return {

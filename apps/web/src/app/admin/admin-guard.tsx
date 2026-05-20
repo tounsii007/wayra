@@ -60,16 +60,14 @@ export function AdminGuard({ children }: Props) {
   }
   if (state === 'unauthenticated') {
     return (
-      <div className="min-h-screen flex items-center justify-center p-8">
+      <div className="flex min-h-screen items-center justify-center p-8">
         <div className="surface max-w-md rounded-2xl p-6 text-center">
-          <ShieldOff className="mx-auto h-10 w-10 text-status-severe" />
+          <ShieldOff className="text-status-severe mx-auto h-10 w-10" />
           <h2 className="mt-3 text-lg font-bold">Sign in required</h2>
-          <p className="mt-1 text-sm text-muted">
-            The admin area is reserved for staff accounts.
-          </p>
+          <p className="text-muted mt-1 text-sm">The admin area is reserved for staff accounts.</p>
           <button
             onClick={() => router.push('/login')}
-            className="mt-4 rounded-full bg-brand-500 px-4 py-2 text-sm font-semibold text-white"
+            className="bg-brand-500 mt-4 rounded-full px-4 py-2 text-sm font-semibold text-white"
           >
             Sign in
           </button>
@@ -79,11 +77,11 @@ export function AdminGuard({ children }: Props) {
   }
   if (state === 'forbidden') {
     return (
-      <div className="min-h-screen flex items-center justify-center p-8">
+      <div className="flex min-h-screen items-center justify-center p-8">
         <div className="surface max-w-md rounded-2xl p-6 text-center">
-          <ShieldOff className="mx-auto h-10 w-10 text-status-severe" />
+          <ShieldOff className="text-status-severe mx-auto h-10 w-10" />
           <h2 className="mt-3 text-lg font-bold">Forbidden</h2>
-          <p className="mt-1 text-sm text-muted">
+          <p className="text-muted mt-1 text-sm">
             Your account doesn't have admin permissions. Ask a teammate to grant you
             <code className="mx-1 rounded bg-[rgb(var(--surface-muted))] px-1 py-0.5 text-xs">
               role = admin

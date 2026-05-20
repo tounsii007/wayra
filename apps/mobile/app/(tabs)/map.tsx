@@ -81,7 +81,13 @@ export default function MapScreen() {
               borderWidth: country === c ? 0 : 1,
             }}
           >
-            <Text style={{ color: country === c ? '#fff' : theme.text, fontSize: 12, fontWeight: '800' }}>
+            <Text
+              style={{
+                color: country === c ? '#fff' : theme.text,
+                fontSize: 12,
+                fontWeight: '800',
+              }}
+            >
               {c}
             </Text>
           </Pressable>
@@ -124,7 +130,11 @@ export default function MapScreen() {
                 }}
               />
               <Text
-                style={{ color: on ? theme.text : theme.textSubtle, fontSize: 11, fontWeight: '700' }}
+                style={{
+                  color: on ? theme.text : theme.textSubtle,
+                  fontSize: 11,
+                  fontWeight: '700',
+                }}
               >
                 {label}
               </Text>
