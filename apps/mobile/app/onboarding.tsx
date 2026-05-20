@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ArrowRight, Sparkles, Activity, DownloadCloud, Train } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/theme';
+import { Button, Chip } from '@/components/ui';
 
 const { width } = Dimensions.get('window');
 
@@ -14,6 +15,7 @@ interface Slide {
   title: string;
   body: string;
   Icon: typeof Train;
+  tone: 'brand' | 'amber' | 'violet' | 'emerald';
 }
 
 export default function Onboarding() {
@@ -28,24 +30,28 @@ export default function Onboarding() {
       title: t('home.features.items.0.title'),
       body: t('home.features.items.0.body'),
       Icon: Train,
+      tone: 'brand',
     },
     {
       key: 'live',
       title: t('home.features.items.1.title'),
       body: t('home.features.items.1.body'),
       Icon: Activity,
+      tone: 'amber',
     },
     {
       key: 'offline',
       title: t('home.features.items.2.title'),
       body: t('home.features.items.2.body'),
       Icon: DownloadCloud,
+      tone: 'violet',
     },
     {
       key: 'ai',
       title: t('home.features.items.3.title'),
       body: t('home.features.items.3.body'),
       Icon: Sparkles,
+      tone: 'emerald',
     },
   ];
 
@@ -66,9 +72,27 @@ export default function Onboarding() {
     }
   }
 
+  const toneColor = (tone: Slide['tone']) => {
+    switch (tone) {
+      case 'brand':
+        return theme.brand;
+      case 'amber':
+        return theme.accent;
+      case 'violet':
+        return theme.accentLegacy.violet;
+      case 'emerald':
+        return theme.status.onTime;
+    }
+  };
+
   return (
     <SafeAreaView edges={['top', 'bottom']} style={{ flex: 1, backgroundColor: theme.bg }}>
       <View style={{ flex: 1 }}>
+        {/* Top brand row */}
+        <View style={{ paddingHorizontal: 24, paddingTop: 8, alignItems: 'flex-start' }}>
+          <Chip label="Welcome to Wayra" tone="brand" />
+        </View>
+
         <FlatList
           ref={listRef}
           data={slides}
@@ -80,6 +104,7 @@ export default function Onboarding() {
           viewabilityConfig={{ itemVisiblePercentThreshold: 50 }}
           renderItem={({ item }) => {
             const Icon = item.Icon;
+            const color = toneColor(item.tone);
             return (
               <View
                 style={{
@@ -87,31 +112,62 @@ export default function Onboarding() {
                   padding: 28,
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: 14,
+                  gap: 18,
                 }}
               >
+                {/* Icon halo + tile */}
                 <View
                   style={{
-                    width: 88,
-                    height: 88,
-                    borderRadius: 28,
-                    backgroundColor: theme.brand,
+                    width: 200,
+                    height: 200,
+                    borderRadius: 100,
                     alignItems: 'center',
                     justifyContent: 'center',
-                    shadowColor: theme.brand,
-                    shadowOpacity: 0.4,
-                    shadowRadius: 20,
-                    shadowOffset: { width: 0, height: 10 },
                   }}
                 >
-                  <Icon color="white" size={36} />
+                  <View
+                    style={{
+                      position: 'absolute',
+                      width: 200,
+                      height: 200,
+                      borderRadius: 100,
+                      backgroundColor: color + '15',
+                    }}
+                  />
+                  <View
+                    style={{
+                      position: 'absolute',
+                      width: 140,
+                      height: 140,
+                      borderRadius: 70,
+                      backgroundColor: color + '22',
+                    }}
+                  />
+                  <View
+                    style={{
+                      width: 96,
+                      height: 96,
+                      borderRadius: 28,
+                      backgroundColor: color,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      shadowColor: color,
+                      shadowOpacity: 0.45,
+                      shadowRadius: 24,
+                      shadowOffset: { width: 0, height: 12 },
+                    }}
+                  >
+                    <Icon color="white" size={40} />
+                  </View>
                 </View>
+
                 <Text
                   style={{
                     color: theme.text,
-                    fontSize: 24,
+                    fontSize: 28,
                     fontWeight: '800',
                     textAlign: 'center',
+                    letterSpacing: -0.8,
                   }}
                 >
                   {item.title}
@@ -132,14 +188,15 @@ export default function Onboarding() {
           }}
         />
 
+        {/* Progress dots */}
         <View
-          style={{ flexDirection: 'row', justifyContent: 'center', gap: 6, paddingVertical: 12 }}
+          style={{ flexDirection: 'row', justifyContent: 'center', gap: 6, paddingVertical: 14 }}
         >
           {slides.map((_, i) => (
             <View
               key={i}
               style={{
-                width: i === index ? 18 : 6,
+                width: i === index ? 24 : 6,
                 height: 6,
                 borderRadius: 999,
                 backgroundColor: i === index ? theme.brand : theme.border,
@@ -148,31 +205,27 @@ export default function Onboarding() {
           ))}
         </View>
 
-        <View style={{ flexDirection: 'row', padding: 20, gap: 12 }}>
-          <Pressable
-            onPress={done}
-            style={{ flex: 1, paddingVertical: 14, alignItems: 'center', justifyContent: 'center' }}
-          >
-            <Text style={{ color: theme.textMuted, fontWeight: '600' }}>Skip</Text>
-          </Pressable>
-          <Pressable
-            onPress={next}
-            style={{
-              flex: 1,
-              paddingVertical: 14,
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexDirection: 'row',
-              gap: 8,
-              backgroundColor: theme.brand,
-              borderRadius: 999,
-            }}
-          >
-            <Text style={{ color: 'white', fontWeight: '700' }}>
-              {index === slides.length - 1 ? 'Get started' : 'Next'}
+        {/* Footer actions */}
+        <View style={{ flexDirection: 'row', padding: 20, gap: 12, alignItems: 'center' }}>
+          <Pressable onPress={done} hitSlop={10}>
+            <Text
+              style={{
+                color: theme.textMuted,
+                fontWeight: '700',
+                fontSize: 13,
+                letterSpacing: 0.4,
+              }}
+            >
+              Skip
             </Text>
-            <ArrowRight color="white" size={16} />
           </Pressable>
+          <View style={{ flex: 1 }} />
+          <Button
+            label={index === slides.length - 1 ? 'Get started' : 'Next'}
+            onPress={next}
+            iconRight={<ArrowRight color="#fff" size={16} />}
+            size="lg"
+          />
         </View>
       </View>
     </SafeAreaView>

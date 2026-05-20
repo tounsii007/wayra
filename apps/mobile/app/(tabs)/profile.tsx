@@ -10,6 +10,14 @@ import {
   Sun,
   Trash2,
   User,
+  Settings2,
+  Palette,
+  Languages,
+  BellRing,
+  ShieldCheck,
+  Mail,
+  ArrowRight,
+  ChevronRight,
 } from 'lucide-react-native';
 import { useTheme } from '@/theme';
 import { useAuthStore } from '@/lib/auth-store';
@@ -22,6 +30,7 @@ import { localeMetadata } from '@wayra/i18n';
 import { SUPPORTED_LOCALES } from '@wayra/shared';
 import type { Locale, Theme } from '@wayra/types';
 import { useTranslation } from 'react-i18next';
+import { Ticket, Chip, Button, ScreenHeader } from '@/components/ui';
 
 const channelLabels: Record<keyof NotificationChannels, string> = {
   delay: 'Delays',
@@ -29,7 +38,7 @@ const channelLabels: Record<keyof NotificationChannels, string> = {
   platformChange: 'Platform changes',
   departureSoon: 'Departure soon',
   tightTransfer: 'Tight transfer',
-  disruptionOnFavorite: 'Disruption on favorites',
+  disruptionOnFavorite: 'Disruption on favourites',
   priceChange: 'Price changes',
   offlineDataStale: 'Offline data stale',
 };
@@ -43,134 +52,160 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: theme.bg }}>
-      <ScrollView contentContainerStyle={{ padding: 20, gap: 14 }}>
-        <Text style={{ color: theme.text, fontSize: 26, fontWeight: '800' }}>
-          {t('nav.settings')}
-        </Text>
+      <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 40, gap: 16 }}>
+        <ScreenHeader
+          chip="Account"
+          chipIcon={<Settings2 color={theme.brand} size={10} />}
+          chipTone="brand"
+          title={t('nav.settings')}
+        />
 
-        <Section title="Account">
+        {/* Account ticket */}
+        <Ticket accent padding="lg">
           {auth.user ? (
             <Pressable
               onPress={() => router.push('/me')}
-              style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}
+              style={({ pressed }) => ({
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 14,
+                opacity: pressed ? 0.7 : 1,
+              })}
             >
               <View
                 style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 12,
+                  width: 56,
+                  height: 56,
+                  borderRadius: 20,
                   backgroundColor: theme.brand,
                   alignItems: 'center',
                   justifyContent: 'center',
+                  shadowColor: theme.brand,
+                  shadowOffset: { width: 0, height: 4 },
+                  shadowOpacity: 0.4,
+                  shadowRadius: 10,
                 }}
               >
-                <User color="#fff" size={16} />
+                <Text style={{ color: '#fff', fontWeight: '800', fontSize: 22 }}>
+                  {(auth.user.displayName ?? auth.user.email ?? '?').slice(0, 1).toUpperCase()}
+                </Text>
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={{ color: theme.text, fontWeight: '800' }}>
-                  {auth.user.displayName ?? 'Signed in'}
-                </Text>
-                <Text style={{ color: theme.textSubtle, fontSize: 12 }}>{auth.user.email}</Text>
-              </View>
-              <Heart color={theme.status.severe} size={14} />
-            </Pressable>
-          ) : (
-            <Pressable
-              onPress={() => router.push('/login')}
-              style={{
-                flexDirection: 'row',
-                gap: 8,
-                alignItems: 'center',
-                paddingVertical: 10,
-                paddingHorizontal: 14,
-                borderRadius: 999,
-                backgroundColor: theme.brand,
-                alignSelf: 'flex-start',
-              }}
-            >
-              <KeyRound color="#fff" size={14} />
-              <Text style={{ color: '#fff', fontWeight: '800' }}>Sign in</Text>
-            </Pressable>
-          )}
-        </Section>
-
-        <Section title="Appearance">
-          <Row label="Theme">
-            <View style={{ flexDirection: 'row', gap: 6 }}>
-              {(['light', 'dark', 'system'] as Theme[]).map((tk) => (
-                <Pressable
-                  key={tk}
-                  onPress={() => prefs.setTheme(tk)}
+                <Text
                   style={{
-                    flexDirection: 'row',
-                    gap: 4,
-                    alignItems: 'center',
-                    paddingHorizontal: 10,
-                    paddingVertical: 6,
-                    borderRadius: 999,
-                    backgroundColor: prefs.themeOverride === tk ? theme.brand : theme.surfaceMuted,
+                    color: theme.text,
+                    fontWeight: '800',
+                    fontSize: 18,
+                    letterSpacing: -0.4,
                   }}
                 >
-                  {tk === 'light' && (
-                    <Sun color={prefs.themeOverride === tk ? '#fff' : theme.text} size={11} />
-                  )}
-                  {tk === 'dark' && (
-                    <Moon color={prefs.themeOverride === tk ? '#fff' : theme.text} size={11} />
-                  )}
-                  {tk === 'system' && (
-                    <Sparkles color={prefs.themeOverride === tk ? '#fff' : theme.text} size={11} />
-                  )}
-                  <Text
+                  {auth.user.displayName ?? 'Welcome'}
+                </Text>
+                <Text style={{ color: theme.textSubtle, fontSize: 12, marginTop: 2 }}>
+                  {auth.user.email}
+                </Text>
+              </View>
+              <ChevronRight color={theme.textSubtle} size={18} />
+            </Pressable>
+          ) : (
+            <View style={{ gap: 12 }}>
+              <View>
+                <Text style={{ color: theme.text, fontWeight: '800', fontSize: 16 }}>
+                  Not signed in
+                </Text>
+                <Text style={{ color: theme.textMuted, fontSize: 13, marginTop: 4 }}>
+                  Sign in to sync favourites, saved trips and notifications across devices.
+                </Text>
+              </View>
+              <Button
+                label="Sign in"
+                onPress={() => router.push('/login')}
+                iconLeft={<KeyRound color="#fff" size={14} />}
+                iconRight={<ArrowRight color="#fff" size={14} />}
+              />
+            </View>
+          )}
+        </Ticket>
+
+        {/* Appearance */}
+        <Section title="Appearance" Icon={Palette} tone="amber">
+          <Row label="Theme">
+            <View style={{ flexDirection: 'row', gap: 4 }}>
+              {(['light', 'dark', 'system'] as Theme[]).map((tk) => {
+                const active = prefs.themeOverride === tk;
+                return (
+                  <Pressable
+                    key={tk}
+                    onPress={() => prefs.setTheme(tk)}
                     style={{
-                      color: prefs.themeOverride === tk ? '#fff' : theme.text,
-                      fontSize: 11,
-                      fontWeight: '800',
+                      flexDirection: 'row',
+                      gap: 4,
+                      alignItems: 'center',
+                      paddingHorizontal: 12,
+                      paddingVertical: 8,
+                      borderRadius: 999,
+                      backgroundColor: active ? theme.brand : theme.surfaceMuted,
                     }}
                   >
-                    {tk}
-                  </Text>
-                </Pressable>
-              ))}
+                    {tk === 'light' && <Sun color={active ? '#fff' : theme.text} size={12} />}
+                    {tk === 'dark' && <Moon color={active ? '#fff' : theme.text} size={12} />}
+                    {tk === 'system' && <Sparkles color={active ? '#fff' : theme.text} size={12} />}
+                    <Text
+                      style={{
+                        color: active ? '#fff' : theme.text,
+                        fontSize: 11,
+                        fontWeight: '800',
+                      }}
+                    >
+                      {tk}
+                    </Text>
+                  </Pressable>
+                );
+              })}
             </View>
           </Row>
-          <Row label="Language">
+
+          <Row label="Language" Icon={Languages}>
             <View
               style={{
                 flexDirection: 'row',
                 flexWrap: 'wrap',
                 gap: 4,
                 justifyContent: 'flex-end',
-                maxWidth: 200,
+                maxWidth: 220,
               }}
             >
-              {SUPPORTED_LOCALES.map((loc) => (
-                <Pressable
-                  key={loc}
-                  onPress={() => prefs.setLocale(loc as Locale)}
-                  style={{
-                    paddingHorizontal: 8,
-                    paddingVertical: 4,
-                    borderRadius: 999,
-                    backgroundColor:
-                      prefs.localeOverride === loc ? theme.brand : theme.surfaceMuted,
-                  }}
-                >
-                  <Text
+              {SUPPORTED_LOCALES.map((loc) => {
+                const active = prefs.localeOverride === loc;
+                return (
+                  <Pressable
+                    key={loc}
+                    onPress={() => prefs.setLocale(loc as Locale)}
                     style={{
-                      color: prefs.localeOverride === loc ? '#fff' : theme.text,
-                      fontSize: 10,
-                      fontWeight: '800',
+                      paddingHorizontal: 10,
+                      paddingVertical: 6,
+                      borderRadius: 999,
+                      backgroundColor: active ? theme.brand : theme.surfaceMuted,
                     }}
                   >
-                    {localeMetadata[loc as Locale].nativeLabel}
-                  </Text>
-                </Pressable>
-              ))}
+                    <Text
+                      style={{
+                        color: active ? '#fff' : theme.text,
+                        fontSize: 10,
+                        fontWeight: '800',
+                      }}
+                    >
+                      {localeMetadata[loc as Locale].nativeLabel}
+                    </Text>
+                  </Pressable>
+                );
+              })}
             </View>
           </Row>
         </Section>
 
-        <Section title="Notifications">
+        {/* Notifications */}
+        <Section title="Notifications" Icon={BellRing} tone="amber">
           <Toggle
             label="Push"
             hint="Notifications for delays and disruptions."
@@ -182,13 +217,14 @@ export default function ProfileScreen() {
                 try {
                   await api.setNotificationPrefs({ pushEnabled: v });
                 } catch {
-                  /* offline: local prefs still toggled */
+                  /* offline */
                 }
               }
             }}
           />
           <Toggle
             label="Email"
+            hint="Daily digest and weekly summary."
             value={prefs.emailEnabled}
             onChange={async (v) => {
               prefs.setEmailEnabled(v);
@@ -201,30 +237,47 @@ export default function ProfileScreen() {
               }
             }}
           />
-          <Text
+
+          <View
             style={{
-              color: theme.textSubtle,
-              fontSize: 10,
-              fontWeight: '800',
-              letterSpacing: 0.6,
-              marginTop: 6,
-              textTransform: 'uppercase',
+              marginTop: 8,
+              padding: 12,
+              borderRadius: 14,
+              backgroundColor: theme.surfaceMuted,
+              borderColor: theme.border,
+              borderWidth: 1,
+              gap: 8,
             }}
           >
-            Channels
-          </Text>
-          {(Object.keys(channelLabels) as Array<keyof NotificationChannels>).map((k) => (
-            <Toggle
-              key={k}
-              label={channelLabels[k]}
-              value={prefs.channels[k]}
-              onChange={(v) => prefs.setChannel(k, v)}
-            />
-          ))}
+            <Text
+              style={{
+                color: theme.textSubtle,
+                fontSize: 10,
+                fontWeight: '800',
+                letterSpacing: 1.4,
+                textTransform: 'uppercase',
+              }}
+            >
+              Channels
+            </Text>
+            {(Object.keys(channelLabels) as Array<keyof NotificationChannels>).map((k) => (
+              <Toggle
+                key={k}
+                label={channelLabels[k]}
+                value={prefs.channels[k]}
+                onChange={(v) => prefs.setChannel(k, v)}
+              />
+            ))}
+          </View>
         </Section>
 
-        <Section title="Data & privacy">
-          <Row label={`Recent searches (${recents.recents.length})`}>
+        {/* Data & privacy */}
+        <Section title="Data & privacy" Icon={ShieldCheck} tone="brand">
+          <Row
+            label={`Recent searches`}
+            hint={`${recents.recents.length} saved locally`}
+            Icon={Mail}
+          >
             <Pressable
               disabled={recents.recents.length === 0}
               onPress={() => recents.clear()}
@@ -232,80 +285,99 @@ export default function ProfileScreen() {
                 flexDirection: 'row',
                 gap: 4,
                 alignItems: 'center',
-                paddingHorizontal: 10,
-                paddingVertical: 6,
+                paddingHorizontal: 12,
+                paddingVertical: 8,
                 borderRadius: 999,
-                backgroundColor: theme.surfaceMuted,
+                backgroundColor: theme.surface,
+                borderColor: theme.border,
+                borderWidth: 1,
                 opacity: recents.recents.length === 0 ? 0.4 : 1,
               }}
             >
-              <Trash2 color={theme.text} size={11} />
+              <Trash2 color={theme.textMuted} size={12} />
               <Text style={{ color: theme.text, fontSize: 11, fontWeight: '800' }}>Clear</Text>
             </Pressable>
           </Row>
-          <Pressable
+
+          <RowLink
+            label="Offline regions"
+            hint="Downloaded cities for offline routing"
+            Icon={CloudDownload}
             onPress={() => router.push('/offline')}
-            style={{ flexDirection: 'row', gap: 10, alignItems: 'center', paddingVertical: 8 }}
-          >
-            <CloudDownload color={theme.text} size={16} />
-            <Text style={{ color: theme.text, fontWeight: '700', flex: 1 }}>Offline regions</Text>
-            <Text style={{ color: theme.brand, fontWeight: '800', fontSize: 12 }}>Manage</Text>
-          </Pressable>
-          <Pressable
+          />
+          <RowLink
+            label="Favourites"
+            hint="Manage saved places and trips"
+            Icon={Heart}
             onPress={() => router.push(auth.user ? '/me' : '/login')}
-            style={{ flexDirection: 'row', gap: 10, alignItems: 'center', paddingVertical: 8 }}
-          >
-            <Heart color={theme.status.severe} size={16} />
-            <Text style={{ color: theme.text, fontWeight: '700', flex: 1 }}>Favorites</Text>
-            <Text style={{ color: theme.brand, fontWeight: '800', fontSize: 12 }}>Open</Text>
-          </Pressable>
+          />
         </Section>
 
-        <Text
-          style={{
-            color: theme.textSubtle,
-            fontSize: 11,
-            paddingVertical: 12,
-            textAlign: 'center',
-          }}
-        >
-          Wayra v0.4 · Data: OSM, GTFS / GTFS-RT, MapLibre tiles.
-        </Text>
+        <View style={{ alignItems: 'center', marginTop: 8 }}>
+          <Chip label="Wayra v0.6 · OSM · GTFS-RT · MapLibre" tone="surface" size="sm" />
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({
+  title,
+  Icon,
+  tone,
+  children,
+}: {
+  title: string;
+  Icon: typeof Settings2;
+  tone: 'brand' | 'amber';
+  children: React.ReactNode;
+}) {
   const theme = useTheme();
+  const bg = tone === 'brand' ? theme.brand : theme.accent;
   return (
-    <View
-      style={{
-        backgroundColor: theme.surface,
-        borderColor: theme.border,
-        borderWidth: 1,
-        borderRadius: 16,
-        padding: 14,
-        gap: 10,
-      }}
-    >
-      <Text
+    <Ticket padding="none">
+      <View
         style={{
-          color: theme.textSubtle,
-          fontSize: 10,
-          fontWeight: '800',
-          letterSpacing: 0.6,
-          textTransform: 'uppercase',
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 10,
+          padding: 16,
+          borderBottomColor: theme.border,
+          borderBottomWidth: 1,
         }}
       >
-        {title}
-      </Text>
-      {children}
-    </View>
+        <View
+          style={{
+            width: 32,
+            height: 32,
+            borderRadius: 10,
+            backgroundColor: bg,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Icon color="#fff" size={14} />
+        </View>
+        <Text style={{ color: theme.text, fontSize: 16, fontWeight: '800', letterSpacing: -0.3 }}>
+          {title}
+        </Text>
+      </View>
+      <View style={{ padding: 16, gap: 14 }}>{children}</View>
+    </Ticket>
   );
 }
 
-function Row({ label, children }: { label: string; children: React.ReactNode }) {
+function Row({
+  label,
+  hint,
+  Icon,
+  children,
+}: {
+  label: string;
+  hint?: string;
+  Icon?: typeof Settings2;
+  children: React.ReactNode;
+}) {
   const theme = useTheme();
   return (
     <View
@@ -316,8 +388,61 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
         gap: 10,
       }}
     >
-      <Text style={{ color: theme.text, fontWeight: '700', flex: 1 }}>{label}</Text>
+      <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center', flex: 1 }}>
+        {Icon && <Icon color={theme.textMuted} size={14} />}
+        <View style={{ flex: 1 }}>
+          <Text style={{ color: theme.text, fontWeight: '700', fontSize: 13 }}>{label}</Text>
+          {hint && (
+            <Text style={{ color: theme.textSubtle, fontSize: 11, marginTop: 2 }}>{hint}</Text>
+          )}
+        </View>
+      </View>
       {children}
     </View>
+  );
+}
+
+function RowLink({
+  label,
+  hint,
+  Icon,
+  onPress,
+}: {
+  label: string;
+  hint?: string;
+  Icon: typeof Settings2;
+  onPress: () => void;
+}) {
+  const theme = useTheme();
+  return (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => ({
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+        opacity: pressed ? 0.7 : 1,
+      })}
+    >
+      <View
+        style={{
+          width: 32,
+          height: 32,
+          borderRadius: 10,
+          backgroundColor: theme.surfaceMuted,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Icon color={theme.textMuted} size={14} />
+      </View>
+      <View style={{ flex: 1 }}>
+        <Text style={{ color: theme.text, fontWeight: '700', fontSize: 13 }}>{label}</Text>
+        {hint && (
+          <Text style={{ color: theme.textSubtle, fontSize: 11, marginTop: 2 }}>{hint}</Text>
+        )}
+      </View>
+      <ChevronRight color={theme.textSubtle} size={16} />
+    </Pressable>
   );
 }

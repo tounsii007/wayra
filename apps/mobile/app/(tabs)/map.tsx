@@ -1,19 +1,21 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
+import { Filter } from 'lucide-react-native';
 import { useTheme } from '@/theme';
 import { MapLibreView } from '@/components/MapLibreView';
 import { COUNTRY_DEFAULT_CENTER, MVP_COUNTRIES } from '@wayra/shared';
 import type { CountryCode, Place } from '@wayra/types';
 import { api } from '@/lib/api';
 
+// Brand-aligned colors
 const MODE_COLORS: Record<string, string> = {
-  station: '#EC0016',
-  metro_station: '#1d4fd1',
+  station: '#0d9488',
+  metro_station: '#0f766e',
   tram_stop: '#7c3aed',
-  bus_stop: '#0ea5a5',
-  airport: '#f59e0b',
+  bus_stop: '#d97706',
+  airport: '#fbbf24',
 };
 
 const MODE_LABELS: Record<string, string> = {
@@ -22,6 +24,20 @@ const MODE_LABELS: Record<string, string> = {
   tram_stop: 'Tram',
   bus_stop: 'Bus',
   airport: 'Air',
+};
+
+const FLAGS: Partial<Record<CountryCode, string>> = {
+  DE: '🇩🇪',
+  FR: '🇫🇷',
+  TN: '🇹🇳',
+  AT: '🇦🇹',
+  CH: '🇨🇭',
+  BE: '🇧🇪',
+  NL: '🇳🇱',
+  IT: '🇮🇹',
+  ES: '🇪🇸',
+  MA: '🇲🇦',
+  DZ: '🇩🇿',
 };
 
 export default function MapScreen() {
@@ -52,57 +68,92 @@ export default function MapScreen() {
         .map((p) => ({
           id: p.id,
           coordinates: p.coordinates,
-          color: MODE_COLORS[p.type] ?? '#2563eb',
+          color: MODE_COLORS[p.type] ?? theme.brand,
         })),
-    [places, enabled],
+    [places, enabled, theme.brand],
   );
 
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: theme.bg }}>
-      <View
-        style={{
-          flexDirection: 'row',
+      {/* Country picker — horizontally scrolling chip cluster */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={{ flexGrow: 0 }}
+        contentContainerStyle={{
           gap: 6,
           paddingHorizontal: 16,
           paddingTop: 8,
-          paddingBottom: 8,
+          paddingBottom: 6,
         }}
       >
-        {MVP_COUNTRIES.map((c) => (
-          <Pressable
-            key={c}
-            onPress={() => setCountry(c)}
-            style={{
-              paddingHorizontal: 12,
-              paddingVertical: 6,
-              borderRadius: 999,
-              backgroundColor: country === c ? theme.brand : theme.surface,
-              borderColor: theme.border,
-              borderWidth: country === c ? 0 : 1,
-            }}
-          >
-            <Text
+        {MVP_COUNTRIES.map((c) => {
+          const active = country === c;
+          return (
+            <Pressable
+              key={c}
+              onPress={() => setCountry(c)}
               style={{
-                color: country === c ? '#fff' : theme.text,
-                fontSize: 12,
-                fontWeight: '800',
+                paddingHorizontal: 14,
+                paddingVertical: 8,
+                borderRadius: 999,
+                backgroundColor: active ? theme.brand : theme.bgElevated,
+                borderColor: active ? theme.brand : theme.border,
+                borderWidth: 1,
+                flexDirection: 'row',
+                gap: 6,
+                alignItems: 'center',
+                ...(active && {
+                  shadowColor: theme.brand,
+                  shadowOffset: { width: 0, height: 4 },
+                  shadowOpacity: 0.4,
+                  shadowRadius: 8,
+                  elevation: 3,
+                }),
               }}
             >
-              {c}
-            </Text>
-          </Pressable>
-        ))}
-      </View>
+              <Text style={{ fontSize: 14 }}>{FLAGS[c]}</Text>
+              <Text
+                style={{
+                  color: active ? '#fff' : theme.text,
+                  fontSize: 11,
+                  fontWeight: '800',
+                  letterSpacing: 0.6,
+                }}
+              >
+                {c}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </ScrollView>
 
-      <View
-        style={{
-          flexDirection: 'row',
-          flexWrap: 'wrap',
+      {/* Mode filter chips */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={{ flexGrow: 0 }}
+        contentContainerStyle={{
           gap: 6,
           paddingHorizontal: 16,
           paddingBottom: 8,
+          alignItems: 'center',
         }}
       >
+        <View style={{ flexDirection: 'row', gap: 4, alignItems: 'center', marginRight: 4 }}>
+          <Filter color={theme.textSubtle} size={12} />
+          <Text
+            style={{
+              color: theme.textSubtle,
+              fontSize: 10,
+              fontWeight: '800',
+              textTransform: 'uppercase',
+              letterSpacing: 1.2,
+            }}
+          >
+            Modes
+          </Text>
+        </View>
         {Object.entries(MODE_LABELS).map(([key, label]) => {
           const on = enabled[key] ?? true;
           return (
@@ -116,9 +167,10 @@ export default function MapScreen() {
                 paddingHorizontal: 10,
                 paddingVertical: 6,
                 borderRadius: 999,
-                backgroundColor: on ? theme.surface : theme.surfaceMuted,
+                backgroundColor: on ? theme.bgElevated : 'transparent',
                 borderColor: theme.border,
-                borderWidth: on ? 1 : 0,
+                borderWidth: 1,
+                opacity: on ? 1 : 0.5,
               }}
             >
               <View
@@ -141,9 +193,10 @@ export default function MapScreen() {
             </Pressable>
           );
         })}
-      </View>
+      </ScrollView>
 
-      <View style={{ flex: 1, backgroundColor: theme.surfaceMuted }}>
+      {/* Map */}
+      <View style={{ flex: 1, backgroundColor: theme.surfaceMuted, position: 'relative' }}>
         <MapLibreView
           center={{ lat: center.lat, lng: center.lng }}
           zoom={center.zoom}
@@ -152,6 +205,70 @@ export default function MapScreen() {
           showUserLocation
           onMarkerPress={(id) => router.push(`/stop/${encodeURIComponent(id)}`)}
         />
+
+        {/* Bottom stat badge */}
+        <View
+          style={{
+            position: 'absolute',
+            left: 16,
+            bottom: 16,
+            backgroundColor: theme.bgElevated + 'ee',
+            borderColor: theme.border,
+            borderWidth: 1,
+            borderRadius: 20,
+            paddingHorizontal: 14,
+            paddingVertical: 8,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 12,
+            shadowColor: '#0f172a',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.1,
+            shadowRadius: 10,
+            elevation: 4,
+          }}
+        >
+          <View>
+            <Text
+              style={{
+                color: theme.textSubtle,
+                fontSize: 9,
+                fontWeight: '800',
+                letterSpacing: 1.4,
+                textTransform: 'uppercase',
+              }}
+            >
+              Showing
+            </Text>
+            <Text
+              style={{
+                color: theme.text,
+                fontSize: 16,
+                fontWeight: '800',
+                fontVariant: ['tabular-nums'],
+              }}
+            >
+              {markers.length} stops
+            </Text>
+          </View>
+          <View style={{ width: 1, height: 28, backgroundColor: theme.border }} />
+          <View>
+            <Text
+              style={{
+                color: theme.textSubtle,
+                fontSize: 9,
+                fontWeight: '800',
+                letterSpacing: 1.4,
+                textTransform: 'uppercase',
+              }}
+            >
+              Country
+            </Text>
+            <Text style={{ color: theme.text, fontSize: 14, fontWeight: '800' }}>
+              {FLAGS[country]} {country}
+            </Text>
+          </View>
+        </View>
       </View>
     </SafeAreaView>
   );
