@@ -17,6 +17,10 @@ out/
 .env.*.local
 !.env.example
 
+# Local Docker overrides (per-machine port remaps, dev volumes, etc.)
+docker-compose.override.yml
+docker-compose.*.override.yml
+
 # Logs
 *.log
 npm-debug.log*
